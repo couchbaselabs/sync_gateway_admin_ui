@@ -27,7 +27,7 @@ function SyncModel(db) {
 
   // private state
   var previewFun, self=this, client = coax(db),
-    dbInfo = {}, previewChannels = {}, previewDocs = {};
+    dbConfig = {}, previewChannels = {}, previewDocs = {};
 
   // public state
   this.db = db;
@@ -58,13 +58,13 @@ function SyncModel(db) {
     return Object.keys(previewChannels);
   }
   this.deployedSyncFunction = function(){
-    return dbInfo.config.sync || "function(doc){\n  channel(doc.channels)\n}";
+    return dbConfig.sync || "function(doc){\n  channel(doc.channels)\n}";
   }
   this.deploySyncFunction = function(code, done) {
     var newConfig = {}
-    for (var k in dbInfo.config) {
-      if (dbInfo.config[k]) {
-        newConfig[k] = dbInfo.config[k]
+    for (var k in dbConfig) {
+      if (dbConfig[k]) {
+        newConfig[k] = dbConfig[k]
       }
     }
     newConfig.sync = code;
@@ -266,10 +266,10 @@ function SyncModel(db) {
     })
   }
 
-  client.get("_info", function(err, info) {
+  client.get("_config", function(err, config) {
     if (err) throw(err);
-    dbInfo = info;
-    self.setSyncFunction(info.config.sync || "function(doc){\n  channel(doc.channels)\n}");
+    dbConfig = config;
+    self.setSyncFunction(config.sync || "function(doc){\n  channel(doc.channels)\n}");
   })
 }
 

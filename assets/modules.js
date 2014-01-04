@@ -28,12 +28,12 @@ function SyncModel(db) {
 
   // private state
   var previewFun, self=this, client = coax(db),
-    dbInfo = {}, previewChannels = {}, previewDocs = {};
+    dbConfig = {}, previewChannels = {}, previewDocs = {};
 
   // public state
   this.db = db;
   this.client = client;
-  this.pageSize = 100
+  this.pageSize = 1000
 
   // pubic methods
   this.setSyncFunction = function(funCode) {
@@ -59,13 +59,13 @@ function SyncModel(db) {
     return Object.keys(previewChannels);
   }
   this.deployedSyncFunction = function(){
-    return dbInfo.config.sync || "function(doc){\n  channel(doc.channels)\n}";
+    return dbConfig.sync || "function(doc){\n  channel(doc.channels)\n}";
   }
   this.deploySyncFunction = function(code, done) {
     var newConfig = {}
-    for (var k in dbInfo.config) {
-      if (dbInfo.config[k]) {
-        newConfig[k] = dbInfo.config[k]
+    for (var k in dbConfig) {
+      if (dbConfig[k]) {
+        newConfig[k] = dbConfig[k]
       }
     }
     newConfig.sync = code;
@@ -267,10 +267,10 @@ function SyncModel(db) {
     })
   }
 
-  client.get("_info", function(err, info) {
+  client.get("_config", function(err, config) {
     if (err) throw(err);
-    dbInfo = info;
-    self.setSyncFunction(info.config.sync || "function(doc){\n  channel(doc.channels)\n}");
+    dbConfig = config;
+    self.setSyncFunction(config.sync || "function(doc){\n  channel(doc.channels)\n}");
   })
 }
 
@@ -372,9 +372,9 @@ function compileSyncFunction(syncCode) {
   return compiledFunction;
 }
 
-},{"coax":"nf6DCT","events":10,"util":11}],"syncModel":[function(require,module,exports){
+},{"coax":"qWrDoj","events":10,"util":11}],"syncModel":[function(require,module,exports){
 module.exports=require('f7r3xx');
-},{}],"nf6DCT":[function(require,module,exports){
+},{}],"qWrDoj":[function(require,module,exports){
 /*
  * coax
  * https://github.com/jchris/coax
@@ -497,7 +497,7 @@ Coax.extend("channels", function(channels, opts) {
 });
 
 },{"hoax":5,"pax":8}],"coax":[function(require,module,exports){
-module.exports=require('nf6DCT');
+module.exports=require('qWrDoj');
 },{}],5:[function(require,module,exports){
 var core = require("./hoax-core"),
   request = require("browser-request");
