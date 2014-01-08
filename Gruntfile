@@ -1,0 +1,28 @@
+module.exports = function(grunt) {
+  grunt.initConfig({
+    react: {
+      dynamic_mappings: {
+        files: [
+          {
+            expand: true,
+            cwd: 'assets/jsx',
+            src: ['*.jsx'],
+            dest: 'build/jsx',
+            ext: '.js'
+          }
+        ]
+      }
+    },
+    browserify:     {
+      options:      {
+        transform:  [ require('grunt-react').browserify ]
+      },
+      app:          {
+        src:        'path/to/source/main.js',
+        dest:       'path/to/target/output.js'
+      }
+    }
+  })
+  grunt.loadNpmTasks('grunt-browserify')
+  grunt.loadNpmTasks('grunt-react');
+};
