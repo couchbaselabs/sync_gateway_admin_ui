@@ -6,16 +6,16 @@ module.exports = function(grunt) {
         files: [
           {
             expand: true,
-            cwd: 'assets/jsx',
+            cwd: 'src/jsx',
             src: ['*.jsx'],
-            dest: 'build/jsx',
+            dest: 'assets/jsx',
             ext: '.js'
           }
         ]
       }
     },
     jshint: {
-      files: ['Gruntfile.js', 'assets/**/*.js', 'build/**/*.js'],
+      files: ['Gruntfile.js', 'src/**/*.js', 'assets/**/*.js'],
       options: {
         "browser": true,
         "globals": {
@@ -36,8 +36,8 @@ module.exports = function(grunt) {
         transform:  [ require('grunt-react').browserify ]
       },
       app:          {
-        src:        'assets/main.js',
-        dest:       'build/bundle.js'
+        src:        'src/main.js',
+        dest:       'assets/bundle.js'
       }
     }
   })
