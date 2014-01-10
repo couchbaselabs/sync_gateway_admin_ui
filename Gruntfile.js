@@ -17,7 +17,7 @@ module.exports = function(grunt) {
     },
     jshint: {
       changed : [],
-      js: ['Gruntfile.js', 'src/js/*.js'],
+      js: ['Gruntfile.js', 'src/js/*.js', 'tests/*.js'],
       jsx : ['tmp/jsx/*.js'],
       options: {
         "browser": true,
@@ -35,6 +35,13 @@ module.exports = function(grunt) {
         "undef": true,
         "unused": false
       }
+    },
+    nodeunit: {
+      all: ['tests/*.js'],
+      // options: {
+      //   reporter: 'tap',
+      //   reporterOutput: false
+      // }
     },
     copy: {
       assets: {
@@ -89,6 +96,13 @@ module.exports = function(grunt) {
           spawn: false,
         },
       },
+      tests : {
+        files: ['tests/*.js'],
+        tasks: ['jshint:js', 'default'],
+        options: {
+          interrupt: true
+        },
+      }
     }
   })
   grunt.loadNpmTasks('grunt-newer');
@@ -98,12 +112,16 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-contrib-watch');
   grunt.loadNpmTasks('grunt-contrib-copy');
   grunt.loadNpmTasks('grunt-contrib-uglify');
+  grunt.loadNpmTasks('grunt-contrib-nodeunit');
 
 
   grunt.registerTask('jsxhint', ['newer:react', 'jshint:jsx']);
-  grunt.registerTask('default', ['jshint:js', 'react', 'jshint:jsx', 'copy:assets', 'browserify', 'uglify']);
+  grunt.registerTask('default', ['jshint:js', 'jsxhint', 'nodeunit:all',
+                                'copy:assets', 'browserify', 'uglify']);
 
   grunt.event.on('watch', function(action, filepath) {
+    // for (var key in require.cache) {delete require.cache[key];}
     grunt.config('jshint.changed', [filepath]);
+    // grunt.config('nodeunit.changed', [filepath]);
   });
 };

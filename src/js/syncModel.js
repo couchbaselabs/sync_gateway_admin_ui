@@ -14,11 +14,12 @@ var events = require('events'),
   util = require("util");
 
 var dbStateSingletons = {};
-exports.SyncModelForDatabase = function(db) {
-  var state = dbStateSingletons[db]
+exports.SyncModelForDatabase = function(dbURL) {
+  var state = dbStateSingletons[dbURL]
   if (!state) {
-    state = new SyncModel(db)
-    dbStateSingletons[db] = state
+    state = new SyncModel(dbURL)
+    state.setMaxListeners(100)
+    dbStateSingletons[dbURL] = state
   }
   return state
 }
@@ -28,7 +29,7 @@ exports.allDBs = function(host, cb){
 }
 
 exports.createDB = function(host, db, config, cb){
-  coax.put([host, db], config, cb);
+  coax.put([host, db, ""], config, cb);
 }
 
 function SyncModel(db) {
@@ -70,6 +71,7 @@ function SyncModel(db) {
   this.deployedSyncFunction = function(){
     return dbConfig.sync || "function(doc){\n  channel(doc.channels)\n}";
   }
+
   this.deploySyncFunction = function(code, done) {
     var newConfig = {}
     for (var k in dbConfig) {
@@ -193,7 +195,7 @@ function SyncModel(db) {
           mergeUsers(channelSet[ch], acc.users);
       })
     })
-    console.log("preview.access", channelSet)
+    // console.log("preview.access", channelSet)
     return {
       access : channelSet,
       channels : preview.channels,
@@ -242,6 +244,18 @@ function SyncModel(db) {
     return Object.keys(keys).sort()
   }
 
+  // function disconnect() {
+  //   if (changesRequest) {
+  //     changesRequest.abort();
+  //   }
+  // }
+  this.shutdown = function() {
+    // if (changesRequest) {
+    //   changesRequest.destroy();
+    // }
+  }
+
+  var changesRequest;
   function loadChangesHistory(){
     // get first page
     // console.log("loadChangesHistory")
@@ -250,7 +264,9 @@ function SyncModel(db) {
       data.results.forEach(onChange)
       self.emit("batch")
 
-      client.changes({since : data.last_seq, include_docs : true}, function(err, data){
+      // disconnect()
+
+      changesRequest = client.changes({since : data.last_seq, include_docs : true}, function(err, data){
         // console.log("change", err, data);
         if (!err)
         onChange(data)
