@@ -69,6 +69,6 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-contrib-watch');
 
   grunt.registerTask('jsxhint', ['newer:react', 'jshint:jsx']);
-  grunt.registerTask('default', ['jshint:js', 'jsxhint', 'browserify']);
+  grunt.registerTask('default', ['jshint:js', 'react', 'jshint:jsx', 'browserify']);
 
 };
