@@ -1,8 +1,17 @@
 /** @jsx React.DOM */
 
-window.SyncPage = React.createClass({
+var helpers = require("./helpers.jsx"),
+  dbPath = helpers.dbPath,
+  dbState = helpers.dbState,
+  docLink = helpers.docLink,
+  userLink = helpers.userLink,
+  channelLink = helpers.channelLink,
+  StateForPropsMixin = helpers.StateForPropsMixin,
+  EventListenerMixin = helpers.EventListenerMixin,
+  JSONDoc = require("./documents.jsx").JSONDoc;
+
+exports.SyncPage = React.createClass({
   render : function() {
-    /*jshint ignore:start */
     return (
       <div className="SyncPage">
         <p>The <strong>Sync Function</strong> determines application-specific behavior regarding who can see and modify which documents. The code you write here can validate updates, route documents to channels, and grant access privileges  to users and groups on a per-channel basis. For more information <a href="http://docs.couchbase.com/sync-gateway/#sync-function-api">see the Sync Function API documentation.</a></p>
@@ -16,7 +25,6 @@ window.SyncPage = React.createClass({
         <SyncFunEditor db={this.props.db}/>
       </div>
       )
-    /*jshint ignore:end */
   }
 })
 
@@ -35,7 +43,29 @@ var SyncFunEditor = React.createClass({
   }
 })
 
-window.DocSyncPreview = React.createClass({
+// smells like ChannelAccessList
+var AccessList = React.createClass({
+  render : function() {
+    var db = this.props.db;
+    var accessList = []
+    for (var ch in this.props.access) {
+      accessList.push({name: ch, users: this.props.access[ch]})
+    }
+    return <div className="access">
+    <h4>Access</h4>
+    <dl>
+    {accessList.map(function(ch) {
+      return <span><dt>{channelLink(db, ch.name)}</dt>
+        {ch.users.map(function(who){
+            return <dd>{userLink(db, who)}</dd>
+          })}</span>
+    })}
+    </dl>
+  </div>
+  }
+})
+
+var DocSyncPreview = exports.DocSyncPreview = React.createClass({
   getDefaultProps : function(){
     return {sync:{channels:[], access:{}}};
   },
@@ -160,13 +190,13 @@ var SyncPreview = React.createClass({
 
 
 var IS_MOBILE = (
-  navigator.userAgent.match(/Android/i)
-    || navigator.userAgent.match(/webOS/i)
-    || navigator.userAgent.match(/iPhone/i)
-    || navigator.userAgent.match(/iPad/i)
-    || navigator.userAgent.match(/iPod/i)
-    || navigator.userAgent.match(/BlackBerry/i)
-    || navigator.userAgent.match(/Windows Phone/i)
+  navigator.userAgent.match(/Android/i) ||
+  navigator.userAgent.match(/webOS/i) ||
+  navigator.userAgent.match(/iPhone/i)||
+  navigator.userAgent.match(/iPad/i) ||
+  navigator.userAgent.match(/iPod/i) ||
+  navigator.userAgent.match(/BlackBerry/i) ||
+  navigator.userAgent.match(/Windows Phone/i)
 );
 
 var CodeMirrorEditor = React.createClass({

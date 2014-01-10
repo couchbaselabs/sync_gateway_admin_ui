@@ -1,5 +1,28 @@
 /** @jsx React.DOM */
 
+var helpers = require("./helpers.jsx"),
+  dbPath = helpers.dbPath,
+  dbState = helpers.dbState,
+  docLink = helpers.docLink,
+  userLink = helpers.userLink,
+  StateForPropsMixin = helpers.StateForPropsMixin,
+  EventListenerMixin = helpers.EventListenerMixin;
+
+module.exports = React.createClass({
+  render : function() {
+    return (
+      <div className="page">
+        <div id="main">
+          <div className="content">
+            <NavBar db={this.props.db} page={this.props.page}/>
+            {this.props.children}
+          </div>
+        </div>
+      </div>
+    );
+  }
+});
+
 var NavBar = React.createClass({
   mixins : [StateForPropsMixin, EventListenerMixin],
   getInitialState : function() {
@@ -9,13 +32,13 @@ var NavBar = React.createClass({
     this.setState({mode : newMode})
   },
   setStateForProps: function(props) {
-    console.log("setStateForProps NavBar", props)
+    // console.log("setStateForProps NavBar", props)
     if (!props.db) return;
     var dbs = dbState(props.db)
     this.listen(dbs, "syncReset", this.syncMode)
   },
   render : function() {
-    console.log("NavBar", this.props)
+    // console.log("NavBar", this.props)
     var page = this.props.page;
     var db = this.props.db;
     if (!db) return <div className="NavBarWrap">
@@ -33,13 +56,13 @@ var NavBar = React.createClass({
       </a>{" "}
       <strong>{db}</strong>{" > "}
       <a className={page == "documents" && "active"}
-        href={dbLink(db)}>Documents</a>{" : "}
+        href={dbPath(db)}>Documents</a>{" : "}
       <a className={page == "sync" && "active"}
-        href={dbLink(db, "sync")}>Sync</a>{" : "}
+        href={dbPath(db, "sync")}>Sync</a>{" : "}
       <a className={page == "channels" && "active"}
-        href={dbLink(db, "channels")}>Channels</a>{" : "}
+        href={dbPath(db, "channels")}>Channels</a>{" : "}
       <a className={page == "users" && "active"}
-        href={dbLink(db, "users")}>Users</a>
+        href={dbPath(db, "users")}>Users</a>
     </div></div>);
   }
 })
@@ -58,23 +81,4 @@ var PreviewToggle = React.createClass({
   }
 })
 
-// <div id="sidebar">
-//   <a id="logo" href="/_utils/"><img src="/_utils/assets/logo.png"/></a>
-//   <div className="sideNav"></div>
-// </div>
-window.PageWrap = React.createClass({
-  render : function() {
-    return (
-      /*jshint ignore:start */
-      <div className="page">
-        <div id="main">
-          <div className="content">
-            <NavBar db={this.props.db} page={this.props.page}/>
-            {this.props.children}
-          </div>
-        </div>
-      </div>
-      /*jshint ignore:end */
-    );
-  }
-});
+

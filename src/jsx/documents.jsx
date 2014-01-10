@@ -1,19 +1,37 @@
 /** @jsx React.DOM */
 
+var helpers = require("./helpers.jsx"),
+  dbPath = helpers.dbPath,
+  dbState = helpers.dbState,
+  docLink = helpers.docLink,
+  userLink = helpers.userLink,
+  brClear = helpers.brClear,
+  channelLink = helpers.channelLink,
+  StateForPropsMixin = helpers.StateForPropsMixin,
+  EventListenerMixin = helpers.EventListenerMixin,
+  DocSyncPreview = require("./sync.jsx").DocSyncPreview;
 
-var sg = require("coax")(location.origin);
+var JSONDoc = exports.JSONDoc = React.createClass({
+  render : function() {
+    return <div className="JSONDoc">
+      <h4>{
+        this.props.id ? <span>{this.props.id+" "} <a href={"/"+this.props.db+"/_raw/"+this.props.id}>raw</a></span> : "Loading..."}</h4>
+      <pre><code>
+      {JSON.stringify(this.props.doc, null, 2)}
+      </code></pre>
+    </div>;
+  }
+})
 
-window.DocumentsPage = React.createClass({
+exports.DocumentsPage = React.createClass({
   render : function() {
     var db = this.props.db;
     var docID = this.props.docID;
     return (
-      /*jshint ignore:start */
       <div>
-      <ListDocs db={db}/>
-      {docID && <DocInfo db={db} docID={docID}/>}
+        <ListDocs db={db}/>
+        {docID && <DocInfo db={db} docID={docID}/>}
       </div>
-      /*jshint ignore:end */
     );
   }
 });
@@ -34,13 +52,12 @@ var ListDocs = React.createClass({
   render : function() {
     var db = this.props.db;
     var rows = this.state.rows;
-    /*jshint ignore:start */
     return <div className="ListDocs">
           <strong>{rows.length} documents</strong>, highlighted documents have access control output with the current sync function.
           <ul>
           {rows.map(function(r) {
             return <li className={r.access && "isAccess"} key={"docs"+r.id}>
-              <a href={dbLink(db, "documents/"+r.id)}>
+              <a href={dbPath(db, "documents/"+r.id)}>
                 {r.id}
               </a>
               </li>;
@@ -49,41 +66,8 @@ var ListDocs = React.createClass({
   }
 })
 
-window.JSONDoc = React.createClass({
-  render : function() {
-    return <div className="JSONDoc">
-      <h4>{
-        this.props.id ? <span>{this.props.id+" "} <a href={"/"+this.props.db+"/_raw/"+this.props.id}>raw</a></span> : "Loading..."}</h4>
-      <pre><code>
-      {JSON.stringify(this.props.doc, null, 2)}
-      </code></pre>
-    </div>;
-  }
-})
 
-// smells like ChannelAccessList
-var AccessList = React.createClass({
-  render : function() {
-    var db = this.props.db;
-    var accessList = []
-    for (var ch in this.props.access) {
-      accessList.push({name: ch, users: this.props.access[ch]})
-    }
-    return <div className="access">
-    <h4>Access</h4>
-    <dl>
-    {accessList.map(function(ch) {
-      return <span><dt>{channelLink(db, ch.name)}</dt>
-        {ch.users.map(function(who){
-            return <dd>{userLink(db, who)}</dd>
-          })}</span>
-    })}
-    </dl>
-  </div>
-  }
-})
-
-window.DocInfo = React.createClass({
+var DocInfo = React.createClass({
   mixins : [StateForPropsMixin],
   getInitialState: function() {
     return {doc: {}, deployed : {channels:[], access:{}}, db : this.props.db};
@@ -101,16 +85,13 @@ window.DocInfo = React.createClass({
     }
   },
   render : function() {
-    console.log("render DocInfo", this.state)
     return (
-      /*jshint ignore:start */
       <div className="DocInfo">
         <JSONDoc db={this.state.db} doc={this.state.doc} id={this.state.docID}/>
         <DocSyncPreview db={this.state.db} sync={this.state.deployed} id={this.state.docID}/>
         <brClear/>
         <p><a href={"/"+this.props.db+"/"+this.state.docID}>Raw document URL</a></p>
       </div>
-      /*jshint ignore:end */
     );
   }
 });

@@ -3,9 +3,11 @@
   through channels. It also mediates any server access so that UI
   components are abtracted from network interactions and the API is
   mostly synchronous queries from the UI triggered by SyncModel events.
-
-  You MUST run ./modules.sh to see changes to this file in your app.
 */
+
+/* jshint -W061 */
+/* global syncFun */
+/* global compiledFunction */
 
 var events = require('events'),
   coax = require("coax"),
@@ -19,6 +21,14 @@ exports.SyncModelForDatabase = function(db) {
     dbStateSingletons[db] = state
   }
   return state
+}
+
+exports.allDBs = function(host, cb){
+  coax([host, "_all_dbs"], cb);
+}
+
+exports.createDB = function(host, db, config, cb){
+  coax.put([host, db], config, cb);
 }
 
 function SyncModel(db) {
@@ -88,11 +98,11 @@ function SyncModel(db) {
 
     for (var id in docs) revs[docs[id]] = id
     var rs = Object.keys(revs).sort(function(a, b){
-      return parseInt(a) - parseInt(b);
+      return parseInt(a, 10) - parseInt(b, 10);
     })
     for (var i = rs.length - 1; i >= 0; i--) {
       var docid = revs[rs[i]]
-      changes.push({id:docid, seq:parseInt(rs[i]), isAccess : chan.access[docid]})
+      changes.push({id:docid, seq:parseInt(rs[i], 10), isAccess : chan.access[docid]})
     }
     var result = {
       name : name,
@@ -147,6 +157,12 @@ function SyncModel(db) {
       })
       cb(err, rows)
     })
+  }
+  this.allUsers = function(cb) {
+    client.get(["_view", "principals"], cb);
+  }
+  this.userInfo = function(id, cb) {
+    client.get(["_user", id], cb)
   }
 
   // private implementation
@@ -253,7 +269,7 @@ function SyncModel(db) {
   })
 
   function onChange(ch) {
-    var seq = parseInt(ch.seq.split(":")[1])
+    var seq = parseInt(ch.seq.split(":")[1], 10)
     // console.log("onChange", seq, ch)
     if (!ch.doc) {
       console.error("no doc", ch)

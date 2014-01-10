@@ -2,18 +2,26 @@
  * @jsx React.DOM
  */
 
-window.AllDatabases = React.createClass({
+var syncModel = require("../js/syncModel.js"),
+  helpers = require("./helpers.jsx"),
+  dbPath = helpers.dbPath,
+  dbState = helpers.dbState,
+  docLink = helpers.docLink,
+  userLink = helpers.userLink,
+  StateForPropsMixin = helpers.StateForPropsMixin,
+  EventListenerMixin = helpers.EventListenerMixin;
+
+module.exports = React.createClass({
   loadList : function() {
-    sg.get("_all_dbs", function(err, list) {
-      console.log("got alldbs", this.state)
-      this.setState({dbs: list});
+    syncModel.allDBs(location.origin, function(err, list) {
+      if (!err)
+        this.setState({dbs: list});
     }.bind(this));
   },
   getInitialState: function() {
     return {dbs: []};
   },
   componentWillMount: function() {
-    console.log("alldbs")
     this.loadList();
   },
   createDatabase : function(e) {
@@ -21,7 +29,7 @@ window.AllDatabases = React.createClass({
     var db = this.refs.dbName.state.value,
       url =this.refs.dbServer.state.value
     // console.log("createDatabase", db, url)
-    sg.put(db, {
+    syncModel.createDB(location.origin, db, {
       server : url
     }, function(err){
       var message;
@@ -32,19 +40,17 @@ window.AllDatabases = React.createClass({
       }
       this.refs.dbName.state.value = ""
       this.loadList();
-      console.log("setState", message)
       this.setState({message : message})
     }.bind(this))
   },
   render : function() {
-    console.log("alldbs",this.state)
     var dbs = this.state.dbs;
     var title = this.props.title || "Databases"
     return (<div>
       <h3>{title}</h3>
       <ul className="defaults">
       {dbs.map(function(name) {
-        return <li key={name}><a href={dbLink(name)}>{name}</a></li>;
+        return <li key={name}><a href={dbPath(name)}>{name}</a></li>;
       })}
       </ul>
       <form>

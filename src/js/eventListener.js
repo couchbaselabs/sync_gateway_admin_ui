@@ -1,7 +1,7 @@
 // Apache 2.0 License http://www.apache.org/licenses/LICENSE-2.0.html
 // Copywrite 2014 Couchbase, Inc.
 
-window.EventListenerMixin = {
+module.exports = {
   listen : function(emitter, event, handler) {
     // console.log("listen", event)
     var mixinStateKeyForEvent = "_EventListenerMixinState:"+event;
