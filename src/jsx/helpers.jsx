@@ -2,19 +2,17 @@
 
 var coax = require("coax"),
   sg = coax(location.origin),
-  SyncModel = require("syncModel");
-
+  SyncModel = require("../js/syncModel");
 
   // window.addEventListener("beforeunload", function() {
   //   return "You have unsaved preview"
   // })
 
-function dbState(db) {
-  // console.log("dbState",sg(db).url)
+exports.dbState = function (db) {
   return SyncModel.SyncModelForDatabase(sg(db).url.toString())
 }
 
-function dbLink(db, path) {
+var dbPath = exports.dbPath = function (db, path) {
   var base = "/_utils/db/"+db
   if (path) {
     base += "/"+path
@@ -22,20 +20,20 @@ function dbLink(db, path) {
   return base
 }
 
-function channelLink(db, channel) {
-  return <a href={dbLink(db,"channels/"+channel)}>{channel}</a>
+exports.channelLink = function(db, channel) {
+  return <a href={dbPath(db,"channels/"+channel)}>{channel}</a>
 }
 
-function docLink(db, id) {
-  return <a href={dbLink(db,"documents/"+id)}>{id}</a>
+exports.docLink = function(db, id) {
+  return <a href={dbPath(db,"documents/"+id)}>{id}</a>
 }
 
-function userLink(db, user) {
-  return <a href={dbLink(db,"users/"+user)}>{user}</a>
+exports.userLink = function(db, user) {
+  return <a href={dbPath(db,"users/"+user)}>{user}</a>
 }
 
 
-window.brClear = React.createClass({
+exports.brClear = React.createClass({
   shouldComponentUpdate : function() {
     return false;
   },
@@ -43,8 +41,8 @@ window.brClear = React.createClass({
     return <br className="clear"/>
   }
 })
-
-window.StateForPropsMixin = {
+exports.EventListenerMixin = require("../js/eventListener.js")
+exports.StateForPropsMixin = {
   componentWillReceiveProps: function(newProps) {
     // console.log("StateForPropsMixin componentWillReceiveProps", newProps, this.props)
     this.setStateForProps(newProps, this.props)

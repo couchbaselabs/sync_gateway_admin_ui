@@ -1,8 +1,19 @@
 /** @jsx React.DOM */
 
-window.SyncPage = React.createClass({
+var helpers = require("./helpers.jsx"),
+  dbPath = helpers.dbPath,
+  dbState = helpers.dbState,
+  docLink = helpers.docLink,
+  userLink = helpers.userLink,
+  channelLink = helpers.channelLink,
+  StateForPropsMixin = helpers.StateForPropsMixin,
+  EventListenerMixin = helpers.EventListenerMixin,
+  documents = require("./documents.jsx"),
+  JSONDoc = documents.JSONDoc,
+  DocSyncPreview = documents.DocSyncPreview;
+
+exports.SyncPage = React.createClass({
   render : function() {
-    /*jshint ignore:start */
     return (
       <div className="SyncPage">
         <p>The <strong>Sync Function</strong> determines application-specific behavior regarding who can see and modify which documents. The code you write here can validate updates, route documents to channels, and grant access privileges  to users and groups on a per-channel basis. For more information <a href="http://docs.couchbase.com/sync-gateway/#sync-function-api">see the Sync Function API documentation.</a></p>
@@ -16,7 +27,6 @@ window.SyncPage = React.createClass({
         <SyncFunEditor db={this.props.db}/>
       </div>
       )
-    /*jshint ignore:end */
   }
 })
 
@@ -33,30 +43,6 @@ var SyncFunEditor = React.createClass({
       <SyncPreview db={this.props.db}/>
     </div>
   }
-})
-
-window.DocSyncPreview = React.createClass({
-  getDefaultProps : function(){
-    return {sync:{channels:[], access:{}}};
-  },
-  render : function() {
-    var sync = this.props.sync;
-    // console.log("sync", sync)
-    var db = this.props.db;
-    if (!sync) return <div></div>;
-    var channels = sync.channels;
-    return <div className="DocSyncPreview">
-      <div className="channels">
-        <h4>Channels</h4>
-        <ul>
-        {channels.map(function(ch) {
-          return <li>{channelLink(db, ch)}</li>
-        })}
-        </ul>
-      </div>
-      <AccessList access={sync.access} db={db}/>
-    </div>;
-    }
 })
 
 var SyncFunctionForm = React.createClass({
@@ -160,13 +146,13 @@ var SyncPreview = React.createClass({
 
 
 var IS_MOBILE = (
-  navigator.userAgent.match(/Android/i)
-    || navigator.userAgent.match(/webOS/i)
-    || navigator.userAgent.match(/iPhone/i)
-    || navigator.userAgent.match(/iPad/i)
-    || navigator.userAgent.match(/iPod/i)
-    || navigator.userAgent.match(/BlackBerry/i)
-    || navigator.userAgent.match(/Windows Phone/i)
+  navigator.userAgent.match(/Android/i) ||
+  navigator.userAgent.match(/webOS/i) ||
+  navigator.userAgent.match(/iPhone/i)||
+  navigator.userAgent.match(/iPad/i) ||
+  navigator.userAgent.match(/iPod/i) ||
+  navigator.userAgent.match(/BlackBerry/i) ||
+  navigator.userAgent.match(/Windows Phone/i)
 );
 
 var CodeMirrorEditor = React.createClass({

@@ -1,5 +1,13 @@
 /** @jsx React.DOM */
 
+var helpers = require("./helpers.jsx"),
+  dbPath = helpers.dbPath,
+  dbState = helpers.dbState,
+  docLink = helpers.docLink,
+  userLink = helpers.userLink,
+  StateForPropsMixin = helpers.StateForPropsMixin,
+  EventListenerMixin = helpers.EventListenerMixin;
+
 function hrefToggleWatchingChannel(db, chName, current) {
   var channels = [];
   var urlparts = current.split("?");
@@ -17,14 +25,14 @@ function hrefToggleWatchingChannel(db, chName, current) {
   } else {
     channels.splice(chIndex, 1)
   }
-  if (channels.length == 0) {
+  if (channels.length === 0) {
     return urlparts[0];
   } else {
-    return dbLink(db, "channels?watch="+channels.join(','))
+    return dbPath(db, "channels?watch="+channels.join(','))
   }
 }
 
-window.ChannelsWatchPage = React.createClass({
+exports.ChannelsWatchPage = React.createClass({
   render : function(){
     var channels = this.props.watch;
     var db = this.props.db,
@@ -44,7 +52,7 @@ window.ChannelsWatchPage = React.createClass({
   }
 })
 
-window.ChannelInfoPage = React.createClass({
+exports.ChannelInfoPage = React.createClass({
   mixins : [StateForPropsMixin, EventListenerMixin],
   getInitialState: function() {
     return {channel: {}};
@@ -63,7 +71,6 @@ window.ChannelInfoPage = React.createClass({
   },
   render : function() {
     var channel = this.state.channel || {};
-    /*jshint ignore:start */
     return (
       <div>
         <h2>Channel: {this.props.id}</h2>
@@ -74,7 +81,6 @@ window.ChannelInfoPage = React.createClass({
         <ChannelAccessList access={channel.access} db={this.props.db}/>
       </div>
       )
-    /*jshint ignore:end */
   }
 })
 
@@ -124,24 +130,24 @@ var ChannelChanges = React.createClass({
     if (channel.hiddenAccessIds && channel.hiddenAccessIds.length > 0) {
       hiddenAccess = <span><ul>{
                 channel.hiddenAccessIds.map(function(id){
-                  return <li className="isAccess">Hidden: <a href={dbLink(db, "documents/"+id)}>{id}</a></li>
+                  return <li className="isAccess">Hidden: <a href={dbPath(db, "documents/"+id)}>{id}</a></li>
                 })
               }</ul></span>
     }
     return (
       <div className="ChannelChanges">
-      <a className="watched" href={dbLink(db, "channels/"+channel.name)}>{channel.name}</a>
+      <a className="watched" href={dbPath(db, "channels/"+channel.name)}>{channel.name}</a>
       {hiddenAccess}
     <ul>
       {channel.changes.map(function(ch){
-        return <li key={channel.name+ch.id} className={ch.isAccess && "isAccess"}>{ch.seq} : <a href={dbLink(db, "documents/"+ch.id)}>{ch.id}</a></li>
+        return <li key={channel.name+ch.id} className={ch.isAccess && "isAccess"}>{ch.seq} : <a href={dbPath(db, "documents/"+ch.id)}>{ch.id}</a></li>
       })}
     </ul></div>
     );
   }
 })
 
-window.RecentChannels = React.createClass({
+var RecentChannels = React.createClass({
   mixins : [StateForPropsMixin, EventListenerMixin],
   getInitialState: function() {
     return {channelNames: [], db : this.props.db};
@@ -149,7 +155,7 @@ window.RecentChannels = React.createClass({
   changed : function() {
     var oldNames = this.state.channelNames,
       newNames = dbState(this.props.db).channelNames()
-      console.log("RecentChannels state", newNames)
+      // console.log("RecentChannels state", newNames)
     if (oldNames.sort().join() !== newNames.sort().join()) {
       this.setState({
         channelNames : newNames
@@ -167,7 +173,6 @@ window.RecentChannels = React.createClass({
       currentLoc = location.toString(),
       channelNames = this.state.channelNames,
       db = this.state.db;
-    /*jshint ignore:start */
     return (<div className="RecentChannels">
       <strong>{channelNames.length} channels</strong>.
       Select channels to watch updates. <a href={"/"+db+"/_changes?limit=5"}>raw</a>
@@ -181,6 +186,5 @@ window.RecentChannels = React.createClass({
           </li>;
       })}
     </ul></div>)
-    /*jshint ignore:end */
   }
 });
