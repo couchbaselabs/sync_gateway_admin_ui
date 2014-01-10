@@ -36,12 +36,29 @@ module.exports = function(grunt) {
         "unused": false
       }
     },
-    nodeunit: {
-      all: ['tests/*.js'],
-      // options: {
-      //   reporter: 'tap',
-      //   reporterOutput: false
-      // }
+    node_tap: {
+      all: {
+          options: {
+              outputType: 'failures', // tap, failures, stats
+              outputTo: 'console' // or file
+              // outputFilePath: '/tmp/out.log' // path for output file,
+              // only makes sense with outputTo 'file'
+          },
+          files: {
+              'tests': ['tests/*.js']
+          }
+      },
+      changed: {
+          options: {
+              outputType: 'tap', // tap, failures, stats
+              outputTo: 'console' // or file
+              // outputFilePath: '/tmp/out.log' // path for output file,
+              // only makes sense with outputTo 'file'
+          },
+          files: {
+              'tests': []
+          }
+      }
     },
     copy: {
       assets: {
@@ -98,9 +115,9 @@ module.exports = function(grunt) {
       },
       tests : {
         files: ['tests/*.js'],
-        tasks: ['jshint:js', 'default'],
+        tasks: ['jshint:js', 'node_tap:changed', 'default'],
         options: {
-          interrupt: true
+          spawn: false,
         },
       }
     }
@@ -112,16 +129,15 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-contrib-watch');
   grunt.loadNpmTasks('grunt-contrib-copy');
   grunt.loadNpmTasks('grunt-contrib-uglify');
-  grunt.loadNpmTasks('grunt-contrib-nodeunit');
-
+  grunt.loadNpmTasks('grunt-node-tap');
 
   grunt.registerTask('jsxhint', ['newer:react', 'jshint:jsx']);
-  grunt.registerTask('default', ['jshint:js', 'jsxhint', 'nodeunit:all',
+  grunt.registerTask('default', ['jshint:js', 'jsxhint', 'node_tap:all',
                                 'copy:assets', 'browserify', 'uglify']);
 
   grunt.event.on('watch', function(action, filepath) {
     // for (var key in require.cache) {delete require.cache[key];}
     grunt.config('jshint.changed', [filepath]);
-    // grunt.config('nodeunit.changed', [filepath]);
+    grunt.config('node_tap.changed.files.tests', [filepath]);
   });
 };
