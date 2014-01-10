@@ -71,13 +71,12 @@ var UsersForDatabase = React.createClass({
     return {users: []};
   },
   componentWillMount: function() {
-    var w = this;
     var dbs = dbState(this.props.db);
     dbs.allUsers(function(err, data) {
-      w.setState({users : data.rows.filter(function(r) {
+      if (!err) this.setState({users : data.rows.filter(function(r) {
         return r.key;
       })})
-    });
+    }.bind(this));
   },
   render : function() {
     var db = this.props.db;
@@ -85,9 +84,9 @@ var UsersForDatabase = React.createClass({
     return (<div className="UsersForDatabase">
       <p>{users.length} user{users.length !== 1 && "s"} in {db}</p>
       <ul >
-            {users.map(function(user) {
-              return <li key={user.key}><a href={"/_utils/db/"+db+"/users/"+user.key}>{user.key}</a></li>;
-            })}
-          </ul></div>)
+        {users.map(function(user) {
+          return <li key={user.key}><a href={"/_utils/db/"+db+"/users/"+user.key}>{user.key}</a></li>;
+        })}
+      </ul></div>)
   }
 })

@@ -159,7 +159,7 @@ function SyncModel(db) {
     })
   }
   this.allUsers = function(cb) {
-    client.get(["_view", "principals"], cb);
+    client.get(["_view", "principals", {state:false}], cb);
   }
   this.userInfo = function(id, cb) {
     client.get(["_user", id], cb)
