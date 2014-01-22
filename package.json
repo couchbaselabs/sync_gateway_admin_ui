@@ -14,6 +14,8 @@
     "grunt-contrib-watch": "~0.5.3",
     "grunt-contrib-copy": "~0.5.0",
     "grunt-node-tap": "~0.1.52",
-    "tap": "~0.4.8"
+    "tap": "~0.4.8",
+    "tape": "~2.3.2",
+    "request": "~2.33.0"
   }
 }
