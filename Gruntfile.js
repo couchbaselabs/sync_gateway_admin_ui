@@ -1,4 +1,8 @@
 module.exports = function(grunt) {
+  var watchChanged = {}
+  if (grunt.file.exists('watchChanged.json')) {
+    watchChanged = grunt.file.readJSON('watchChanged.json')
+  }
   grunt.initConfig({
     pkg: grunt.file.readJSON('package.json'),
     react: { // just for jsxhint, production transform is done
@@ -56,7 +60,7 @@ module.exports = function(grunt) {
               // only makes sense with outputTo 'file'
           },
           files: {
-              'tests': []
+              'tests': watchChanged.node_tap || []
           }
       }
     },
@@ -100,7 +104,7 @@ module.exports = function(grunt) {
     },
     watch: {
       scripts: {
-        files: ['src/js/*.js'],
+        files: ['Gruntfile.js', 'src/js/*.js'],
         tasks: ['jshint:changed', 'default'],
         options: {
           spawn: false,
@@ -117,7 +121,7 @@ module.exports = function(grunt) {
         files: ['tests/*.js'],
         tasks: ['jshint:js', 'node_tap:changed', 'default'],
         options: {
-          spawn: false,
+          interrupt: true,
         },
       }
     }
@@ -132,12 +136,14 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-node-tap');
 
   grunt.registerTask('jsxhint', ['newer:react', 'jshint:jsx']);
-  grunt.registerTask('default', ['jshint:js', 'jsxhint', 'node_tap:all',
-                                'copy:assets', 'browserify', 'uglify']);
+  grunt.registerTask('default', ['jshint:js', 'jsxhint', 'node_tap:all', 'copy:assets', 'browserify', 'uglify']);
 
   grunt.event.on('watch', function(action, filepath) {
     // for (var key in require.cache) {delete require.cache[key];}
     grunt.config('jshint.changed', [filepath]);
+    grunt.file.write("watchChanged.json", JSON.stringify({
+      node_tap : [filepath]
+    }))
     grunt.config('node_tap.changed.files.tests', [filepath]);
   });
 };

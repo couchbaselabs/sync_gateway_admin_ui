@@ -181,7 +181,7 @@ function SyncModel(db) {
     }
     return {
       access : access,
-      channels : Object.keys(deployed.channels)
+      channels : deployed.channels ? Object.keys(deployed.channels) : []
     }
   }
 
@@ -250,17 +250,17 @@ function SyncModel(db) {
   //   }
   // }
   this.shutdown = function() {
-    // if (changesRequest) {
-    //   changesRequest.destroy();
-    // }
+    if (changesRequest) {
+      changesRequest.destroy();
+    }
   }
 
   var changesRequest;
   function loadChangesHistory(){
     // get first page
-    // console.log("loadChangesHistory")
+    console.log("loadChangesHistory")
     client.get(["_changes", {limit : self.pageSize, include_docs : true}], function(err, data) {
-      // console.log("history", data)
+      console.log("history", data)
       data.results.forEach(onChange)
       self.emit("batch")
 
@@ -284,18 +284,32 @@ function SyncModel(db) {
     }
   })
 
-  function onChange(ch) {
+  function onChangeWDoc(ch, doc) {
     var seq = parseInt(ch.seq.split(":")[1], 10)
-    // console.log("onChange", seq, ch)
-    if (!ch.doc) {
-      console.error("no doc", ch)
-      return;
-    }
+    ch.doc = doc
+    // console.log("onChange", seq, doc)
     var sync = runSyncFunction(previewChannels, ch.id, ch.doc, seq)
     self.emit("change", ch)
     Object.keys(sync.changed).forEach(function(channel) {
       self.emit("ch:"+channel);
     })
+  }
+
+  function onChange(ch) {
+    if (ch.doc) {
+      onChangeWDoc(ch, ch.doc)
+    }  else {
+      console.log("doc async", ch.id)
+      // return;
+      client.get(ch.id, function(err, doc) {
+        if (err) {
+          console.error("doc missing", ch.id)
+        } else {
+          onChangeWDoc(ch, doc)
+        }
+      })
+    }
+
   }
 
   client.get("_config", function(err, config) {

@@ -1,10 +1,15 @@
-/*jshint unused:true */
+/*jxshint unused:true */
 
-var //hostname = "http://localhost:4985/",
+
+var hostname = "http://localhost:4985/",
   SyncModel = require("../src/js/syncModel"),
-  // coax = require("coax"),
-  test = require("tap").test;
+  http = require("http"),
+  client = require("../src/js/json-client"),
+  test = require("tape").test
 
+  // test = tap.t;
+
+http.globalAgent.maxSockets = 100;
 
 // var SyncModel = {
 //   createDB : function(x,y,z,cb){cb()},
@@ -21,160 +26,157 @@ test("sync model is reachable", function(t) {
   t.end()
 })
 
-// exports["with database"] = {
-//   setUp : function(done) {
-//     this.dbName = 'test-'+Math.random().toString().substr(2)
-//     this.dbClient = coax(hostname + this.dbName)
-//     SyncModel.createDB(hostname, this.dbName, {server : "walrus://"}, function() {
-//       this.dbState = SyncModel.SyncModelForDatabase(hostname + this.dbName)
-//       done()
-//     }.bind(this))
-//   },
-//   tearDown : function(done) {
-//     this.dbState.shutdown()
-//     done()
-//   },
-//   "created in-memory test database" : function(t) {
-//     this.dbClient(function(err, info) {
-//       t.ok(!err, "created database "+JSON.stringify(err))
-//       t.equal(info.db_name, this.dbName)
-//       t.equal(info.doc_count, 0)
-//       t.done()
-//     }.bind(this))
-//   },
-//   "with documents" : {
-//     setUp : function(done) {
-//       this.dbClient.post("_bulk_docs", {
-//         docs : [{
-//           _id : "ace",
-//           channels : ["xylophone", "yakima", "zoo"]
-//         }, {
-//           _id : "booth",
-//           channels : ["yakima", "zoo"]
-//         }, {
-//           _id : "cat",
-//           channels : ["claws"],
-//           grant : {
-//             user : "kitty",
-//             channels : ["claws", "xylophone"]
-//           }
-//         }]
-//       }, function(){
-//         // assert.ok(!err, "posted docs")
-//         // assert.equal(ok.length, 3, "all saved")
-//         done()
-//       })
-//     },
-//     "docs saved" : function(t) {
-//       this.dbClient(function(err, info) {
-//         t.equal(info.doc_count, 3)
-//         t.done()
-//       }.bind(this))
-//     },
-//     "can get document sync info" : function(t) {
-//       // debugger;
-//       this.dbState.getDoc("ace", function(err, doc, deployed, preview) {
-//         t.equal(doc._id, "ace")
-//         t.deepEqual(deployed.channels, doc.channels)
-//         t.deepEqual(preview.channels, doc.channels)
-//         console.log("got doc done");
-//         t.done()
-//       })
-//     },
-//     "calculates channel membership" : function(t){
-//       console.log("laste test");
-//       t.ok(true)
-//       t.done()
-//       // console.log("befre conected");
-//       // this.dbState.on("connected", function() {
-//       //   var chan = this.dbState.channel("yakima")
-//       //   console.log("conected", chan);
-//       //   t.ok(chan.changes, "has changes")
-//       //   t.equal(chan.changes[0].id, "booth")
-//       //   t.equal(chan.changes[1].id, "ace")
-//       //   // var names = dbState.channelNames();
-//       //   // console.log("names", names)
-//       //   // assert.equal(names.length, 4, '"xylophone", "yakima", "zoo", "claws"')
-//       //   t.done()
-//       // }.bind(this))
-//     }
-//   }
-// }
+var dbState,
+  dbName = 'test-'+Math.random().toString().substr(2),
+  dbURL = hostname + dbName;
 
-// // function runPreview() {
-// //   var next = getNext(arguments);
-// //   console.log("runPreview")
+test("with database", function(t) {
+  console.log("create database", dbName)
+  SyncModel.createDB(hostname, dbName, {server : "walrus://"}, function() {
+    dbState = SyncModel.SyncModelForDatabase(hostname + dbName)
+    dbState.on("batch", function(){
+      console.log("batch")
+    })
+    client(dbURL, function(err, r, info) {
+      t.ok(!err, "created database "+JSON.stringify(err))
+      t.equal(info.db_name, dbName, "dbName")
+      t.equal(info.doc_count, 0, "doc count")
+      t.test("create documents", function(t){
+        client.post({uri: dbURL+"/_bulk_docs", body : {
+          docs : [{
+            _id : "ace",
+            channels : ["xylophone", "yakima", "zoo"]
+          }, {
+            _id : "booth",
+            channels : ["yakima", "zoo"]
+          }, {
+            _id : "cat",
+            channels : ["claws"],
+            grant : {
+              user : "kitty",
+              channels : ["claws", "xylophone"]
+            }
+          }]
+        }}, function(err, r, ok){
+          t.error(err, "posted docs")
+          t.equal(ok.length, 3, "all saved")
+          t.end()
+        })
+      })
+      t.end()
+    })
+  })
+})
 
-// // }
+test("get sync info", function(t){
+  dbState.getDoc("ace", function(err, doc, deployed, preview) {
+    t.equal(doc._id, "ace")
+    t.deepEqual(deployed.channels, doc.channels)
+    t.deepEqual(preview.channels, doc.channels)
+    t.end()
+  })
+})
 
-// // function testAccess() {
-// //   var next = getNext(arguments);
-// //   console.log("testAccess")
-// //   var chan = dbState.channel("xylophone")
-// //   assert.ok(!chan.access, "no access yet")
-// //   next();
-// // };
+test("channel membership", function(t){
+  dbState.on("change", function(ch) {
+    var names = dbState.channelNames()
+    var chan = dbState.channel("yakima")
+    if (names.length < 4) {return console.log("wait", ch.id)}
+    t.ok(chan.changes, "has changes")
+    // console.log("chan", chan.changes)
+    t.equal(chan.changes[0].id, "booth")
+    console.log("names", names)
+    t.deepEqual(names.sort(), ["claws","xylophone","yakima","zoo"])
+    t.end()
+  })
+  client.put({uri:dbURL+"/space",body:{channels : []}}, function(err, r, ok) {
+    t.error(err)
+  })
+})
 
-// // function testUpdateSyncCode(){
-// //   var next = getNext(arguments);
-// //   console.log("testUpdateSyncCode")
-// //   dbState.setSyncFunction("function(doc){ channel(doc.channels); if (doc.grant) {access(doc.grant.user, doc.grant.channels)} }")
-// //   dbState.once("batch", function(){
-// //     var chan = dbState.channel("xylophone")
-// //     assert.ok(chan.access, "access")
-// //     next();
-// //   })
-// // }
+test("channel access list", function(t) {
+  var chan = dbState.channel("xylophone")
+  // console.log("access",chan.access)
+  t.equals(chan.access, undefined, "no access yet")
+  t.end()
+})
 
-// // function testRandomDoc() {
-// //   var next = getNext(arguments);
-// //   console.log("testRandomDoc")
-// //   var docid = dbState.randomDocID();
-// //   assert.ok(["ace", "booth", "cat"].indexOf(docid) !== -1, "testRandomDoc")
-// //   next()
-// // }
+test("set simulated sync function", function(t) {
+  dbState.setSyncFunction("function(doc){ channel(doc.channels); if (doc.grant) {access(doc.grant.user, doc.grant.channels)} }")
+  dbState.once("batch", function(){
+    var chan = dbState.channel("xylophone")
+    t.ok(chan.access, "access")
+    t.end();
+  })
+})
 
-// // function testRandomAccessDoc() {
-// //   var next = getNext(arguments);
-// //   var docid = dbState.randomAccessDocID();
-// //   console.log("testRandomAccessDoc")
-// //   assert.equal(docid, "cat", "testRandomAccessDoc")
-// //   next()
-// // }
+test("preview and deployed output are different", function(t){
+  var docid = dbState.randomAccessDocID();
+  dbState.getDoc(docid, function(doc, deployedSync, previewSync) {
+    t.equal(JSON.stringify(deployedSync.channels), JSON.stringify(previewSync.channels))
+    t.notEqual(JSON.stringify(deployedSync.access), JSON.stringify(previewSync.access), "previewing sync function with access calls, over deployed bucket without")
+    t.end()
+  })
+})
 
+test("random doc", function(t){
+  var docid = dbState.randomDocID();
+  t.ok(["ace", "booth", "cat"].indexOf(docid) !== -1, "testRandomDoc")
+  t.end()
+})
 
-// // function testGetDoc() {
-// //   var next = getNext(arguments);
-// //   var docid = dbState.randomAccessDocID();
-// //   console.log("testGetDoc")
-// //   dbState.getDoc(docid, function(doc, deployedSync, previewSync) {
-// //     assert.equal(JSON.stringify(deployedSync.channels), JSON.stringify(previewSync.channels))
-// //     assert.notEqual(JSON.stringify(deployedSync.access), JSON.stringify(previewSync.access), "previewing sync function with access calls, over deployed bucket without")
-// //     next()
-// //   })
-// // }
+test("doc that has access impact", function(t) {
+  var docid = dbState.randomAccessDocID();
+  t.equal(docid, "cat", "testRandomAccessDoc")
+  t.end()
+})
 
-// // function testDeploySyncCode(){
-// //   var next = getNext(arguments);
-// //   var newCode = "function(doc){ channel(doc.channels); if (doc.grant) {access(doc.grant.user, doc.grant.channels)} }"
-// //   console.log("testDeploySyncCode")
-// //   dbState.deploySyncFunction(newCode, function(err){
-// //     assert.ok(!err)
-// //     dbState.client.get("_info", function(err, info){
-// //       assert.equal(info.config.sync, newCode)
-// //       next();
-// //     })
-// //   })
-// // }
+test("deploy sync code", function(t) {
+  var newCode = "function(doc){ channel(doc.channels); if (doc.grant) {access(doc.grant.user, doc.grant.channels)} }"
+  dbState.on("batch", function(){
+    // t.end()
+    t.error(true) // race condition
+  })
+  console.log("deploy sync code")
+  dbState.deploySyncFunction(newCode, function(err){
+    t.error(err, "deploySyncFunction")
+    dbState.client.get("_config", function(err, config){
+      t.error(err, "client.get")
+      t.equal(config.sync, newCode)
+      client.put({uri:dbURL+"/nonce",body:{channels : []}}, function(err, r, ok) {
+        t.error(err, "did put")
+        t.end()
+      })
+    })
+  })
+})
 
+test("this erased a memory bucket", function(t) {
+  client.get(dbURL+"/ace", function(err, r, ace) {
+    t.ok(err)
+    t.end()
+  })
+})
 
-// // function newChangesShowUp(){
-// //   var next = getNext(arguments);
-// //   console.log("newChangesShowUp")
-// //   next()
-// // }
+// test("new changes show up", function(t) {
+//   // t.plan(2) // fail
+//   dbState.on("change", function(ch) {
+//     t.equal(ch.id, "nice", "correct doc")
+//     t.end()
+//   })
+//   client.put({uri:dbURL+"/nice",body:{channels : []}}, function(err, r, ok) {
+//     t.error(err, "did put nice")
+//     t.equal(ok.id, "nice", "created doc")
+//   })
+// setTimeout(function(){
+//   t.end() // todo fix me
+// },2)
+// })
 
-
-// // setUp(initData, runPreview, testAccess, testUpdateSyncCode, testRandomDoc, testRandomAccessDoc, testGetDoc, testDeploySyncCode, newChangesShowUp)
-
+test("hack because change listener never hangs up", function(t){
+  t.end()
+  setTimeout(function(){
+    process.exit()
+  }, 2)
+})
 
