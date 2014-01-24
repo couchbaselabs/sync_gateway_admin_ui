@@ -19,7 +19,7 @@ Before you can work on this code, you need nodejs installed locally. Once you ha
 	npm install
 	grunt
 
-You'll need to run `grunt` every time you change code file. You can also run it continuously with `grunt watch`.
+You'll need to run `grunt` every time you change code files. You can also run it continuously with `grunt watch`.
 
 ## Deploying to Sync Gateway
 
@@ -28,7 +28,8 @@ When you are developing Sync Gateway will serve the assets from your `utils/asse
 To build these assets you need to:
 
     go get github.com/jteeuwen/go-bindata
-    cat assets/bundle.min.js | go-bindata -func admin_bundle_js | gofmt > admin_bundle.go
-    cat assets/vendor.min.js | go-bindata -func admin_bundle_js | gofmt > vendor_bundle.go
-    cat installed | go-bindata -func admin_bundle_js | gofmt > vendor_bundle.go
+    grunt && cat assets/index.html | go-bindata -func admin_bundle_html -pkg rest | gofmt > admin_bundle.go
+    # this last step is done automatically by sync_gateway/build.sh
+    cp admin_bundle.go ../src/github.com/couchbaselabs/sync_gateway/rest/
+
 
