@@ -258,9 +258,9 @@ function SyncModel(db) {
   var changesRequest;
   function loadChangesHistory(){
     // get first page
-    console.log("loadChangesHistory")
+    // console.log("loadChangesHistory")
     client.get(["_changes", {limit : self.pageSize, include_docs : true}], function(err, data) {
-      console.log("history", data)
+      // console.log("history", data)
       data.results.forEach(onChange)
       self.emit("batch")
 
@@ -332,7 +332,7 @@ function shuffleArray(array) {
 }
 
 var syncWrapper = function(newDoc, oldDoc, realUserCtx) {
-  //syncCodeStringHere
+  "syncCodeStringHere";
 
   function makeArray(maybeArray) {
     if (Array.isArray(maybeArray)) {
@@ -411,8 +411,9 @@ var syncWrapper = function(newDoc, oldDoc, realUserCtx) {
 
 function compileSyncFunction(syncCode) {
   var codeString = "var syncFun = ("+ syncCode+")",
-    wrappedCode = syncWrapper.replace("//syncCodeStringHere", codeString),
+    wrappedCode = syncWrapper.replace('"syncCodeStringHere"', codeString),
     evalString = "var compiledFunction = ("+ wrappedCode+")";
+    // console.log("eval", evalString)
   eval(evalString);
   return compiledFunction;
 }

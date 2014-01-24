@@ -17,7 +17,7 @@ var PageWrap = require("./page.jsx"),
 Davis.$ = Zepto;
 
 exports.start = function() {
-  console.log("start")
+  console.info("binding routes")
   Davis(function() {
     this.settings.generateRequestOnPageLoad = true;
     this.settings.handleRouteNotFound = true;
@@ -26,7 +26,13 @@ exports.start = function() {
     this.bind("routeNotFound", routeNotFound)
     this.bind("lookupRoute", lookupRoute)
 
-    // bind controllers to URL paths
+    // Bind controllers to URL paths
+    // 
+    // If you find yourself making big changes here
+    // (like adding something more than /db/:db)
+    // think about moving to a full page JSX router
+    // like Chris describes in a comment here 
+    // http://facebook.github.io/react/docs/interactivity-and-dynamic-uis.html
     this.scope("/_utils", function() {
       this.get('/', drawIndexPage)
       this.get('/db/:db', drawDocsPage)
@@ -57,7 +63,7 @@ function drawIndexPage(req) {
         <p>Welcome to Couchbase Sync Gateway. You are connected to the admin
         port at <a href={location.toString()}>{location.toString()}</a></p>
         <AllDatabases title="Please select a database:"/>
-        <p>Link to docs. Architecture diagram. cloud signup, downloads. Click
+        <p>Documentation for <a href="http://docs.couchbase.com/sync-gateway/">the Sync Gateway is here.</a> Visit the developer portal for <a href="http://mobile.couchbase.com">downloads, examples, cloud signup, and more documentation.</a>
         here to install sample datasets: beerdb, todos... </p>
       </PageWrap>)
   }

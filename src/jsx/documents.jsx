@@ -86,7 +86,6 @@ var ListDocs = React.createClass({
     return {rows: []};
   },
   componentWillMount: function() {
-    console.log("load ListDocs")
     var dbs = dbState(this.props.db)
     dbs.on("connected", function() {
       dbs.allDocs(function(err, rows){
