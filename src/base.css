@@ -97,10 +97,16 @@ a:hover {
   margin: 1em;
 }
 
-.logo img {
+a.logo {
+  background-image: url(logo.png);
+  background-size: contain;
+  background-repeat: no-repeat;
   padding-top: 0.2em;
-  margin:0 0.2em;
-  height: .8em;
+  margin:0.2em;
+  height:0.8em;
+  width: 2em;
+  display: block;
+  float:left;
 }
 
 .NavBar {

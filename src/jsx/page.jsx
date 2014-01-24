@@ -51,9 +51,7 @@ var NavBar = React.createClass({
     </div>;
     return (<div className="NavBarWrap"><div className={"NavBar "+this.state.mode}>
       <PreviewToggle mode={this.state.mode} db={db}/>
-      <a className="logo" href="/_utils/">
-        <img src="/_utils/assets/logo.png"/>
-      </a>{" "}
+      <a className="logo" href="/_utils/" >{" "}</a>{" "}
       <strong>{db}</strong>{" > "}
       <a className={page == "documents" && "active"}
         href={dbPath(db)}>Documents</a>{" : "}

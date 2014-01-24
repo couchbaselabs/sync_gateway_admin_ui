@@ -16,6 +16,7 @@
     "grunt-node-tap": "~0.1.52",
     "tap": "~0.4.8",
     "tape": "~2.3.2",
-    "request": "~2.33.0"
+    "request": "~2.33.0",
+    "grunt-static-inline": "~0.1.2"
   }
 }

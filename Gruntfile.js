@@ -93,12 +93,31 @@ module.exports = function(grunt) {
     },
     uglify: {
       options: {
-        mangle: false
+        mangle: false,
+        beautify : {
+          ascii_only : true
+        }
       },
       assets: {
         files: {
           'assets/bundle.min.js': ['assets/bundle.js'],
           'assets/vendor.min.js': ['src/vendor/*.js']
+        }
+      }
+    },
+    imageEmbed: {
+      dist: {
+        src: [ "src/base.css" ],
+        dest: "assets/base.css",
+        options: {
+          deleteAfterEncoding : false
+        }
+      }
+    },
+    staticinline: {
+      main: {
+        files: {
+          'assets/index.html': 'index.html',
         }
       }
     },
@@ -113,6 +132,13 @@ module.exports = function(grunt) {
       jsx: {
         files: ['src/jsx/*.jsx'],
         tasks: ['jsxhint', 'default'],
+        options: {
+          spawn: false,
+        },
+      },
+      other : {
+        files: ['index.html','src/**/*.css', 'src/vendor/**/*'],
+        tasks: ['default'],
         options: {
           spawn: false,
         },
@@ -134,9 +160,11 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-contrib-copy');
   grunt.loadNpmTasks('grunt-contrib-uglify');
   grunt.loadNpmTasks('grunt-node-tap');
+  grunt.loadNpmTasks('grunt-static-inline');
+  grunt.loadNpmTasks("grunt-image-embed");
 
   grunt.registerTask('jsxhint', ['newer:react', 'jshint:jsx']);
-  grunt.registerTask('default', ['jshint:js', 'jsxhint', 'node_tap:all', 'copy:assets', 'browserify', 'uglify']);
+  grunt.registerTask('default', ['jshint:js', 'jsxhint', 'node_tap:all', 'copy:assets', 'browserify', 'imageEmbed','uglify', 'staticinline']);
 
   grunt.event.on('watch', function(action, filepath) {
     // for (var key in require.cache) {delete require.cache[key];}

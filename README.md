@@ -20,3 +20,15 @@ Before you can work on this code, you need nodejs installed locally. Once you ha
 	grunt
 
 You'll need to run `grunt` every time you change code file. You can also run it continuously with `grunt watch`.
+
+## Deploying to Sync Gateway
+
+When you are developing Sync Gateway will serve the assets from your `utils/assets` directory, but when Sync Gateway is deployed without a `utils/assets` subdirectory (as when it is distributed for production, it will pick the assets up from the `go-bindata/` directory.)
+
+To build these assets you need to:
+
+    go get github.com/jteeuwen/go-bindata
+    cat assets/bundle.min.js | go-bindata -func admin_bundle_js | gofmt > admin_bundle.go
+    cat assets/vendor.min.js | go-bindata -func admin_bundle_js | gofmt > vendor_bundle.go
+    cat installed | go-bindata -func admin_bundle_js | gofmt > vendor_bundle.go
+
