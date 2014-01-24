@@ -43,9 +43,7 @@ var NavBar = React.createClass({
     var db = this.props.db;
     if (!db) return <div className="NavBarWrap">
       <div className="NavBar">
-        <a className="logo" href="/_utils/">
-          <img src="/_utils/assets/logo.png"/>
-        </a>{" "}
+        <a className="logo" href="/_utils/" >{" "}</a>{" "}
         <strong>Hello.</strong>
       </div>
     </div>;
