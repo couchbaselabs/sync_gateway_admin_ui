@@ -94,6 +94,9 @@ module.exports = function(grunt) {
     uglify: {
       options: {
         mangle: false,
+        compress : {
+          unused : false
+        },
         beautify : {
           ascii_only : true
         }
