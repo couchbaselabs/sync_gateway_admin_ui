@@ -119,7 +119,7 @@ var DocInfo = React.createClass({
   setDoc : function(id) {
     if (!id) return;
     dbState(this.props.db).getDoc(id, function(err, doc, deployedSync, previewSync) {
-      if (err) {return console.error(err);}
+      if (err) { return console.error(err)}
       this.setState({docID : id, doc : doc, deployed : deployedSync, preview : previewSync})
     }.bind(this))
   },
@@ -132,7 +132,7 @@ var DocInfo = React.createClass({
     return (
       <div className="DocInfo">
         <JSONDoc db={this.state.db} doc={this.state.doc} id={this.state.docID}/>
-        <DocSyncPreview db={this.state.db} sync={this.state.deployed} id={this.state.docID}/>
+        <DocSyncPreview db={this.state.db} sync={this.state.preview} id={this.state.docID}/>
         <brClear/>
         <p><a href={"/"+this.props.db+"/"+this.state.docID}>Raw document URL</a></p>
       </div>
