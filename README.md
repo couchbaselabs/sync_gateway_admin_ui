@@ -28,8 +28,6 @@ When you are developing Sync Gateway will serve the assets from your `utils/asse
 To build these assets you need to:
 
     go get github.com/jteeuwen/go-bindata
-    grunt && cat assets/index.html | go-bindata -func admin_bundle_html -pkg rest | gofmt > admin_bundle.go
-    # this last step is done automatically by sync_gateway/build.sh
-    cp admin_bundle.go ../src/github.com/couchbaselabs/sync_gateway/rest/
+    grunt && mkdir -p src/github.com/couchbaselabs/sync_gateway_admin_ui/ && cat assets/index.html | go-bindata -func Admin_bundle_html | gofmt > src/github.com/couchbaselabs/sync_gateway_admin_ui/admin_bundle.go
 
 
