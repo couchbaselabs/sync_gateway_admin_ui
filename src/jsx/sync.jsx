@@ -16,13 +16,7 @@ exports.SyncPage = React.createClass({
   render : function() {
     return (
       <div className="SyncPage">
-        <p>The <strong>Sync Function</strong> determines application-specific behavior regarding who can see and modify which documents. The code you write here can validate updates, route documents to channels, and grant access privileges  to users and groups on a per-channel basis. For more information <a href="http://docs.couchbase.com/sync-gateway/#sync-function-api">see the Sync Function API documentation.</a></p>
-        <p>Try some examples:
-        <ul className="defaults">
-        <li><a onClick={""/*this.handleExampleClick.bind(this, "basic")*/}>basic</a> - {"the default Sync Function used when the application doesn't specify one"}</li>
-        <li>personal data - just sync my data to my devices, no sharing</li>
-        <li>social rooms - todos, chat, photo sharing, can all use a room membership model.</li>
-        </ul>
+        <p>The <strong>Sync Function</strong> determines application-specific behavior regarding who can see and modify which documents. The code you write here can validate updates, route documents to channels, and grant access privileges  to users and groups on a per-channel basis. For more information <a href="http://docs.couchbase.com/sync-gateway/#sync-function-api">see the Sync Function API documentation.</a>
         </p>
         <SyncFunEditor db={this.props.db}/>
       </div>
