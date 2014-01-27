@@ -380,6 +380,7 @@ var syncWrapper = function(newDoc, oldDoc, realUserCtx) {
   var results = {
     channels : [],
     access : [],
+    roles : [],
     reject : false
   };
   function channel(){
@@ -392,6 +393,13 @@ var syncWrapper = function(newDoc, oldDoc, realUserCtx) {
       channels : makeArray(channels)
     })
   }
+  function role(users, channels){
+    results.roles.push({
+      users : makeArray(users),
+      channels : makeArray(channels)
+    })
+  }
+
   function reject(code, message) {
     results.reject = [code, message];
   }
