@@ -43,8 +43,8 @@ function SyncModel(db) {
   // public state
   this.db = db;
   this.client = client;
-  this.pageSize = 1000
-
+  this.workingSet = 1000
+  this.pageSize = 10
   // pubic methods
   this.setSyncFunction = function(funCode) {
     var oldCode = previewFun && previewFun.code
@@ -53,6 +53,7 @@ function SyncModel(db) {
     }
     previewChannels = {};
     previewDocs = {};
+    totalChanges = 0
     previewFun = compileSyncFunction(funCode)
     previewFun.code = funCode
     loadChangesHistory()
@@ -256,15 +257,29 @@ function SyncModel(db) {
   }
 
   var changesRequest;
+  var oldBefore;
+  function moreHistory(before) {
+    console.log("totalChanges", totalChanges, self.workingSet)
+    if (oldBefore !== before && totalChanges < self.workingSet) {
+      oldBefore = before;
+      client.get(["_changes", {since : before, include_docs : true,
+        limit : self.pageSize}], function(err, data) {
+        console.log("history", data)
+        data.results.forEach(onChange)
+        self.emit("batch")
+        moreHistory(data.last_seq)
+      })
+    }
+  }
+
   function loadChangesHistory(){
     // get first page
     // console.log("loadChangesHistory")
     client.get(["_changes", {limit : self.pageSize, include_docs : true}], function(err, data) {
-      // console.log("history", data)
+      console.log("history once", data)
       data.results.forEach(onChange)
       self.emit("batch")
-
-      // disconnect()
+      moreHistory(data.last_seq)
 
       changesRequest = client.changes({since : data.last_seq, include_docs : true}, function(err, data){
         // console.log("change", err, data);
@@ -284,10 +299,12 @@ function SyncModel(db) {
     }
   })
 
+  var totalChanges = 0
   function onChangeWDoc(ch, doc) {
     var seq = parseInt(ch.seq.split(":")[1], 10)
     ch.doc = doc
     // console.log("onChange", seq, doc)
+    totalChanges++;
     var sync = runSyncFunction(previewChannels, ch.id, ch.doc, seq)
     self.emit("change", ch)
     Object.keys(sync.changed).forEach(function(channel) {
