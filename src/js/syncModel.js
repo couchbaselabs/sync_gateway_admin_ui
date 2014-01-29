@@ -399,7 +399,6 @@ var syncWrapper = function(newDoc, oldDoc, realUserCtx) {
       channels : makeArray(channels)
     })
   }
-
   function reject(code, message) {
     results.reject = [code, message];
   }

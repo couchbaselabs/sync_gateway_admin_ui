@@ -21,11 +21,13 @@ Before you can work on this code, you need nodejs installed locally. Once you ha
 
 You'll need to run `grunt` every time you change code files. You can also run it continuously with `grunt watch`.
 
-## Deploying to Sync Gateway
+To point Sync Gateway at the development bundle created by `grunt`, add this line to your config file in the top level config:
 
-When you are developing Sync Gateway will serve the assets from your `utils/assets` directory, but when Sync Gateway is deployed without a `utils/assets` subdirectory (as when it is distributed for production, it will pick the assets up from the `go-bindata/` directory.)
+	"adminUI" : "./utils/assets/index.html",
 
-To build these assets you need to:
+## Building for Release
+
+To release this code for consumption by Sync Gateway's build process, it needs to be packaged as Go code:
 
     go get github.com/jteeuwen/go-bindata
     grunt && mkdir -p src/github.com/couchbaselabs/sync_gateway_admin_ui/ && cat assets/index.html | go-bindata -func Admin_bundle_html | gofmt > src/github.com/couchbaselabs/sync_gateway_admin_ui/admin_bundle.go
