@@ -259,12 +259,12 @@ function SyncModel(db) {
   var changesRequest;
   var oldBefore;
   function moreHistory(before) {
-    console.log("totalChanges", totalChanges, self.workingSet)
+    // console.log("totalChanges", totalChanges, self.workingSet)
     if (oldBefore !== before && totalChanges < self.workingSet) {
       oldBefore = before;
       client.get(["_changes", {since : before, include_docs : true,
         limit : self.pageSize}], function(err, data) {
-        console.log("history", data)
+        // console.log("history", data)
         data.results.forEach(onChange)
         self.emit("batch")
         moreHistory(data.last_seq)
@@ -276,7 +276,7 @@ function SyncModel(db) {
     // get first page
     // console.log("loadChangesHistory")
     client.get(["_changes", {limit : self.pageSize, include_docs : true}], function(err, data) {
-      console.log("history once", data)
+      // console.log("history once", data)
       data.results.forEach(onChange)
       self.emit("batch")
       moreHistory(data.last_seq)
@@ -416,6 +416,7 @@ var syncWrapper = function(newDoc, oldDoc, realUserCtx) {
       channels : makeArray(channels)
     })
   }
+
   function reject(code, message) {
     results.reject = [code, message];
   }
