@@ -16,6 +16,7 @@ Before you can work on this code, you need nodejs installed locally. Once you ha
 
 	cd utils/
 	npm install -g grunt-cli
+	npm install -g tap
 	npm install
 	grunt
 
