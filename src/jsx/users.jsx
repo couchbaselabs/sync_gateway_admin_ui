@@ -85,7 +85,7 @@ var UsersForDatabase = React.createClass({
       <p>{users.length} user{users.length !== 1 && "s"} in {db}</p>
       <ul >
         {users.map(function(user) {
-          return <li key={user.key}><a href={"/_utils/db/"+db+"/users/"+user.key}>{user.key}</a></li>;
+          return <li key={user.key}><a href={"/_admin/db/"+db+"/users/"+user.key}>{user.key}</a></li>;
         })}
       </ul></div>)
   }

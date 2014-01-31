@@ -1,6 +1,6 @@
 # Developer Consoler for Couchbase Sync Gateway
 
-To use this interface visit [http://localhost:4985/_utils/](http://localhost:4985/_utils/) in your browser. This port is bound to localhost only by default, so if you want to connect to it from a remote device you may need to create a tunnel.
+To use this interface visit [http://localhost:4985/_admin/](http://localhost:4985/_admin/) in your browser. This port is bound to localhost only by default, so if you want to connect to it from a remote device you may need to create a tunnel.
 
 ## What can it do?
 

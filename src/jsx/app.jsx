@@ -33,7 +33,7 @@ exports.start = function() {
     // think about moving to a full page JSX router
     // like Chris describes in a comment here
     // http://facebook.github.io/react/docs/interactivity-and-dynamic-uis.html
-    this.scope("/_utils", function() {
+    this.scope("/_admin", function() {
       this.get('/', drawIndexPage)
       this.get('/db/:db', drawDocsPage)
       this.get('/db/:db/documents/:id', drawDocsPage)
@@ -54,7 +54,7 @@ function draw(component, container) {
   );
 }
 
-/*  /_utils/
+/*  /_admin/
     The home page, list and create databases.
 */
 function drawIndexPage(req) {
@@ -68,8 +68,8 @@ function drawIndexPage(req) {
       </PageWrap>)
   }
 
-/*  /_utils/db/myDatabase
-    /_utils/db/myDatabase/documents/myDocID
+/*  /_admin/db/myDatabase
+    /_admin/db/myDatabase/documents/myDocID
     The index page for myDatabase, list and edit documents.
 */
 function drawDocsPage(req) {
@@ -79,7 +79,7 @@ function drawDocsPage(req) {
     </PageWrap>);
 }
 
-/*  /_utils/db/myDatabase/sync
+/*  /_admin/db/myDatabase/sync
     Sync function editor for myDatabase
 */
 function drawSyncPage(req) {
@@ -89,7 +89,7 @@ function drawSyncPage(req) {
     </PageWrap>);
 }
 
-/*  /_utils/db/myDatabase/channels
+/*  /_admin/db/myDatabase/channels
     Channel watcher page for myDatabase
 */
 function drawChannelWatchPage (req) {
@@ -101,7 +101,7 @@ function drawChannelWatchPage (req) {
 }
 
 /*
-    /_utils/db/myDatabase/channels/myChannel
+    /_admin/db/myDatabase/channels/myChannel
     Channel detail page
 */
 function drawChannelInfoPage(req) {
@@ -112,8 +112,8 @@ function drawChannelInfoPage(req) {
 }
 
 
-/*  /_utils/db/myDatabase/users
-    /_utils/db/myDatabase/users/userID
+/*  /_admin/db/myDatabase/users
+    /_admin/db/myDatabase/users/userID
     List and edit users.
 */
 function drawUserPage(req) {
@@ -129,11 +129,11 @@ function drawUserPage(req) {
 */
 function routeNotFound(r) {
   setTimeout(function(){ // required sleep
-    window.location = "/_utils"
+    window.location = "/_admin/"
   },100)
 }
 function lookupRoute(req) {
-  if (req.path.indexOf("/_utils") !== 0) {
+  if (req.path.indexOf("/_admin") !== 0) {
     window.location = req.path;
     req.delegateToServer()
   }

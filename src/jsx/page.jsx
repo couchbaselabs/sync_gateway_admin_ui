@@ -43,13 +43,13 @@ var NavBar = React.createClass({
     var db = this.props.db;
     if (!db) return <div className="NavBarWrap">
       <div className="NavBar">
-        <a className="logo" href="/_utils/" >{" "}</a>{" "}
+        <a className="logo" href="/_admin/" >{" "}</a>{" "}
         <strong>Hello.</strong>
       </div>
     </div>;
     return (<div className="NavBarWrap"><div className={"NavBar "+this.state.mode}>
       <PreviewToggle mode={this.state.mode} db={db}/>
-      <a className="logo" href="/_utils/" >{" "}</a>{" "}
+      <a className="logo" href="/_admin/" >{" "}</a>{" "}
       <strong>{db}</strong>{" > "}
       <a className={page == "documents" && "active"}
         href={dbPath(db)}>Documents</a>{" : "}

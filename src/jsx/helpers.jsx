@@ -13,7 +13,7 @@ exports.dbState = function (db) {
 }
 
 var dbPath = exports.dbPath = function (db, path) {
-  var base = "/_utils/db/"+db
+  var base = "/_admin/db/"+db
   if (path) {
     base += "/"+path
   }
