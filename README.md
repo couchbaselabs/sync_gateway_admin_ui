@@ -2,7 +2,7 @@
 
 **NOTE:** This is not a standalone project -- it's a submodule of the [Couchbase Sync Gateway][SG]. We are keeping it in a separate repository so that its Git commits and Github issues are separated from the main gateway's, for clarity.
 
-This project contains the Web assets for the Sync Gateway's admin console. To use this interface, launch a Sync Gateway server and visit http://localhost:4985/_admin/ in your browser. (This port is bound to localhost-only by default, so if you want to connect to it from a remote device you may need to create a tunnel.)
+This project contains the Web assets for the Sync Gateway's admin console. To use this interface, launch a Sync Gateway server and visit [http://localhost:4985/_admin/](http://localhost:4985/_admin/) in your browser. (This port is bound to localhost-only by default, so if you want to connect to it from a remote device you may need to create a tunnel or change your gateway config.)
 
 ## What can you do with it?
 
@@ -33,7 +33,7 @@ You'll need to run `grunt` every time you change code files. You can also run it
 
 To point Sync Gateway at the development bundle created by `grunt`, add this line to your Sync Gateway config file at the top level:
 
-```json
+```
 	"adminUI" : "vendor/src/github.com/couchbaselabs/sync_gateway_admin_ui/assets/index.html",
 ```
 
