@@ -321,7 +321,9 @@ function SyncModel(db) {
   function onChange(ch) {
     if (ch.doc) {
       onChangeWDoc(ch, ch.doc)
-    }  else {
+    }  else if (ch.id == "_user/") {
+      // ignore, this is an access control change sequence not a data sequence
+    } else {
       console.log("doc async", ch.id)
       // return;
       client.get(ch.id, function(err, doc) {
