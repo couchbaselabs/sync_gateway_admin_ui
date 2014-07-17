@@ -40,7 +40,6 @@ test("with database", function(t) {
     client(dbURL, function(err, r, info) {
       t.ok(!err, "created database "+JSON.stringify(err))
       t.equal(info.db_name, dbName, "dbName")
-      t.equal(info.doc_count, 0, "doc count")
       t.test("create documents", function(t){
         client.post({uri: dbURL+"/_bulk_docs", body : {
           docs : [{
@@ -112,7 +111,12 @@ test("set simulated sync function", function(t) {
 
 test("preview and deployed output are different", function(t){
   var docid = dbState.randomAccessDocID();
-  dbState.getDoc(docid, function(doc, deployedSync, previewSync) {
+  dbState.getDoc(docid, function(err, doc, deployedSync, previewSync) {
+    // console.log("preview", deployedSync, previewSync);
+    t.ok(!err, "no error")
+    t.ok(doc, "doc")
+    t.ok(deployedSync, "deployedSync")
+    t.ok(previewSync, "previewSync")
     t.equal(JSON.stringify(deployedSync.channels), JSON.stringify(previewSync.channels))
     t.notEqual(JSON.stringify(deployedSync.access), JSON.stringify(previewSync.access), "previewing sync function with access calls, over deployed bucket without")
     t.end()
@@ -121,7 +125,7 @@ test("preview and deployed output are different", function(t){
 
 test("random doc", function(t){
   var docid = dbState.randomDocID();
-  t.ok(["ace", "booth", "cat"].indexOf(docid) !== -1, "testRandomDoc")
+  t.ok(["ace", "booth", "cat"].indexOf(docid) !== -1, "testRandomDoc id: "+ docid)
   t.end()
 })
 
@@ -135,7 +139,7 @@ test("deploy sync code", function(t) {
   var newCode = "function(doc){ channel(doc.channels); if (doc.grant) {access(doc.grant.user, doc.grant.channels)} }"
   dbState.on("batch", function(){
     // t.end()
-    t.error(true) // race condition
+    t.error(true, "shouldn't call batch") // race condition
   })
   console.log("deploy sync code")
   dbState.deploySyncFunction(newCode, function(err){
