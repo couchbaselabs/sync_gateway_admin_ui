@@ -301,9 +301,15 @@ function SyncModel(db) {
 
   var totalChanges = 0
   function onChangeWDoc(ch, doc) {
-    var seq = parseInt(ch.seq.split(":")[1], 10)
+    // console.log("onChangeWDoc", ch, doc)
+    var seq;
+    if ("number" !== typeof ch.seq) {
+      seq = parseInt(ch.seq.split(":")[1], 10)
+    } else {
+      seq = ch.seq
+    }
+    
     ch.doc = doc
-    // console.log("onChange", seq, doc)
     totalChanges++;
     var sync = runSyncFunction(previewChannels, ch.id, ch.doc, seq)
     self.emit("change", ch)
