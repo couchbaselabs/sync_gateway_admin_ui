@@ -1,6 +1,6 @@
 # Developer Console for Couchbase Sync Gateway
 
-**NOTE:** This is not a standalone project -- it's a submodule of the [Couchbase Sync Gateway][SG]. We are keeping it in a separate repository so that its Git commits and Github issues are separated from the main gateway's, for clarity.
+**NOTE:** This is not a standalone project -- it's a submodule of the [Couchbase Sync Gateway][SG]. We are keeping it in a separate repository so that its Git commits and Github issues are separated from the main gateway's, for clarity. In addition, this project is currently in an early development and experimental phase. The resulting dashboard will change drastically in the near future.
 
 This project contains the Web assets for the Sync Gateway's admin console. To use this interface, launch a Sync Gateway server and visit [http://localhost:4985/_admin/](http://localhost:4985/_admin/) in your browser. (This port is bound to localhost-only by default, so if you want to connect to it from a remote device you may need to create a tunnel or change your gateway config.)
 
