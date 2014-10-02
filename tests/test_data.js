@@ -137,22 +137,23 @@ test("doc that has access impact", function(t) {
 
 test("deploy sync code", function(t) {
   var newCode = "function(doc){ channel(doc.channels); if (doc.grant) {access(doc.grant.user, doc.grant.channels)} }"
-  dbState.on("batch", function(){
-    // t.end()
-    t.error(true, "shouldn't call batch") // race condition
-  })
-  console.log("deploy sync code")
-  dbState.deploySyncFunction(newCode, function(err){
-    t.error(err, "deploySyncFunction")
-    dbState.client.get("_config", function(err, config){
-      t.error(err, "client.get")
-      t.equal(config.sync, newCode)
-      client.put({uri:dbURL+"/nonce",body:{channels : []}}, function(err, r, ok) {
-        t.error(err, "did put")
-        t.end()
+  setTimeout(function(){ // let the previous batch quiece
+    dbState.on("batch", function(){
+      t.error(true, "shouldn't call batch") // race condition
+    })
+    console.log("deploy sync code")
+    dbState.deploySyncFunction(newCode, function(err){
+      t.error(err, "deploySyncFunction")
+      dbState.client.get("_config", function(err, config){
+        t.error(err, "client.get")
+        t.equal(config.sync, newCode)
+        client.put({uri:dbURL+"/nonce",body:{channels : []}}, function(err, r, ok) {
+          t.error(err, "did put")
+          t.end()
+        })
       })
     })
-  })
+  },0)
 })
 
 test("this erased a memory bucket", function(t) {
