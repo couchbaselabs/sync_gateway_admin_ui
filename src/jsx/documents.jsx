@@ -8,7 +8,8 @@ var helpers = require("./helpers.jsx"),
   brClear = helpers.brClear,
   channelLink = helpers.channelLink,
   StateForPropsMixin = helpers.StateForPropsMixin,
-  EventListenerMixin = helpers.EventListenerMixin;
+  EventListenerMixin = helpers.EventListenerMixin,
+  CodeMirrorEditor = require("./editor.jsx").CodeMirrorEditor;
 
 var JSONDoc = exports.JSONDoc = React.createClass({
   render : function() {
@@ -19,6 +20,31 @@ var JSONDoc = exports.JSONDoc = React.createClass({
       {JSON.stringify(this.props.doc, null, 2)}
       </code></pre>
     </div>;
+  }
+})
+
+var EditableJSONDoc = React.createClass({
+  saveDoc : function(){
+
+  },
+  revertDoc : function(){
+    
+  },
+  render : function(){
+    var editor = this.props.doc ? <CodeMirrorEditor
+              onChange={this.props.bindState('doc')}
+              className="JSONDocEditor"
+              codeText={JSON.stringify(this.props.doc, null, 2)} /> : <div/>;
+    return <form className="EditableJSONDoc">
+      <h4>{
+        this.props.id ? <span>{this.props.id+" "} <a href={"/"+this.props.db+"/_raw/"+this.props.id}>raw</a></span> : "Loading..."}
+      </h4>
+      {editor}
+      <div className="EditableJSONDocButtons">
+        <button onClick={this.saveDoc}>Save Doc</button>
+        <button onClick={this.revertDoc}>Revert Doc</button>
+      </div>
+    </form>
   }
 })
 
@@ -114,7 +140,7 @@ var ListDocs = React.createClass({
 var DocInfo = React.createClass({
   mixins : [StateForPropsMixin],
   getInitialState: function() {
-    return {doc: {}, deployed : {channels:[], access:{}}, db : this.props.db};
+    return {deployed : {channels:[], access:{}}, db : this.props.db};
   },
   setDoc : function(id) {
     if (!id) return;
@@ -122,6 +148,13 @@ var DocInfo = React.createClass({
       if (err) { return console.error(err)}
       this.setState({docID : id, doc : doc, deployed : deployedSync, preview : previewSync})
     }.bind(this))
+  },
+  bindState: function(name) {
+    return function(value) {
+      var newState = {};
+      newState[name] = value;
+      this.setState(newState);
+    }.bind(this);
   },
   setStateForProps : function(props) {
     if (props.db && props.docID) {
@@ -131,7 +164,7 @@ var DocInfo = React.createClass({
   render : function() {
     return (
       <div className="DocInfo">
-        <JSONDoc db={this.state.db} doc={this.state.doc} id={this.state.docID}/>
+        <EditableJSONDoc db={this.state.db} doc={this.state.doc} id={this.state.docID} bindState={this.bindState}/>
         <DocSyncPreview db={this.state.db} sync={this.state.preview} id={this.state.docID}/>
         <brClear/>
         <p><a href={"/"+this.props.db+"/"+this.state.docID}>Raw document URL</a></p>
