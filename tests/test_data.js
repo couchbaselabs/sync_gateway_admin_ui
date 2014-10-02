@@ -153,7 +153,7 @@ test("deploy sync code", function(t) {
         })
       })
     })
-  },0)
+  },10)
 })
 
 test("this erased a memory bucket", function(t) {
