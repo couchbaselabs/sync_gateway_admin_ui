@@ -83,7 +83,7 @@ test("channel membership", function(t){
     if (names.length < 4) {return console.log("wait", ch.id)}
     t.ok(chan.changes, "has changes")
     // console.log("chan", chan.changes)
-    t.equal(chan.changes[0].id, "booth")
+    t.equal(chan.changes[0].id, "booth") // why do we get ace sometimes?
     console.log("names", names)
     t.deepEqual(names.sort(), ["claws","xylophone","yakima","zoo"])
     t.end()
