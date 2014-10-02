@@ -37,7 +37,7 @@ var DocSyncPreview = exports.DocSyncPreview = React.createClass({
         <h4>Channels</h4>
         <ul>
         {channels.map(function(ch) {
-          return <li>{channelLink(db, ch)}</li>
+          return <li key={db + ch}>{channelLink(db, ch)}</li>
         })}
         </ul>
       </div>
@@ -58,9 +58,9 @@ var AccessList = React.createClass({
     <h4>Access</h4>
     <dl>
     {accessList.map(function(ch) {
-      return <span><dt>{channelLink(db, ch.name)}</dt>
+      return <span key={ch.name}><dt>{channelLink(db, ch.name)}</dt>
         {ch.users.map(function(who){
-            return <dd>{userLink(db, who)}</dd>
+            return <dd key={ch.name + who}>{userLink(db, who)}</dd>
           })}</span>
     })}
     </dl>
