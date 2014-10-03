@@ -148,10 +148,15 @@ function SyncModel(db) {
       if (err) {return cb(err);}
       var deployed = raw._sync;
       delete raw._sync;
+      raw._rev = deployed.rev;
+      raw._id = id;
       var previewSet = {}
       var preview = runSyncFunction(previewSet, id, raw, 0)
       cb(err, raw, transformDeployed(id, deployed), transformPreview(id, preview))
     });
+  }
+  this.saveDoc = function(doc, cb) {
+    client.put(doc._id, doc, cb)
   }
   this.allDocs = function(cb) {
     client.get("_all_docs", function(err, data) {

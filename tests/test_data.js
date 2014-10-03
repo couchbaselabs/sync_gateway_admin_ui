@@ -78,14 +78,18 @@ test("get sync info", function(t){
 
 test("channel membership", function(t){
   dbState.on("change", function(ch) {
-    var names = dbState.channelNames()
-    var chan = dbState.channel("yakima")
-    if (names.length < 4) {return console.log("wait", ch.id)}
-    t.ok(chan.changes, "has changes")
-    // console.log("chan", chan.changes)
-    t.equal(chan.changes[0].id, "booth") // why do we get ace sometimes?
-    console.log("names", names)
-    t.deepEqual(names.sort(), ["claws","xylophone","yakima","zoo"])
+    var yakima = dbState.channel("yakima")
+    t.ok(yakima.changes, "has changes")
+    var ids = yakima.changes.map(function(c){return c.id})
+    if (ids.length < 2) {return console.log("wait")}
+
+    var claws = dbState.channel("claws")
+    if (claws.changes.length < 1) {return console.log("Wait2")}
+
+    t.assert(ids.indexOf("booth") != -1, "booth is a change")
+    t.assert(ids.indexOf("ace") != -1, "ace is a change")
+
+    t.deepEqual(dbState.channelNames().sort(), ["claws","xylophone","yakima","zoo"])
     t.end()
   })
   client.put({uri:dbURL+"/space",body:{channels : []}}, function(err, r, ok) {
@@ -99,6 +103,26 @@ test("channel access list", function(t) {
   t.equals(chan.access, undefined, "no access yet")
   t.end()
 })
+
+test("can modify documents", function(t) {
+  dbState.getDoc("booth", function(err, doc){
+    t.error(err)
+    var ogRev = doc._rev;
+    t.equal(doc._id, "booth")
+    t.error(doc.modified, "shouldn't be modified")
+    doc.modified = "totally";
+    dbState.saveDoc(doc, function(err){
+      t.error(err)
+      dbState.getDoc("booth", function(err, doc){
+        t.error(err)
+        t.equal(doc._id, "booth")
+        t.notEqual(ogRev, doc._rev, "needs new rev")
+        t.equal(doc.modified, "totally")
+        t.end()
+      })
+    })
+  })
+});
 
 test("set simulated sync function", function(t) {
   dbState.setSyncFunction("function(doc){ channel(doc.channels); if (doc.grant) {access(doc.grant.user, doc.grant.channels)} }")
