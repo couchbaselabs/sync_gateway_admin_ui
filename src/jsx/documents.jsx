@@ -114,15 +114,17 @@ var ListDocs = React.createClass({
   },
   findOrCreateDoc : function(e){
     e.preventDefault()
-    // this.getD
-    console.log("createDoc")
+    var id = this.refs.goID.getDOMNode().value
+    console.log("createDoc", id)
+    var url = dbPath(this.props.db, "documents/"+id)
+    document.location = url;
   },
   render : function() {
     var db = this.props.db;
     var rows = this.state.rows;
     return <div className="ListDocs">
           <strong>{rows.length} documents</strong>, highlighted documents have access control output with the current sync function.
-          <p>Load or create document with ID: <input type="text"/> 
+          <p>Load or create document with ID: <input ref="goID" type="text"/> 
           <button onClick={this.findOrCreateDoc}>Go</button></p>
           <ul>
           {rows.map(function(r) {
