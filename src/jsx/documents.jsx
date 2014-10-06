@@ -32,14 +32,11 @@ var EditableJSONDoc = React.createClass({
               loadSeq={this.props.loadSeq}
               codeText={this.props.docText} /> : <div/>;
     return <form className="EditableJSONDoc">
-      <h4>{
-        this.props.id ? <span>{this.props.id+" "} <a href={"/"+this.props.db+"/_raw/"+this.props.id}>raw</a></span> : "Loading..."}
-      </h4>
-      {editor}
       <div className="EditableJSONDocButtons">
         <button onClick={this.props.saveDoc}>Save Doc</button>
         <button onClick={this.props.revertDoc}>Revert Doc</button>
       </div>
+      {editor}
     </form>
   }
 })
@@ -115,11 +112,18 @@ var ListDocs = React.createClass({
       }.bind(this));
     }.bind(this))
   },
+  findOrCreateDoc : function(e){
+    e.preventDefault()
+    // this.getD
+    console.log("createDoc")
+  },
   render : function() {
     var db = this.props.db;
     var rows = this.state.rows;
     return <div className="ListDocs">
           <strong>{rows.length} documents</strong>, highlighted documents have access control output with the current sync function.
+          <p>Load or create document with ID: <input type="text"/> 
+          <button onClick={this.findOrCreateDoc}>Go</button></p>
           <ul>
           {rows.map(function(r) {
             return <li className={r.access && "isAccess"} key={"docs"+r.id}>
@@ -141,10 +145,15 @@ var DocInfo = React.createClass({
   setDoc : function(id) {
     if (!id) return;
     dbState(this.props.db).getDoc(id, function(err, doc, deployedSync, previewSync) {
-      if (err) { return console.error(err)}
+      if (err && err.error == "not_found") {
+        doc = {_id : id}
+      } else if (err) {
+        return console.error(err)
+      }
       console.log("getDoc", doc)
       this.setState({docID : id, 
         docText : JSON.stringify(doc, null, 2),
+        isNewDoc : !doc._rev,
         loadSeq : this.state.loadSeq + 1,
         deployed : deployedSync, preview : previewSync})
     }.bind(this))
@@ -177,8 +186,16 @@ var DocInfo = React.createClass({
     }
   },
   render : function() {
+    var newDocMessage;
+    if (this.state.isNewDoc) {
+      newDocMessage = <p><em>Document with ID "{this.props.docID}" will be created on save.</em></p>
+    }
     return (
       <div className="DocInfo">
+      <h4>{
+        this.state.docID ? <span>{this.state.docID+" "} <a href={"/"+this.props.db+"/_raw/"+this.state.docID}>raw</a></span> : "Loading..."}
+      </h4>
+        {newDocMessage}
         <EditableJSONDoc db={this.state.db} docText={this.state.docText} id={this.state.docID} bindState={this.bindState} saveDoc={this.saveDoc} revertDoc={this.revertDoc} loadSeq={this.state.loadSeq}/>
         <DocSyncPreview db={this.state.db} sync={this.state.preview} id={this.state.docID}/>
         <brClear/>
