@@ -24,25 +24,19 @@ var JSONDoc = exports.JSONDoc = React.createClass({
 })
 
 var EditableJSONDoc = React.createClass({
-  saveDoc : function(){
-
-  },
-  revertDoc : function(){
-    
-  },
   render : function(){
-    var editor = this.props.doc ? <CodeMirrorEditor
-              onChange={this.props.bindState('doc')}
+    var editor = this.props.docText ? <CodeMirrorEditor
+              onChange={this.props.bindState('docText')}
               className="JSONDocEditor"
-              codeText={JSON.stringify(this.props.doc, null, 2)} /> : <div/>;
+              codeText={this.props.docText} /> : <div/>;
     return <form className="EditableJSONDoc">
       <h4>{
         this.props.id ? <span>{this.props.id+" "} <a href={"/"+this.props.db+"/_raw/"+this.props.id}>raw</a></span> : "Loading..."}
       </h4>
       {editor}
       <div className="EditableJSONDocButtons">
-        <button onClick={this.saveDoc}>Save Doc</button>
-        <button onClick={this.revertDoc}>Revert Doc</button>
+        <button onClick={this.props.saveDoc}>Save Doc</button>
+        <button onClick={this.props.revertDoc}>Revert Doc</button>
       </div>
     </form>
   }
@@ -136,18 +130,36 @@ var ListDocs = React.createClass({
   }
 })
 
-
 var DocInfo = React.createClass({
   mixins : [StateForPropsMixin],
   getInitialState: function() {
-    return {deployed : {channels:[], access:{}}, db : this.props.db};
+    return {deployed : {channels:[], access:{}}, db : this.props.db, docText : ""};
   },
   setDoc : function(id) {
     if (!id) return;
     dbState(this.props.db).getDoc(id, function(err, doc, deployedSync, previewSync) {
       if (err) { return console.error(err)}
-      this.setState({docID : id, doc : doc, deployed : deployedSync, preview : previewSync})
+      console.log("getDoc", doc)
+      this.setState({docID : id, 
+        docText : JSON.stringify(doc, null, 2),
+        // doc : doc, 
+        deployed : deployedSync, preview : previewSync})
     }.bind(this))
+  },
+  saveDoc : function(e){
+    e.preventDefault();
+    if (!(this.state.docText && this.state.docID)) {return;}
+    var doc = JSON.parse(this.state.docText)
+    console.log("saveDoc", doc)
+    dbState(this.props.db).saveDoc(doc, function(err) {
+      console.log("saved Doc", this.state.docID)
+      this.setDoc(this.state.docID)
+    }.bind(this))
+  },
+  revertDoc : function(e){
+    e.preventDefault();
+    if (!this.state.docID) return;
+    this.setDoc(this.state.docID)
   },
   bindState: function(name) {
     return function(value) {
@@ -164,7 +176,7 @@ var DocInfo = React.createClass({
   render : function() {
     return (
       <div className="DocInfo">
-        <EditableJSONDoc db={this.state.db} doc={this.state.doc} id={this.state.docID} bindState={this.bindState}/>
+        <EditableJSONDoc db={this.state.db} docText={this.state.docText} id={this.state.docID} bindState={this.bindState} saveDoc={this.saveDoc} revertDoc={this.revertDoc}/>
         <DocSyncPreview db={this.state.db} sync={this.state.preview} id={this.state.docID}/>
         <brClear/>
         <p><a href={"/"+this.props.db+"/"+this.state.docID}>Raw document URL</a></p>

@@ -24,11 +24,15 @@ exports.CodeMirrorEditor = React.createClass({
     // console.log("CodeMirror",this.editor)
     this.editor.on('change', this.onChange);
   },
-  onChange: function() {
-    if (this.props.onChange) {
+  onChange: function(e, change) {
+    if (change.origin !== "setValue" && this.props.onChange) {
       var content = this.editor.getValue();
       this.props.onChange(content);
     }
+  },
+  componentWillUpdate : function(newProps) {
+    console.log("componentWillUpdate", this.editor, newProps.codeText)
+    this.editor.setValue(newProps.codeText)
   },
   render: function() {
     // wrap in a div to fully contain CodeMirror
