@@ -16,7 +16,7 @@ exports.CodeMirrorEditor = React.createClass({
       return;
     }
     this.editor = CodeMirror.fromTextArea(this.refs.editor.getDOMNode(), {
-      mode: 'javascript',
+      mode: this.props.mode,
       lineNumbers: true,
       matchBrackets: true,
       readOnly: this.props.readOnly
@@ -31,8 +31,12 @@ exports.CodeMirrorEditor = React.createClass({
     }
   },
   componentWillUpdate : function(newProps) {
-    console.log("componentWillUpdate", this.editor, newProps.codeText)
-    this.editor.setValue(newProps.codeText)
+    // console.log("componentWillUpdate", this.props, newProps)
+    // don't refill the editor unless we get new external data
+    // console.log(newProps)
+    if (this.props.loadSeq !== newProps.loadSeq) {
+      this.editor.setValue(newProps.codeText)      
+    }
   },
   render: function() {
     // wrap in a div to fully contain CodeMirror

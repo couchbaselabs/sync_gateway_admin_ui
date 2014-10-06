@@ -28,6 +28,8 @@ var EditableJSONDoc = React.createClass({
     var editor = this.props.docText ? <CodeMirrorEditor
               onChange={this.props.bindState('docText')}
               className="JSONDocEditor"
+              mode="json"
+              loadSeq={this.props.loadSeq}
               codeText={this.props.docText} /> : <div/>;
     return <form className="EditableJSONDoc">
       <h4>{
@@ -133,7 +135,8 @@ var ListDocs = React.createClass({
 var DocInfo = React.createClass({
   mixins : [StateForPropsMixin],
   getInitialState: function() {
-    return {deployed : {channels:[], access:{}}, db : this.props.db, docText : ""};
+    return {deployed : {channels:[], access:{}}, 
+    db : this.props.db, docText : "", loadSeq : 0};
   },
   setDoc : function(id) {
     if (!id) return;
@@ -142,7 +145,7 @@ var DocInfo = React.createClass({
       console.log("getDoc", doc)
       this.setState({docID : id, 
         docText : JSON.stringify(doc, null, 2),
-        // doc : doc, 
+        loadSeq : this.state.loadSeq + 1,
         deployed : deployedSync, preview : previewSync})
     }.bind(this))
   },
@@ -176,7 +179,7 @@ var DocInfo = React.createClass({
   render : function() {
     return (
       <div className="DocInfo">
-        <EditableJSONDoc db={this.state.db} docText={this.state.docText} id={this.state.docID} bindState={this.bindState} saveDoc={this.saveDoc} revertDoc={this.revertDoc}/>
+        <EditableJSONDoc db={this.state.db} docText={this.state.docText} id={this.state.docID} bindState={this.bindState} saveDoc={this.saveDoc} revertDoc={this.revertDoc} loadSeq={this.state.loadSeq}/>
         <DocSyncPreview db={this.state.db} sync={this.state.preview} id={this.state.docID}/>
         <brClear/>
         <p><a href={"/"+this.props.db+"/"+this.state.docID}>Raw document URL</a></p>

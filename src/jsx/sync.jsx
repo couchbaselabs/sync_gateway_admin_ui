@@ -79,6 +79,7 @@ var SyncFunctionForm = React.createClass({
   render : function() {
     var editor = this.state.code ? <CodeMirrorEditor
         onChange={this.bindState('code')}
+        mode="javascript"
         className="SyncFunctionCodeEditor"
         codeText={this.state.code} /> : <div/>
     return <form className="SyncFunctionCode">
