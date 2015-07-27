@@ -3,6 +3,7 @@ var helpers = require("./helpers.jsx"),
   dbState = helpers.dbState,
   docLink = helpers.docLink,
   userLink = helpers.userLink,
+  RouteHandler = require('react-router').RouteHandler,
   StateForPropsMixin = helpers.StateForPropsMixin,
   EventListenerMixin = helpers.EventListenerMixin;
 
@@ -12,14 +13,16 @@ module.exports = React.createClass({
       <div className="page">
         <div id="main">
           <div className="content">
-            <NavBar db={this.props.db} page={this.props.page}/>
-            {this.props.children}
+            <RouteHandler/>
           </div>
         </div>
       </div>
     );
   }
 });
+
+//             <NavBar db={this.props.db} page={this.props.page}/>
+
 
 var NavBar = React.createClass({
   mixins : [StateForPropsMixin, EventListenerMixin],

@@ -1,7 +1,6 @@
 /**
  * @jsx React.DOM
  */
- /* global Davis */
  /* global Zepto */
 
 var PageWrap = require("./page.jsx"),
@@ -12,38 +11,48 @@ var PageWrap = require("./page.jsx"),
   UsersPage = require("./users.jsx"),
   AllDatabases = require("./databases.jsx"),
   documents = require("./documents.jsx"),
-  DocumentsPage = documents.DocumentsPage;
+  DocumentsPage = documents.DocumentsPage,
+  Router = require('react-router'),
+  Route = Router.Route;
 
-Davis.$ = Zepto;
+
+var IndexPage = React.createClass({
+  render : function(){
+    return (
+      <div>
+        <p>Welcome to Couchbase Sync Gateway. You are connected to the admin
+        port at <a href={location.toString()}>{location.toString()}</a></p>
+        <AllDatabases title="Please select a database:"/>
+        <p>Documentation for <a href="http://docs.couchbase.com/sync-gateway/">the Sync Gateway is here.</a> Visit the developer portal for <a href="http://developer.couchbase.com/mobile/">downloads and examples.</a>
+        </p>
+      </div>
+      );
+  }
+})
+
+var DbWrap = PageWrap;
+
 
 exports.start = function() {
   console.info("binding routes")
-  Davis(function() {
-    this.settings.generateRequestOnPageLoad = true;
-    this.settings.handleRouteNotFound = true;
 
-    // global handlers
-    this.bind("routeNotFound", routeNotFound)
-    this.bind("lookupRoute", lookupRoute)
+  var routes = (
+    <Route path="_admin" handler={PageWrap}>
+      <Route path="/" handler={IndexPage}/>
+      <Route path="db/:db" handler={DbWrap}>
+        <Route path="documents/:id" handler={DocumentsPage}/>
+        <Route path="sync" handler={SyncPage}/>
+        <Route path="channels" handler={ChannelsWatchPage}/>
+        <Route path="channels/:id" handler={ChannelInfoPage}/>
+        <Route path="users" handler={UsersPage}/>
+        <Route path="users/:id" handler={UsersPage}/>
+      </Route>
+    </Route>
+    );
 
-    // Bind controllers to URL paths
-    //
-    // If you find yourself making big changes here
-    // (like adding something more than /db/:db)
-    // think about moving to a full page JSX router
-    // like Chris describes in a comment here
-    // http://facebook.github.io/react/docs/interactivity-and-dynamic-uis.html
-    this.scope("/_admin", function() {
-      this.get('/', drawIndexPage)
-      this.get('/db/:db', drawDocsPage)
-      this.get('/db/:db/documents/:id', drawDocsPage)
-      this.get('/db/:db/sync', drawSyncPage)
-      this.get('/db/:db/channels', drawChannelWatchPage)
-      this.get('/db/:db/channels/:id', drawChannelInfoPage)
-      this.get('/db/:db/users', drawUserPage)
-      this.get('/db/:db/users/:id', drawUserPage)
-      // todo this.get('/db/:db/users/:id/channels', userChannelsPage)
-    })
+  Router.run(routes, Router.HashLocation, (Root) => {
+    console.log("run", Root)
+    React.render(<Root/>, document.getElementById('container'));
   });
 }
 
@@ -54,19 +63,6 @@ function draw(component, container) {
   );
 }
 
-/*  /_admin/
-    The home page, list and create databases.
-*/
-function drawIndexPage(req) {
-    draw(
-      <PageWrap page="home">
-        <p>Welcome to Couchbase Sync Gateway. You are connected to the admin
-        port at <a href={location.toString()}>{location.toString()}</a></p>
-        <AllDatabases title="Please select a database:"/>
-        <p>Documentation for <a href="http://docs.couchbase.com/sync-gateway/">the Sync Gateway is here.</a> Visit the developer portal for <a href="http://developer.couchbase.com/mobile/">downloads and examples.</a>
-        </p>
-      </PageWrap>)
-  }
 
 /*  /_admin/db/myDatabase
     /_admin/db/myDatabase/documents/myDocID
@@ -75,7 +71,7 @@ function drawIndexPage(req) {
 function drawDocsPage(req) {
   draw(
     <PageWrap db={req.params.db} page="documents">
-      <DocumentsPage db={req.params.db} docID={req.params.id}/>
+     
     </PageWrap>);
 }
 
