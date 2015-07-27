@@ -450,8 +450,8 @@ var syncWrapper = function(newDoc, oldDoc, realUserCtx) {
 function compileSyncFunction(syncCode) {
   var codeString = "var syncFun = ("+ syncCode+")",
     wrappedCode = syncWrapper.replace('"syncCodeStringHere"', codeString),
-    evalString = "var compiledFunction = ("+ wrappedCode+")";
-    // console.log("eval", evalString)
+    evalString = "compiledFunction = ("+ wrappedCode+")",
+    compiledFunction;
   eval(evalString);
   return compiledFunction;
 }

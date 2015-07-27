@@ -1,5 +1,3 @@
-/** @jsx React.DOM */
-
 var coax = require("coax"),
   sg = coax(location.origin),
   SyncModel = require("../js/syncModel");

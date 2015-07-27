@@ -48,7 +48,7 @@ exports.start = function() {
 }
 
 function draw(component, container) {
-  React.renderComponent(
+  React.render(
     component,
     container || document.getElementById('container')
   );

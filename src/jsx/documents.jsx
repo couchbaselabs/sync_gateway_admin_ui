@@ -1,5 +1,3 @@
-/** @jsx React.DOM */
-
 var helpers = require("./helpers.jsx"),
   dbPath = helpers.dbPath,
   dbState = helpers.dbState,

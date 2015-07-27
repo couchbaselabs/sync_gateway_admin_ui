@@ -5,18 +5,13 @@ module.exports = function(grunt) {
   }
   grunt.initConfig({
     pkg: grunt.file.readJSON('package.json'),
-    react: { // just for jsxhint, production transform is done
-             // by browserify
-      dynamic_mappings: {
-        files: [
-          {
-            expand: true,
-            cwd: 'src/jsx',
-            src: ['*.jsx'],
-            dest: 'tmp/jsx',
-            ext: '.js'
-          }
-        ]
+    babel : {
+      // for jshint only
+      options :  {
+        only : "*.jsx"
+      },
+      dist : {
+        "tmp/babel.js" : "src/jsx/*"
       }
     },
     jshint: {
@@ -84,7 +79,7 @@ module.exports = function(grunt) {
     browserify:     {
       options:      {
         debug : true,
-        transform:  [ require('grunt-react').browserify ]
+        transform:  [ require('babelify').configure({sourceMap : true}) ]
       },
       app:          {
         src: 'src/js/main.js',
@@ -157,7 +152,7 @@ module.exports = function(grunt) {
   })
   grunt.loadNpmTasks('grunt-newer');
   grunt.loadNpmTasks('grunt-browserify')
-  grunt.loadNpmTasks('grunt-react');
+  grunt.loadNpmTasks('grunt-babel');
   grunt.loadNpmTasks('grunt-contrib-jshint');
   grunt.loadNpmTasks('grunt-contrib-watch');
   grunt.loadNpmTasks('grunt-contrib-copy');
@@ -166,7 +161,7 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-static-inline');
   grunt.loadNpmTasks("grunt-image-embed");
 
-  grunt.registerTask('jsxhint', ['newer:react', 'jshint:jsx']);
+  grunt.registerTask('jsxhint', ['babel', 'jshint:jsx']);
   grunt.registerTask('default', ['jshint:js', 'jsxhint', 'node_tap:all', 'copy:assets', 'browserify', 'imageEmbed','uglify', 'staticinline']);
 
   grunt.event.on('watch', function(action, filepath) {

@@ -1,7 +1,3 @@
-/**
- * @jsx React.DOM
- */
-
 var syncModel = require("../js/syncModel.js"),
   helpers = require("./helpers.jsx"),
   dbPath = helpers.dbPath,
