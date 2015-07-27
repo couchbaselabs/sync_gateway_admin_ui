@@ -63,7 +63,7 @@ function drawIndexPage(req) {
         <p>Welcome to Couchbase Sync Gateway. You are connected to the admin
         port at <a href={location.toString()}>{location.toString()}</a></p>
         <AllDatabases title="Please select a database:"/>
-        <p>Documentation for <a href="http://docs.couchbase.com/sync-gateway/">the Sync Gateway is here.</a> Visit the developer portal for <a href="http://mobile.couchbase.com">downloads, examples, cloud signup, and more documentation.</a>
+        <p>Documentation for <a href="http://docs.couchbase.com/sync-gateway/">the Sync Gateway is here.</a> Visit the developer portal for <a href="http://developer.couchbase.com/mobile/">downloads and examples.</a>
         </p>
       </PageWrap>)
   }
