@@ -27,42 +27,45 @@ test("sync model is reachable", function(t) {
 })
 
 var dbState,
-  dbName = 'test-'+Math.random().toString().substr(2),
+  dbName = 'test-sync',
   dbURL = hostname + dbName;
 
 test("with database", function(t) {
   console.log("create database", dbName)
-  SyncModel.createDB(hostname, dbName, {server : "walrus://"}, function() {
-    dbState = SyncModel.SyncModelForDatabase(hostname + dbName)
-    dbState.on("batch", function(){
-      console.log("batch")
-    })
-    client(dbURL, function(err, r, info) {
-      t.ok(!err, "created database "+JSON.stringify(err))
-      t.equal(info.db_name, dbName, "dbName")
-      t.test("create documents", function(t){
-        client.post({uri: dbURL+"/_bulk_docs", body : {
-          docs : [{
-            _id : "ace",
-            channels : ["xylophone", "yakima", "zoo"]
-          }, {
-            _id : "booth",
-            channels : ["yakima", "zoo"]
-          }, {
-            _id : "cat",
-            channels : ["claws"],
-            grant : {
-              user : "kitty",
-              channels : ["claws", "xylophone"]
-            }
-          }]
-        }}, function(err, r, ok){
-          t.error(err, "posted docs")
-          t.equal(ok.length, 3, "all saved")
-          t.end()
-        })
+  SyncModel.deleteDB(hostname, dbName, function() {
+
+    SyncModel.createDB(hostname, dbName, {server : "walrus://"}, function() {
+      dbState = SyncModel.SyncModelForDatabase(hostname + dbName)
+      dbState.on("batch", function(){
+        console.log("batch")
       })
-      t.end()
+      client(dbURL, function(err, r, info) {
+        t.ok(!err, "created database "+JSON.stringify(err))
+        t.equal(info.db_name, dbName, "dbName")
+        t.test("create documents", function(t){
+          client.post({uri: dbURL+"/_bulk_docs", body : {
+            docs : [{
+              _id : "ace",
+              channels : ["xylophone", "yakima", "zoo"]
+            }, {
+              _id : "booth",
+              channels : ["yakima", "zoo"]
+            }, {
+              _id : "cat",
+              channels : ["claws"],
+              grant : {
+                user : "kitty",
+                channels : ["claws", "xylophone"]
+              }
+            }]
+          }}, function(err, r, ok){
+            t.error(err, "posted docs")
+            t.equal(ok.length, 3, "all saved")
+            t.end()
+          })
+        })
+        t.end()
+      })
     })
   })
 })

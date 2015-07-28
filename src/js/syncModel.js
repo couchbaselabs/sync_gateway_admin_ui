@@ -32,6 +32,11 @@ exports.createDB = function(host, db, config, cb){
   coax.put([host, db, ""], config, cb);
 }
 
+exports.deleteDB = function(host, db, cb){
+  coax.del([host, db, ""], cb);
+}
+
+
 function SyncModel(db) {
   // setup on / emit / etc
   events.EventEmitter.call(this);
