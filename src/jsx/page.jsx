@@ -1,4 +1,5 @@
 var helpers = require("./helpers.jsx"),
+  React = require("react"),
   dbPath = helpers.dbPath,
   dbState = helpers.dbState,
   docLink = helpers.docLink,

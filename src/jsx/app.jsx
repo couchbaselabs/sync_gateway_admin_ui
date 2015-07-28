@@ -1,7 +1,4 @@
-/**
- * @jsx React.DOM
- */
- /* global Zepto */
+/* global Zepto */
 
 var PageWrap = require("./page.jsx"),
   channels = require("./channels.jsx"),
@@ -12,8 +9,9 @@ var PageWrap = require("./page.jsx"),
   AllDatabases = require("./databases.jsx"),
   documents = require("./documents.jsx"),
   DocumentsPage = documents.DocumentsPage,
+  React = require("react"),
   Router = require('react-router'),
-  Route = Router.Route;
+  Route = Router.Route, DefaultRoute = Router.DefaultRoute, RouteHandler = Router.RouteHandler;
 
 
 var IndexPage = React.createClass({
@@ -30,107 +28,40 @@ var IndexPage = React.createClass({
   }
 })
 
-var DbWrap = PageWrap;
-
+var Wrap = React.createClass({
+  render () {
+    return (
+      <div>
+        <h1>App</h1>
+        <RouteHandler/>
+      </div>
+    )
+  }
+});
 
 exports.start = function() {
   console.info("binding routes")
 
   var routes = (
-    <Route path="_admin" handler={PageWrap}>
-      <Route path="/" handler={IndexPage}/>
-      <Route path="db/:db" handler={DbWrap}>
-        <Route path="documents/:id" handler={DocumentsPage}/>
-        <Route path="sync" handler={SyncPage}/>
-        <Route path="channels" handler={ChannelsWatchPage}/>
-        <Route path="channels/:id" handler={ChannelInfoPage}/>
-        <Route path="users" handler={UsersPage}/>
-        <Route path="users/:id" handler={UsersPage}/>
+    <Route handler={Wrap}>
+      <Route path="/_admin/" handler={IndexPage}>
+        <Route path="db/:db" handler={DocumentsPage}/>
+
       </Route>
     </Route>
     );
 
-  Router.run(routes, Router.HashLocation, (Root) => {
-    console.log("run", Root)
+  Router.run(routes, Router.HistoryLocation, (Root) => {
     React.render(<Root/>, document.getElementById('container'));
   });
 }
+//         
+// <Route path="db/:db" handler={DbWrap}>
+//   <Route path="documents/:id" handler={DocumentsPage}/>
+//   <Route path="sync" handler={SyncPage}/>
+//   <Route path="channels" handler={ChannelsWatchPage}/>
+//   <Route path="channels/:id" handler={ChannelInfoPage}/>
+//   <Route path="users" handler={UsersPage}/>
+//   <Route path="users/:id" handler={UsersPage}/>
+// </Route>
 
-function draw(component, container) {
-  React.render(
-    component,
-    container || document.getElementById('container')
-  );
-}
-
-
-/*  /_admin/db/myDatabase
-    /_admin/db/myDatabase/documents/myDocID
-    The index page for myDatabase, list and edit documents.
-*/
-function drawDocsPage(req) {
-  draw(
-    <PageWrap db={req.params.db} page="documents">
-     
-    </PageWrap>);
-}
-
-/*  /_admin/db/myDatabase/sync
-    Sync function editor for myDatabase
-*/
-function drawSyncPage(req) {
-  draw(
-    <PageWrap db={req.params.db} page="sync">
-      <SyncPage db={req.params.db}/>
-    </PageWrap>);
-}
-
-/*  /_admin/db/myDatabase/channels
-    Channel watcher page for myDatabase
-*/
-function drawChannelWatchPage (req) {
-  var watch = (req.params.watch && req.params.watch.split(',') || []);
-  draw(
-    <PageWrap db={req.params.db} page="channels">
-        <ChannelsWatchPage db={req.params.db} watch={watch} title={req.params.title}/>
-    </PageWrap>);
-}
-
-/*
-    /_admin/db/myDatabase/channels/myChannel
-    Channel detail page
-*/
-function drawChannelInfoPage(req) {
-  draw(
-    <PageWrap db={req.params.db} page="channels">
-      <ChannelInfoPage db={req.params.db} id={req.params.id}/>
-    </PageWrap>);
-}
-
-
-/*  /_admin/db/myDatabase/users
-    /_admin/db/myDatabase/users/userID
-    List and edit users.
-*/
-function drawUserPage(req) {
-  draw(
-    <PageWrap page="users" db={req.params.db}>
-      <UsersPage db={req.params.db} userID={req.params.id}/>
-    </PageWrap>);
-}
-
-/*  404 handlers
-    If the 404 is in-app, redirect to the index page.
-    Otherwise make a server request for the new page.
-*/
-function routeNotFound(r) {
-  setTimeout(function(){ // required sleep
-    window.location = "/_admin/"
-  },100)
-}
-function lookupRoute(req) {
-  if (req.path.indexOf("/_admin") !== 0) {
-    window.location = req.path;
-    req.delegateToServer()
-  }
-}

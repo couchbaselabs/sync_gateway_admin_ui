@@ -11,17 +11,22 @@ module.exports = function(grunt) {
         only : "*.jsx"
       },
       dist : {
-        "tmp/babel.js" : "src/jsx/*"
+        files: [{
+            expand: true,
+            cwd: '.',
+            src: ['src/jsx/*.jsx'],
+            dest: 'tmp',
+            ext: '.js'
+        }]
       }
     },
     jshint: {
       changed : [],
       js: ['Gruntfile.js', 'src/js/*.js', 'tests/*.js'],
-      jsx : ['tmp/jsx/*.js'],
+      jsx : ['tmp/src/jsx/*.js'],
       options: {
         "browser": true,
         "globals": {
-          "React" : true,
           "CodeMirror" : true,
           "confirm" : true
         },

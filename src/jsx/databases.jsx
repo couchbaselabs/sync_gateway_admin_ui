@@ -1,4 +1,5 @@
 var syncModel = require("../js/syncModel.js"),
+  React = require("react"),
   helpers = require("./helpers.jsx"),
   dbPath = helpers.dbPath,
   dbState = helpers.dbState,

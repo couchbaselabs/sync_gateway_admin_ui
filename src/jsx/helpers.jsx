@@ -1,4 +1,5 @@
 var coax = require("coax"),
+  React = require("react"),
   sg = coax(location.origin),
   SyncModel = require("../js/syncModel");
 

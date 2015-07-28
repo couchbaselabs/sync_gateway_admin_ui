@@ -1,3 +1,5 @@
+var React = require("react");
+
 var IS_MOBILE = (
   navigator.userAgent.match(/Android/i) ||
   navigator.userAgent.match(/webOS/i) ||
