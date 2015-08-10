@@ -20,9 +20,9 @@ var IndexPage = React.createClass({
       <div>
         <p>Welcome to Couchbase Sync Gateway. You are connected to the admin
         port at <a href={location.toString()}>{location.toString()}</a></p>
-        <AllDatabases title="Please select a database:"/>
         <p>Documentation for <a href="http://docs.couchbase.com/sync-gateway/">the Sync Gateway is here.</a> Visit the developer portal for <a href="http://developer.couchbase.com/mobile/">downloads and examples.</a>
         </p>
+        <RouteHandler/>
       </div>
       );
   }
@@ -39,13 +39,31 @@ var Wrap = React.createClass({
   }
 });
 
+var SelectDB = React.createClass({
+  render() {
+    return (
+      <AllDatabases title="Please select a database:"/>
+      )
+  }
+})
+
+var AboutDB = React.createClass({
+  render() {
+    return (
+      <p>About DB</p>
+      )
+  }
+})
+
+
 exports.start = function() {
   console.info("binding routes")
 
   var routes = (
     <Route handler={Wrap}>
       <Route path="/_admin/" handler={IndexPage}>
-        <Route path="db/:db" handler={DocumentsPage}/>
+        <DefaultRoute handler={SelectDB}/>
+        <Route path="db/:db" handler={AboutDB}/>
 
       </Route>
     </Route>
