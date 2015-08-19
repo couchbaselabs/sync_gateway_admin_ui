@@ -22,7 +22,7 @@ Currently it tries to load the last 1000 changes into the brower's memory. If yo
 Before you can work on this code, you need [node.js][NODEJS] installed locally. Once you have that, run these commands.
 
 ```bash
-	cd vendor/src/github.com/couchbaselabs/sync_gateway_admin_ui
+	cd src/github.com/couchbaselabs/sync_gateway_admin_ui
 	npm install -g grunt-cli   # you might need to sudo this
 	npm install -g tap         # ditto
 	npm install
@@ -34,7 +34,7 @@ You'll need to run `grunt` every time you change code files. You can also run it
 To point Sync Gateway at the development bundle created by `grunt`, add this line to your Sync Gateway config file at the top level:
 
 ```
-	"adminUI" : "vendor/src/github.com/couchbaselabs/sync_gateway_admin_ui/assets/index.html",
+	"adminUI" : "src/github.com/couchbaselabs/sync_gateway_admin_ui/assets/index.html",
 ```
 
 ## Building for Release
