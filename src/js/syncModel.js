@@ -364,6 +364,9 @@ function shuffleArray(array) {
 var syncWrapper = function(newDoc, oldDoc, realUserCtx) {
   "syncCodeStringHere";
 
+  var _ = require("underscore"),
+    log = console.log.bind(console);
+
   function makeArray(maybeArray) {
     if (Array.isArray(maybeArray)) {
       return maybeArray;

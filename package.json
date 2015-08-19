@@ -2,6 +2,7 @@
   "name": "sync-gateway-utils",
   "dependencies": {
     "coax": "0.4.x",
+    "underscore": "1.4.4",
     "react": "^0.13.3"
   },
   "devDependencies": {
