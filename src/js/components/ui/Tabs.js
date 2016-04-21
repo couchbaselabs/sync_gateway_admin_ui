@@ -14,26 +14,63 @@ class Tabs extends React.Component {
 
   componentWillMount() {
     const { tabs } = this.props;
-
     if (tabs.length === 0)
       return;
 
-    let selectedTabId = null;
-    const { router } = this.context;
-    const routes = { };
-    for (let tab of tabs) {
-      if (router.isActive(tab.to, false))
-        selectedTabId = tab.id;
-      routes[tab.id] = tab.to;
+    const selectedTabId = this.resolveActiveTabId(tabs);
+    if (!selectedTabId) {
+      console.log("WARNING: Tabs component couldn't find an active tab.");
+      return;
     }
 
-    if (!selectedTabId)
-      console.log("WARNING: Tabs component couldn't find an active tab.");
+    const routes = this.getRoutesFromTabs(tabs);
 
     this.setState(Object.assign({ }, this.state, {
-      selectedTabId: selectedTabId || tabs[0].id,
-      routes
+      selectedTabId, routes
     }));
+  }
+
+  componentWillReceiveProps(nextProps) {
+    // TODO: 
+    // Currently assuming that the configuration will not change, which is
+    // not correct. What should be done is comparing this.props.tabs and 
+    // nextProps.tabs. If there are some changes, reset routes states.
+
+    const { tabs } = nextProps;
+
+    // Recalculate selected tab:
+    let selectedTabId = this.resolveActiveTabId(tabs);
+    if (!selectedTabId) {
+      console.log("WARNING: Tabs component couldn't find an active tab.");
+      return;
+    }
+
+    if (this.state.selectedTabId !== selectedTabId) {
+      this.setState(Object.assign({ }, this.state, {
+        selectedTabId: selectedTabId
+      }));
+    }
+  }
+
+  resolveActiveTabId(tabs) {
+    const { router } = this.context;
+
+    let active = null;
+    for (let tab of tabs) {
+      if (router.isActive(tab.to, false)) {
+        active = tab.id;
+        break;
+      }
+    }
+    return active;
+  }
+
+  getRoutesFromTabs(tabs) {
+    const routes = { };
+    for (let tab of tabs) {
+      routes[tab.id] = tab.to;
+    }
+    return routes;
   }
 
   onClick(tab) {
