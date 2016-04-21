@@ -1,70 +1,86 @@
 import React, { PropTypes } from 'react';
-import { Link, browserHistory } from 'react-router';
+import { Link } from 'react-router';
 import classNames from 'classnames';
 
 class Tabs extends React.Component {
-  constructor(props) {
-    super(props);
+  constructor(props, context) {
+    super(props, context);
     this.state = {
-      selectedTab: null,
-      lastRoutePath: { }
+      selectedTabId: null,
+      routes: null
     };
-    this.onTab = this.onTab.bind(this);
+    this.onClick = this.onClick.bind(this);
   }
 
   componentWillMount() {
     const { tabs } = this.props;
 
-    if (!this.state.selectedTab) {
-      const selectedTab = tabs.length > 0 ? tabs[0].id : null;
-      this.setState(Object.assign({ }, this.state, { selectedTab }));
+    if (tabs.length === 0)
+      return;
+
+    let selectedTabId = null;
+    const { router } = this.context;
+    const routes = { };
+    for (let tab of tabs) {
+      if (router.isActive(tab.to, false))
+        selectedTabId = tab.id;
+      routes[tab.id] = tab.to;
     }
+
+    if (!selectedTabId)
+      console.log("WARNING: Tabs component couldn't find an active tab.");
+
+    this.setState(Object.assign({ }, this.state, {
+      selectedTabId: selectedTabId || tabs[0].id,
+      routes
+    }));
   }
 
-  onTab(tab, event) {
-    event.preventDefault();
+  onClick(tab) {
+    const { selectedTabId, routes } = this.state;
 
-    const { selectedTab, lastRoutePath } = this.state;
-
-    let destination = null;
-    let lastPathToSave = null;
-
-    if (tab.id === selectedTab) {
-      destination = tab.to;
-      lastPathToSave = tab.to;
-    } else {
-      destination = lastRoutePath[tab.id] || tab.to;
-      lastPathToSave = window.location.pathname
+    let to;
+    if (tab.id === selectedTabId)
+      to = tab.to;
+    else {
+      // TODO: 
+      // 1. We will need to handle baseURL when integrating with SG.
+      // 2. We may also need to handle query.
+      // 3. Check if there is a way to get the info from the router or history.
+      to = window.location.pathname;
     }
 
-    const savedPath = Object.assign({ }, this.state.lastRoutePath, {
-        [selectedTab]: lastPathToSave
+    const newRoutes = Object.assign({ }, routes, {
+      [selectedTabId]: to
     })
 
     this.setState(Object.assign({ }, this.state, { 
-      selectedTab: tab.id, 
-      lastRoutePath: savedPath 
+      selectedTabId: tab.id, 
+      routes: newRoutes
     }));
-
-    browserHistory.push(destination);
   }
 
   render() {
     const { tabs } = this.props;
-    const tabLinks = tabs.map((tab) => {
+    const { selectedTabId, routes } = this.state;
+
+    const tabItems = tabs.map((tab) => {
+      const to = routes[tab.id];
       const classes = classNames({
-        active: (tab.id === this.state.selectedTab)
+        active: (tab.id === selectedTabId)
       });
+      
       return (
         <li key={tab.id} role="presentation" className={classes}>
-          <a href="#" onClick={this.onTab.bind(this, tab)}>{tab.name}</a>
+          <Link to={to} onClick={this.onClick.bind(this, tab)}>{tab.name}</Link>
         </li>
       );
     });
+
     return (
       <div className="nav-tabs-custom">
         <ul className="nav nav-tabs">
-          {tabLinks}
+          {tabItems}
         </ul>
         {this.props.children}
       </div>
@@ -81,6 +97,10 @@ Tabs.propTypes = {
   })).isRequired,
   routes: PropTypes.array.isRequired,
   params: PropTypes.object.isRequired
+};
+
+Tabs.contextTypes = {
+  router: PropTypes.object.isRequired
 };
 
 export default Tabs;
