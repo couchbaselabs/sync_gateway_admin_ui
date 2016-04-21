@@ -1,7 +1,9 @@
 import React from 'react';
 import { render } from 'react-dom';
 import { Provider } from 'react-redux'
-import { Router, Route, IndexRoute, IndexRedirect, browserHistory } from 'react-router';
+import { 
+  Router, Route, IndexRoute, IndexRedirect, browserHistory 
+} from 'react-router';
 
 // CSS:
 import '../assets/css/main.css'
@@ -23,31 +25,46 @@ import thunk from './actions/Thunk';
 import reducers from './reducers';
 
 // Route Components:
-import App from './components/App';
-import DatabaseList from './components/DatabaseList';
-import Database from './components/Database';
-import Documents from './components/Documents';
-import DocumentList from './components/DocumentList';
-import DocumentNew from './components/DocumentNew';
-import Document from './components/Document';
-import Revision from './components/Revision';
+// - App:
+import App from './components/app/App';
+// - Databases:
+import DatabasesPage from './components/databases/DatabasesPage';
+import DatabaseList from './components/databases/DatabaseList';
+import Database from './components/databases/Database';
+import DocumentsPage from './components/databases/DocumentsPage';
+import DocumentList from './components/databases/DocumentList';
+import DocumentNew from './components/databases/DocumentNew';
+import Document from './components/databases/Document';
+import Revision from './components/databases/Revision';
+import ChannelsPage from './components/databases/ChannelsPage';
+import UsersPage from './components/databases/UsersPage';
 
+// Redux Store:
 const store = createStore(reducers, applyMiddleware(thunk));
 
 render((
   <Provider store={store}>
     <Router history={browserHistory}>
       <Route path='/' component={App}>
-        <IndexRoute component={DatabaseList}/>
-        <Route path='/:db' component={Database}>
-          <IndexRedirect to='/:db/documents' />
-          <Route path='/:db/documents' component={Documents}>
-            <IndexRoute component={DocumentList} />
-            <Route path='/:db/documents/new' component={DocumentNew}/>
-            <Route path='/:db/documents/:docId' component={Document}>
-              <Route path='/db:/documents/:docId/:revId' component={Revision}/>
+        <IndexRedirect to='/databases'/>
+        /* > Databases: */
+        <Route path='/databases' component={DatabasesPage}>
+          <IndexRoute component={DatabaseList} />
+          <Route path='/databases/:db' component={Database}>
+            <IndexRedirect to='/databases/:db/documents' />
+            /* >> Documents: */
+            <Route path='/databases/:db/documents' component={DocumentsPage}>
+              <IndexRoute component={DocumentList} />
+              <Route path='/databases/:db/documents/new' component={DocumentNew}/>
+              <Route path='/databases/:db/documents/:docId' component={Document}>
+                <Route path='/databases/db:/documents/:docId/:revId' component={Revision}/>
+              </Route>
             </Route>
-          </Route>          
+            /* >> Channels: */
+            <Route path='/databases/:db/channels' component={ChannelsPage}></Route>
+            /* >> Users: */
+            <Route path='/databases/:db/users' component={UsersPage}></Route>
+          </Route>
         </Route>
       </Route>
     </Router>

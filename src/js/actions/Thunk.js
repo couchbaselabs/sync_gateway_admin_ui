@@ -19,7 +19,6 @@ function thunk({ dispatch, getState }) {
 
     return request
       .then((res) => {
-        debugger;
         dispatch(Object.assign({ }, { 
           type: SUCCESS, 
           data: res.data, 

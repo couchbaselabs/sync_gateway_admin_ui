@@ -1,6 +1,6 @@
 import React, { PropTypes } from 'react';
 import { Link } from 'react-router';
-import { makeUrlPath, truncateString } from '../utils';
+import { makeUrlPath, truncateString } from '../../utils';
 
 const Breadcrumbs = (props) => {
   if (!props.routes)

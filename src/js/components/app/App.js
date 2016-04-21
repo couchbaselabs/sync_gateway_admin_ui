@@ -9,31 +9,28 @@ const setAppTheme = (theme) => {
   document.body.classList.add(theme);  
 }
 
-const setSidebarEnabled = (enabled) => {
-  if (enabled) {
-    document.body.classList.remove('sidebar-collapse');
-    document.body.classList.add('sidebar-mini');
-  } else {
-    document.body.classList.remove('sidebar-mini');
-    document.body.classList.add('sidebar-collapse');
-  }
+const setBodyClass = () => {
+  document.body.classList.add('sidebar-mini');
 }
 
 const App = (props) => {
   const { theme, sidebarEnabled, sidebar, contentHeader, 
-    children, routes, params} = props;
+    routes, params, children } = props;
 
   setAppTheme(theme);
-  setSidebarEnabled(sidebarEnabled);
+  setBodyClass();
   
   const { primary, secondary } = contentHeader || { };
   
   return (
     <div className="wrapper">
-      <AppHeader displaySidebarButton={sidebarEnabled}/>
+      <AppHeader/>
       <AppSidebar/>
-      <AppContent primaryHeader={primary} secondaryHeader={secondary} 
-        routes={routes} params={params}>
+      <AppContent 
+        primaryHeader={primary} 
+        secondaryHeader={secondary} 
+        routes={routes} 
+        params={params}>
         {children}
       </AppContent>
     </div>
@@ -42,8 +39,6 @@ const App = (props) => {
 
 App.propTypes = {
   theme: PropTypes.string,
-  sidebarEnabled: PropTypes.bool,
-  sidebar: PropTypes.array,
   contentHeader: PropTypes.shape({ 
     primary: PropTypes.string, 
     secondary: PropTypes.string 
@@ -52,11 +47,9 @@ App.propTypes = {
 
 App.defaultProps = { 
   theme: 'skin-black',
-  sidebarEnabled: false,
-  sidebar: []
 }
 
 export default connect((state) => {
-  const { sidebarEnabled, contentHeader } = state.app;
-  return { sidebarEnabled, contentHeader };
+  const { theme, contentHeader } = state.app;
+  return { theme, contentHeader };
 })(App);

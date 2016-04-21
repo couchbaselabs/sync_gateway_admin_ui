@@ -1,11 +1,11 @@
 import React, { PropTypes } from 'react';
 import { connect } from 'react-redux'
 import { Link } from 'react-router';
+import { setAppContentHeader } from '../../actions/Api';
+import { fetchAllDatabases, fetchDatabase } from '../../actions/Api';
+import { makeUrlPath } from '../../utils';
 import { Row, Col, Table, Button } from 'react-bootstrap';
-import { Box, BoxHeader, BoxBody, BoxTools, Icon} from './ui';
-import { setAppContentHeader } from '../actions/Api';
-import { fetchAllDatabases, fetchDatabase } from '../actions/Api';
-import { makeUrlPath } from '../utils';
+import { Box, BoxHeader, BoxBody, BoxTools, Icon} from '../ui';
 
 class DatabaseList extends React.Component {
   constructor(props) {
@@ -14,7 +14,6 @@ class DatabaseList extends React.Component {
   
   componentDidMount() {
     const { dispatch } = this.props;
-    dispatch(setAppContentHeader('Sync Gateway', 'v1.2.1'));
     dispatch(fetchAllDatabases());
   }
   
@@ -46,7 +45,7 @@ class DatabaseList extends React.Component {
       const { update_seq = '', instance_start_time = '' } = dbInfo[db] || { };
       return (
         <tr key={db}>
-          <td><Link to={makeUrlPath(db)}>{db}</Link></td>
+          <td><Link to={makeUrlPath('databases', db)}>{db}</Link></td>
           <td>{update_seq}</td>
           <td>{instance_start_time}</td>
         </tr>

@@ -1,7 +1,7 @@
 import React, { PropTypes } from 'react';
 import { connect } from 'react-redux'
-import { paramsOrProps } from '../utils';
-import { fetchDoc } from '../actions/Api';
+import { paramsOrProps } from '../../utils';
+import { fetchDoc } from '../../actions/Api';
 
 class Revision extends React.Component {
   constructor(props) {

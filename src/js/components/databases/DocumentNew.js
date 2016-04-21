@@ -2,12 +2,12 @@ import React, { PropTypes } from 'react';
 import { connect } from 'react-redux'
 import { Link } from 'react-router';
 import { browserHistory } from 'react-router'
-import { makeUrlPath } from '../utils';
-import Keys from '../actions/Keys';
-import { createDoc, resetProgress } from '../actions/Api';
+import { makeUrlPath } from '../../utils';
+import Keys from '../../actions/Keys';
+import { createDoc, resetProgress } from '../../actions/Api';
 import { Button, ButtonToolbar, Col, Row, Table } from 'react-bootstrap';
-import { Box, BoxHeader, BoxBody, BoxTools, BoxFooter, Icon } from './ui';
-import { Brace } from './ui';
+import { Box, BoxHeader, BoxBody, BoxTools, BoxFooter, Brace, Icon } from '../ui';
+
 import 'brace/mode/json';
 
 class DocumentNew extends React.Component {

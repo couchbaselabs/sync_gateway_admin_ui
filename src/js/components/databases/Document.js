@@ -1,6 +1,6 @@
 import React, { PropTypes } from 'react';
 import { connect } from 'react-redux'
-import { fetchDoc } from '../actions/Api';
+import { fetchDoc } from '../../actions/Api';
 import Revision from './Revision';
 import RevisionList from './RevisionList';
 
