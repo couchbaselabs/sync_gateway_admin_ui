@@ -27,7 +27,6 @@ function thunk({ dispatch, getState }) {
         }));
       })
       .catch((error) => {
-        debugger;
         console.log("Error occurred when dispatching the request: " + error);
         dispatch(Object.assign({ }, { 
           type: FAILURE,

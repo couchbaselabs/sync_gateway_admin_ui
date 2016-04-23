@@ -1,7 +1,6 @@
 import React, { PropTypes } from 'react';
 import { connect } from 'react-redux'
 import { Link } from 'react-router';
-import { browserHistory } from 'react-router'
 import { makeUrlPath } from '../../utils';
 import Keys from '../../actions/Keys';
 import { createDoc, resetProgress } from '../../actions/Api';
@@ -11,8 +10,8 @@ import { Box, BoxHeader, BoxBody, BoxTools, BoxFooter, Brace, Icon } from '../ui
 import 'brace/mode/json';
 
 class DocumentNew extends React.Component {
-  constructor(props) {
-    super(props);
+  constructor(props, context) {
+    super(props, context);
     
     this.state = {
       doc: '{\n\t\n}',
@@ -33,8 +32,9 @@ class DocumentNew extends React.Component {
     const { progress, onSave } = this.props;
     if (progress && progress.success) {
       if (onSave)
-        onSave();  
-      browserHistory.goBack();
+        onSave();
+      const { router } = this.context;
+      router.goBack();
     }
   }
   
@@ -53,9 +53,10 @@ class DocumentNew extends React.Component {
   
   cancel() {
     const { onCancel } = this.props;
+    const { router } = this.context;
     if (onCancel)
       onCancel();
-    browserHistory.goBack();
+    router.goBack();
   }
 
   render() {
@@ -95,6 +96,11 @@ DocumentNew.propTypes = {
   onCancel: PropTypes.func,
   progress: PropTypes.object
 }
+
+DocumentNew.contextTypes = {
+  router: PropTypes.object.isRequired
+};
+
 
 export default connect(state => {
   return { progress: state.document.progress[Keys.CREATE_DOC] }

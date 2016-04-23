@@ -1,9 +1,8 @@
 import React from 'react';
 import { render } from 'react-dom';
 import { Provider } from 'react-redux'
-import { 
-  Router, Route, IndexRoute, IndexRedirect, browserHistory 
-} from 'react-router';
+import { Router, Route, IndexRoute, IndexRedirect } from 'react-router';
+import { browserHistory } from './app'
 
 // CSS:
 import '../assets/css/main.css'
