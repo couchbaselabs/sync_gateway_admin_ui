@@ -46,9 +46,11 @@ class Tabs extends React.Component {
     }
 
     if (this.state.selectedTabId !== selectedTabId) {
-      this.setState(Object.assign({ }, this.state, {
-        selectedTabId: selectedTabId
-      }));
+      this.setState((prevState, currentProps) => {
+        return Object.assign({ }, prevState, {
+          selectedTabId
+        })
+      });
     }
   }
 
