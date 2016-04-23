@@ -2,6 +2,7 @@ import React, { PropTypes } from 'react';
 import { connect } from 'react-redux'
 import { paramsOrProps } from '../../utils';
 import { fetchDoc } from '../../actions/Api';
+import { Brace } from '../ui';
 
 class Revision extends React.Component {
   constructor(props) {
@@ -16,11 +17,11 @@ class Revision extends React.Component {
 
   render() {
     const { rev } = this.props;
+    const json = rev ? JSON.stringify(rev, null, '\t') : '';
     return (
-      <div>
-        <h3>Content:</h3>
-        <pre>{rev ? JSON.stringify(rev, undefined, 4) : ''}</pre>
-      </div>  
+      <div className="docEditor">
+        <Brace name="docEditor" mode="json" value={json} />
+      </div>
     );
   }
 }

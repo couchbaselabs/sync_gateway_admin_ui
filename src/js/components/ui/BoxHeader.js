@@ -9,4 +9,8 @@ const BoxHeader = (props) => {
   );
 }
 
+BoxHeader.propTypes = {
+  title: PropTypes.string
+}
+
 export default BoxHeader;

@@ -3,8 +3,9 @@ import { connect } from 'react-redux'
 import { Link } from 'react-router';
 import { makeUrlPath } from '../../utils';
 import { fetchAllDocs } from '../../actions/Api';
-import { Button, ButtonToolbar, Col, Row, Table } from 'react-bootstrap';
-import { Box, BoxHeader, BoxBody, BoxTools, Icon } from '../ui';
+import { Button, Table } from 'react-bootstrap';
+import { Box, BoxHeader, BoxTools, BoxBody, BoxFooter, 
+  Icon, Space } from '../ui';
 
 class DocumentList extends React.Component {
   constructor(props) {
@@ -22,11 +23,30 @@ class DocumentList extends React.Component {
     const boxHeader = (
       <BoxHeader title="Documents">
         <BoxTools>
-          <Link to={makeUrlPath('databases', db, 'documents', 'new')}>
-            <Button bsSize="sm"><Icon name="plus"/></Button>
-          </Link>
+          <div>
+            <input type="text" className="form-control input-sm" placeholder="Document ID"/>
+            <span className="glyphicon glyphicon-search form-control-feedback"></span>
+          </div>
         </BoxTools>
       </BoxHeader>
+    );
+
+    const toolbar = (
+      <div className="box-controls">
+        <Link to={makeUrlPath('databases', db, 'documents', 'new')}>
+          <Button bsSize="sm"><Icon name="plus"/></Button>
+        </Link><Space/>
+        <Link to={makeUrlPath('databases', db, 'documents', 'new')}>
+          <Button bsSize="sm"><Icon name="trash-o"/></Button>
+        </Link>
+        <div className="pull-right">
+          {'1 - 100 '}<Space/>
+          <div className="btn-group">
+            <Button bsSize="sm"><Icon name="chevron-left"/></Button>
+            <Button bsSize="sm"><Icon name="chevron-right"/></Button>
+          </div>
+        </div>
+      </div>
     );
 
     const tableHeader = (
@@ -37,38 +57,55 @@ class DocumentList extends React.Component {
       </tr>
     );
 
-    const documents = rows.map(row =>
+    const tableRows = rows.map(row =>
       <tr key={row.id}>
         <td><input type="checkbox"/></td>
         <td>
-          <Link to={makeUrlPath('databases', params.db, 'documents', row.id)}>{row.id}</Link>
+          <Link to={makeUrlPath('databases', db, 'documents', row.id)}>
+            {row.id}
+          </Link>
         </td>
         <td>{row.value.rev}</td>
       </tr>
     );
-    
-    const boxBody = (
-      <div>
-        <div className="btn-box-tool pull-right">
-          <Link to={makeUrlPath('databases', db, 'documents', 'new')}>
-            <Button bsSize="sm"><Icon name="plus"/></Button>
-          </Link>
-        </div>
-        <Table striped>
+
+    const table = (
+      <Table striped>
         <tbody>
           {tableHeader}
-          {documents}
+          {tableRows}
         </tbody>
       </Table>
-      </div>
+    );
+    
+    const boxBody = (
+      <BoxBody withPadding={false}>
+        {toolbar}
+        {table}
+      </BoxBody>
+    );
+
+    const boxFooter = (
+      <BoxFooter withPadding={false}>
+        <div className="box-controls">
+          <Button bsSize="sm" style={{visibility: 'hidden'}}>noops</Button>
+          <div className="pull-right">
+            {'1 - 100 '}<Space/>
+            <div className="btn-group">
+              <Button bsSize="sm"><Icon name="chevron-left"/></Button>
+              <Button bsSize="sm"><Icon name="chevron-right"/></Button>
+            </div>
+          </div>
+        </div>
+      </BoxFooter>
     );
     
     return (
-      <Row>
-        <Col md={12}>
-          {boxBody}
-        </Col>
-      </Row>
+      <Box topLine={false}>
+        {boxHeader}
+        {boxBody}
+        {boxFooter}
+      </Box>
     );
   }
 }

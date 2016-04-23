@@ -1,25 +1,25 @@
 import React, { PropTypes } from 'react';
-import className from 'classnames';
+import classNames from 'classnames';
 
-const BoxBody = ({ noPadding, children }) => {
-  const classes = className({
+const BoxBody = ({ withPadding, children }) => {
+  const clazz = classNames({
     ['box-body']: true,
-    ['no-padding']: noPadding
+    ['no-padding']: !withPadding
   });
 
   return (
-    <div className={classes}>
+    <div className={clazz}>
       {children}
     </div>
   );
 }
 
 BoxBody.propTypes = {
-  noPadding: PropTypes.bool
+  withPadding: PropTypes.bool
 };
 
 BoxBody.defaultProps = { 
-  noPadding: true 
+  withPadding: true 
 }
 
 export default BoxBody;

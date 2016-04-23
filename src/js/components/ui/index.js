@@ -5,6 +5,7 @@ import BoxFooter from './BoxFooter'
 import BoxTools from './BoxTools'
 import Brace from './Brace'
 import Icon from './Icon'
+import Space from './Space'
 import Tabs from './Tabs'
 
 export {
@@ -15,5 +16,6 @@ export {
   BoxTools,
   Brace,
   Icon,
+  Space,
   Tabs
 }
