@@ -1,6 +1,6 @@
 import React, { PropTypes } from 'react';
 import { Link } from 'react-router';
-import { makeUrlPath, truncateString } from '../../utils';
+import { makePath, truncateString } from '../../utils';
 
 const Breadcrumbs = (props) => {
   if (!props.routes)
@@ -51,7 +51,7 @@ const resolveBreads = (path, params, custom) => {
   if (comps.length == 0) 
     comps = [''];
 
-  const resolvedPath = makeUrlPath(...comps);
+  const resolvedPath = makePath(...comps);
 
   let name = custom[path];
   if (!name)

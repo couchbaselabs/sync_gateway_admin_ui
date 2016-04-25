@@ -1,7 +1,7 @@
 import Axios from 'axios';
 import Keys from './Keys';
 import { serverApi } from '../app';
-import { makeUrlPath } from '../utils';
+import { makePath } from '../utils';
 
 export function setAppSidebarEnabled(enabled) {
   return { 
@@ -26,7 +26,7 @@ export function resetProgress(key) {
 }
 
 export function fetchAllDatabases() {
-  const path = makeUrlPath('_all_dbs');
+  const path = makePath('_all_dbs');
   const request = Axios.get(serverApi(path));
   const types = [ 
     Keys.FETCH_ALL_DATABASES, 
@@ -37,7 +37,7 @@ export function fetchAllDatabases() {
 }
 
 export function fetchDatabase(db) {
-  const path = makeUrlPath(db);
+  const path = makePath(db);
   const request = Axios.get(serverApi(path));
   const types = [ 
     Keys.FETCH_DATABASE, 
@@ -50,7 +50,7 @@ export function fetchDatabase(db) {
 
 export function fetchAllDocs(db) {
   const query = { access: true, channels: true, include_docs: true };
-  const path = makeUrlPath(db, '_all_docs', query);
+  const path = makePath(db, '_all_docs', query);
   const request = Axios.get(serverApi(path));
   const types = [ 
     Keys.FETCH_ALL_DOCS, 
@@ -65,7 +65,7 @@ export function fetchDoc(db, docId, revId) {
   const query = { revs: true };
   if (revId) 
     query['rev'] = revId;
-  const path = makeUrlPath(db, docId, query);
+  const path = makePath(db, docId, query);
   const request = Axios.get(serverApi(path));
   const types = revId ? [ 
     Keys.FETCH_DOC_REV, 
@@ -82,7 +82,7 @@ export function fetchDoc(db, docId, revId) {
 
 export function createDoc(db, doc) {
   debugger;
-  const path = makeUrlPath(db, '');
+  const path = makePath(db, '');
   const request = Axios.post(serverApi(path), doc, { 
     headers: { 'Content-Type': 'application/json' }
   });

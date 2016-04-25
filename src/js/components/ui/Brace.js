@@ -8,8 +8,8 @@ class Brace extends React.Component {
   }
 
   componentDidMount() {
-    const { cursorAt, fontSize, mode, name, readOnly, tabSize, theme, value } 
-      = this.props;
+    const { cursorAt, fontSize, mode, name, readOnly, onLoad, 
+      tabSize, theme, value } = this.props;
     
     this.editor = brace.edit(name);
     
@@ -34,6 +34,10 @@ class Brace extends React.Component {
       this.editor.moveCursorTo(cursorAt.row, cursorAt.column);
     
     this.editor.focus();
+    
+    if (onLoad) {
+      onLoad(this.editor);
+    }
   }
 
   componentWillReceiveProps(nextProps) {
@@ -104,6 +108,7 @@ Brace.propTypes = {
   mode: PropTypes.string,
   name: PropTypes.string.isRequired,
   onChange: PropTypes.func,
+  onLoad: PropTypes.func,
   readOnly: PropTypes.bool,
   tabSize: PropTypes.number,
   theme: PropTypes.string,

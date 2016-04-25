@@ -35,6 +35,7 @@ import DocumentList from './components/databases/DocumentList';
 import DocumentNew from './components/databases/DocumentNew';
 import Document from './components/databases/Document';
 import Revision from './components/databases/Revision';
+import RevisionEdit from './components/databases/RevisionEdit';
 import ChannelsPage from './components/databases/ChannelsPage';
 import UsersPage from './components/databases/UsersPage';
 
@@ -56,7 +57,8 @@ render((
               <IndexRoute component={DocumentList} />
               <Route path='/databases/:db/documents/new' component={DocumentNew}/>
               <Route path='/databases/:db/documents/:docId' component={Document}>
-                <Route path='/databases/db:/documents/:docId/:revId' component={Revision}/>
+                <Route path='/databases/:db/documents/:docId/:revId' component={Revision}/>
+                <Route path='/databases/:db/documents/:docId/:revId/edit' component={RevisionEdit}/>
               </Route>
             </Route>
             /* >> Channels: */

@@ -1,7 +1,7 @@
 import React, { PropTypes } from 'react';
 import { connect } from 'react-redux'
 import { Link } from 'react-router';
-import { makeUrlPath } from '../../utils';
+import { makePath } from '../../utils';
 import { fetchAllDocs } from '../../actions/Api';
 import { Button, Table } from 'react-bootstrap';
 import { Box, BoxHeader, BoxTools, BoxBody, BoxFooter, 
@@ -33,10 +33,10 @@ class DocumentList extends React.Component {
 
     const toolbar = (
       <div className="box-controls">
-        <Link to={makeUrlPath('databases', db, 'documents', 'new')}>
+        <Link to={makePath('databases', db, 'documents', 'new')}>
           <Button bsSize="sm"><Icon name="plus"/></Button>
         </Link><Space/>
-        <Link to={makeUrlPath('databases', db, 'documents', 'new')}>
+        <Link to={makePath('databases', db, 'documents', 'new')}>
           <Button bsSize="sm"><Icon name="trash-o"/></Button>
         </Link>
         <div className="pull-right">
@@ -61,7 +61,7 @@ class DocumentList extends React.Component {
       <tr key={row.id}>
         <td><input type="checkbox"/></td>
         <td>
-          <Link to={makeUrlPath('databases', db, 'documents', row.id)}>
+          <Link to={makePath('databases', db, 'documents', row.id)}>
             {row.id}
           </Link>
         </td>

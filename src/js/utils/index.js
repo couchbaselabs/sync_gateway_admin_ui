@@ -1,4 +1,4 @@
-export function makeUrlPath(...comps) {
+export function makePath(...comps) {
   let paths = comps;
   
   let query = null;

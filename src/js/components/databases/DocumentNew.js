@@ -1,7 +1,6 @@
 import React, { PropTypes } from 'react';
 import { connect } from 'react-redux'
 import { Link } from 'react-router';
-import { makeUrlPath } from '../../utils';
 import Keys from '../../actions/Keys';
 import { createDoc, resetProgress } from '../../actions/Api';
 import { Button, ButtonToolbar, Col, Row, Table } from 'react-bootstrap';
