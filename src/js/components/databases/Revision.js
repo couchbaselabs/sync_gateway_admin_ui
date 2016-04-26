@@ -2,6 +2,7 @@ import React, { PropTypes } from 'react';
 import { connect } from 'react-redux'
 import { Link } from 'react-router';
 import Clipboard from 'clipboard';
+import { serverApi } from '../../app';
 import { makePath, paramsOrProps } from '../../utils';
 import { fetchDoc } from '../../actions/Api';
 import { Button, DropdownButton, MenuItem } from 'react-bootstrap';
@@ -11,6 +12,7 @@ class Revision extends React.Component {
   constructor(props) {
     super(props);
     this.braceOnLoad = this.braceOnLoad.bind(this);
+    this.attachmentsOnSelect = this.attachmentsOnSelect.bind(this);
   }
 
   componentDidMount() {
@@ -37,13 +39,35 @@ class Revision extends React.Component {
     this.editor = editor;
   }
 
+  attachmentsOnSelect(event, key) {
+    const { db, docId, revId } = paramsOrProps(this.props);
+    const path = makePath(db, docId, key, {rev: revId});
+    window.open(serverApi(path), '_blank');
+  }
+
   render() {
     const { rev } = this.props;
     if (!rev)
       return null;
 
     const { db, docId, revId } = paramsOrProps(this.props);
-    const json = JSON.stringify(rev, null, '\t');
+    
+    let attachmentsDropDown = null;
+    if (rev._attachments) {
+      const menuItems = [];
+      Object.keys(rev._attachments).forEach(key => {
+        menuItems.push(<MenuItem key={key} eventKey={key}>{key}</MenuItem>);
+      });
+
+      attachmentsDropDown = (
+        <div className="pull-right">
+          <DropdownButton title="View Attachments" id="attachments" bsSize="sm" 
+            onSelect={this.attachmentsOnSelect}>
+            {menuItems}
+          </DropdownButton>
+        </div>        
+      );
+    }
 
     const toolbar = (
       <div className="box-controls">
@@ -53,22 +77,22 @@ class Revision extends React.Component {
         <Space/>
         <Button id="copy" bsSize="sm"><Icon name="clipboard"/> Copy</Button>
         <Space/>
-        <div className="pull-right">
-          <DropdownButton title="View Attachments" id="attachments" bsSize="sm">
-            <MenuItem eventKey="1">the_inside_story_on_shared_libraries_and_dynamic_loading.pdf</MenuItem>
-            <MenuItem eventKey="2">Order Confirmation - LuckyVitamin.pdf</MenuItem>
-          </DropdownButton>
-        </div>
+        {attachmentsDropDown}
+      </div>
+    );
+
+    const json = JSON.stringify(rev, null, '\t');
+    const editor = (
+      <div className="docEditor">
+        <Brace name="docEditor" mode="json" value={json} readOnly={true} 
+          onLoad={this.braceOnLoad}/>
       </div>
     );
 
     return (
       <div>
         {toolbar}
-        <div className="docEditor">
-          <Brace name="docEditor" mode="json" value={json} readOnly={true} 
-            onLoad={this.braceOnLoad}/>
-        </div>
+        {editor}
       </div>
     );
   }

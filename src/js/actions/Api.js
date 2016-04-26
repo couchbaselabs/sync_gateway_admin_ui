@@ -81,7 +81,6 @@ export function fetchDoc(db, docId, revId) {
 }
 
 export function createDoc(db, doc) {
-  debugger;
   const path = makePath(db, '');
   const request = Axios.post(serverApi(path), doc, { 
     headers: { 'Content-Type': 'application/json' }

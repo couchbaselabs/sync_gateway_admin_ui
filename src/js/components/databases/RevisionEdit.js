@@ -32,7 +32,10 @@ class RevisionEdit extends React.Component {
       </div>
     );
 
-    const { rev } = this.props;
+    let { rev } = this.props;
+    if (rev) // Remove _revisions data:
+      rev = Object.assign({ }, rev, { _revisions: undefined });
+
     const json = rev ? JSON.stringify(rev, null, '\t') : '';
     return (
       <div>
