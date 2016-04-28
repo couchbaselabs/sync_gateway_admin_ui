@@ -3,3 +3,27 @@
   width: 100%;
   padding-bottom: 2px;
 }
+
+/* Regular box without the top line */
+.box.box-no-top-line { 
+  border-top: 0;
+}
+
+/* Custom box header toolbar that can be use with pull-left and pull-right */
+.box-header-toolbar {
+  position: absolute;
+  left: 10px;
+  right: 10px;
+  top: 5px;
+}
+
+.box-controls {
+  padding: 5px;
+}
+.box-controls.with-border {
+  border-bottom: 1px solid #f4f4f4;
+}
+.box-controls > .pull-right .dropdown-menu {
+  right: 0;
+  left: auto;
+}

@@ -1,10 +1,12 @@
 import React, { PropTypes } from 'react';
 import { Link } from 'react-router';
-import { makeUrlPath } from '../utils';
+import { makePath } from '../../utils';
 
 const RevisionList = ({ db, docId, revIds }) => {
   var revLinks = revIds.map(revId => 
-    <li key={revId}><Link to={makeUrlPath(db, docId, revId)}>{revId}</Link></li>
+    <li key={revId}>
+      <Link to={makePath('databases', db, docId, revId)}>{revId}</Link>
+    </li>
   );
   return (
     <div>

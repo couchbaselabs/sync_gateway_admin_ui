@@ -6,7 +6,7 @@
   "main": "index.js",
   "scripts": {
     "start": "webpack-dev-server --progress --colors --history-api-fallback",
-    "prod": "webpack -p"
+    "production": "webpack -p"
   },
   "author": "Pasin Suriyentrakorn",
   "license": "Apache-2.0",
@@ -15,7 +15,9 @@
     "bootstrap": "^3.3.6",
     "brace": "^0.8.0",
     "classnames": "^2.2.3",
+    "clipboard": "^1.5.10",
     "font-awesome": "^4.5.0",
+    "history": "^2.1.0",
     "jquery": "^2.2.3",
     "keymirror": "^0.1.1",
     "react": "^15.0.1",

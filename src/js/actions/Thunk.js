@@ -1,43 +1,46 @@
 function thunk({ dispatch, getState }) {
-  return (next) => (action) => {
-    if (typeof action === 'function') {
+  return next => action => {
+    if (typeof action === 'function')
       return action(dispatch, getState);
-    }
 
-    let { request, types, payload } = action;
-    if (!request && !types) {
+    let { request } = action;
+    if (!request)
       return next(action);
-    }
 
-    const [REQUEST, SUCCESS, FAILURE] = types;
+    let { type, payload } = action;
     payload = payload || { };
 
     dispatch(Object.assign({ }, { 
-      type: REQUEST, 
-      payload
+      type,
+      payload,
+      inProgress: true
     }));
 
-    return request
+    request
       .then((res) => {
-        debugger;
         dispatch(Object.assign({ }, { 
-          type: SUCCESS, 
-          data: res.data, 
+          type,
+          payload,
+          inProgress: false,
+          success: true,
           status: res.status,
-          payload
+          data: res.data,
         }));
       })
       .catch((error) => {
-        debugger;
-        console.log("Error occurred when dispatching the request: " + error);
+        console.log(`Error dispatching action ${type}: ${error}`);
         dispatch(Object.assign({ }, { 
-          type: FAILURE,
+          type,
+          payload,
+          inProgress: false,
+          success: false,
           error: error,
-          data: error.data, 
           status: error.status, 
-          payload
+          data: error.data
         }));
       });
+
+    return { type };
   };
 }
 

@@ -1,7 +1,7 @@
 import Axios from 'axios';
 import Keys from './Keys';
-import Config from '../Config';
-import { makeUrlPath } from '../utils';
+import { serverApi } from '../app';
+import { makePath } from '../utils';
 
 export function setAppSidebarEnabled(enabled) {
   return { 
@@ -18,79 +18,90 @@ export function setAppContentHeader(primary, secondary) {
   }
 }
 
-export function resetProgress(key) {
+export function resetProgress(...keys) {
   return {
     type: Keys.RESET_PROGRESS,
-    key: key
+    keys: keys
   }
 }
 
 export function fetchAllDatabases() {
-  const path = makeUrlPath('_all_dbs');
-  const request = Axios.get(Config.endpoint(path));
-  const types = [ 
-    Keys.FETCH_ALL_DATABASES, 
-    Keys.FETCH_ALL_DATABASES_SUCCESS, 
-    Keys.FETCH_ALL_DATABASES_ERROR 
-  ];
-  return { types, request };
+  const type = Keys.FETCH_ALL_DATABASES;
+  const path = makePath('_all_dbs');
+  const request = Axios.get(serverApi(path));
+  return { type, request };
 }
 
 export function fetchDatabase(db) {
-  const path = makeUrlPath(db);
-  const request = Axios.get(Config.endpoint(path));
-  const types = [ 
-    Keys.FETCH_DATABASE, 
-    Keys.FETCH_DATABASE_SUCCESS, 
-    Keys.FETCH_DATABASE_ERROR
-  ];
+  const type = Keys.FETCH_DATABASE;
+  const path = makePath(db);
+  const request = Axios.get(serverApi(path));
   const payload = { db };
-  return { types, request, payload };
+  return { type, request, payload };
 }
 
 export function fetchAllDocs(db) {
+  const type = Keys.FETCH_ALL_DOCS;
   const query = { access: true, channels: true, include_docs: true };
-  const path = makeUrlPath(db, '_all_docs', query);
-  const request = Axios.get(Config.endpoint(path));
-  const types = [ 
-    Keys.FETCH_ALL_DOCS, 
-    Keys.FETCH_ALL_DOCS_SUCCESS, 
-    Keys.FETCH_ALL_DOCS_ERROR 
-  ];
+  const path = makePath(db, '_all_docs', query);
+  const request = Axios.get(serverApi(path));
   const payload = { db };
-  return { types, request, payload };
+  return { type, request, payload };
 }
 
-export function fetchDoc(db, docId, revId) {
+export function fetchDoc(db, docId) {
+  const type = Keys.FETCH_DOC;
   const query = { revs: true };
-  if (revId) 
-    query['rev'] = revId;
-  const path = makeUrlPath(db, docId, query);
-  const request = Axios.get(Config.endpoint(path));
-  const types = revId ? [ 
-    Keys.FETCH_DOC_REV, 
-    Keys.FETCH_DOC_REV_SUCCESS, 
-    Keys.FETCH_DOC_REV_ERROR 
-  ] : [ 
-    Keys.FETCH_DOC, 
-    Keys.FETCH_DOC_SUCCESS, 
-    Keys.FETCH_DOC_ERROR
-  ];
-  const payload = { db, docId, revId };
-  return { types, request, payload }
+  const path = makePath(db, docId, query);
+  const request = Axios.get(serverApi(path));
+  const payload = { db, docId };
+  return { type, request, payload }
 }
 
-export function createDoc(db, doc) {
-  debugger;
-  const path = makeUrlPath(db, '');
-  const request = Axios.post(Config.endpoint(path), doc, { 
+export function resetFetchDocProgress() {
+  return resetProgress(Keys.FETCH_DOC);
+}
+
+export function fetchDocRev(db, docId, revId) {
+  const type = Keys.FETCH_DOC_REV;
+  const query = { revs: true, rev: revId };
+  const path = makePath(db, docId, query);
+  const request = Axios.get(serverApi(path));
+  const payload = { db, docId, revId };
+  return { type, request, payload }
+}
+
+export function createDoc(db, json) {
+  const type = Keys.CREATE_DOC;
+  const path = makePath(db, '');
+  const request = Axios.post(serverApi(path), json, { 
     headers: { 'Content-Type': 'application/json' }
   });
-  const types = [ 
-    Keys.CREATE_DOC, 
-    Keys.CREATE_DOC_SUCCESS, 
-    Keys.CREATE_DOC_ERROR 
-  ];
-  const payload = { db, doc };
-  return { types, request, payload };
+  const payload = { db, json };
+  return { type, request, payload };
+}
+
+export function updateDoc(db, docId, revId, json) {
+  const type = Keys.UPDATE_DOC;
+  const query = { rev: revId };
+  const path = makePath(db, docId, query);
+  const body = Object.assign({ }, json, { _id: undefined, _rev: undefined });
+  const request = Axios.put(serverApi(path), body, {
+    headers: { 'Content-Type': 'application/json' }
+  });
+  const payload = { db, docId, revId, body };
+  return { type, request, payload };
+}
+
+export function resetUpdateDocProgress() {
+  return resetProgress(Keys.UPDATE_DOC);
+}
+
+export function deleteDoc(db, docId, revId) {
+  const type = Keys.DELETE_DOC;
+  const query = { rev: revId };
+  const path = makePath(db, docId, query);
+  const request = Axios.delete(serverApi(path));
+  const payload = { db, docId, revId };
+  return { type, request, payload }; 
 }

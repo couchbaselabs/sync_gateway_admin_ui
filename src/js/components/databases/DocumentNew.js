@@ -1,25 +1,23 @@
 import React, { PropTypes } from 'react';
 import { connect } from 'react-redux'
 import { Link } from 'react-router';
-import { browserHistory } from 'react-router'
-import { makeUrlPath } from '../utils';
-import Keys from '../actions/Keys';
-import { createDoc, resetProgress } from '../actions/Api';
+import Keys from '../../actions/Keys';
+import { createDoc, resetProgress } from '../../actions/Api';
 import { Button, ButtonToolbar, Col, Row, Table } from 'react-bootstrap';
-import { Box, BoxHeader, BoxBody, BoxTools, BoxFooter, Icon } from './ui';
-import { Brace } from './ui';
+import { Box, BoxHeader, BoxBody, BoxTools, BoxFooter, Brace, Icon } from '../ui';
+
 import 'brace/mode/json';
 
 class DocumentNew extends React.Component {
-  constructor(props) {
-    super(props);
+  constructor(props, context) {
+    super(props, context);
     
     this.state = {
       doc: '{\n\t\n}',
       cursorAt: { row:1, column:1 }
     };
     
-    this.onChange = this.onChange.bind(this);
+    this.onEditorChange = this.onEditorChange.bind(this);
     this.save = this.save.bind(this);
     this.cancel = this.cancel.bind(this);
   }
@@ -30,15 +28,14 @@ class DocumentNew extends React.Component {
   }
   
   componentDidUpdate() {
-    const { progress, onSave } = this.props;
+    const { progress } = this.props;
     if (progress && progress.success) {
-      if (onSave)
-        onSave();  
-      browserHistory.goBack();
+      const { router } = this.context;
+      router.goBack();
     }
   }
   
-  onChange(body) {
+  onEditorChange(body) {
     this.setState(Object.assign({ }, this.state, { 
       doc: body,
       cursorAt: null
@@ -48,14 +45,19 @@ class DocumentNew extends React.Component {
   save() {
     const { dispatch, params } = this.props;
     const { doc } = this.state;
-    dispatch(createDoc(params.db, doc));
+    let json;
+    try {
+      json = JSON.parse(doc);
+    } catch (error) {
+      // TODO: Show error
+      return;
+    }
+    dispatch(createDoc(params.db, json));
   }
   
   cancel() {
-    const { onCancel } = this.props;
-    if (onCancel)
-      onCancel();
-    browserHistory.goBack();
+    const { router } = this.context;
+    router.goBack();
   }
 
   render() {
@@ -82,7 +84,7 @@ class DocumentNew extends React.Component {
         <BoxBody>
           <div className="docEditor">
             <Brace name="docEditor" mode="json" value={doc} 
-              cursorAt={cursorAt} onChange={this.onChange}/>
+              cursorAt={cursorAt} onChange={this.onEditorChange}/>
           </div>
         </BoxBody>
       </Box>
@@ -91,10 +93,12 @@ class DocumentNew extends React.Component {
 }
 
 DocumentNew.propTypes = {
-  onSave: PropTypes.func,
-  onCancel: PropTypes.func,
   progress: PropTypes.object
 }
+
+DocumentNew.contextTypes = {
+  router: PropTypes.object.isRequired
+};
 
 export default connect(state => {
   return { progress: state.document.progress[Keys.CREATE_DOC] }
