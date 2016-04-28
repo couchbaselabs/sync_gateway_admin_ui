@@ -1,15 +1,23 @@
 import Keys from '../actions/Keys';
+import { withProgress, tryResetProgress } from './Progress';
 
 const initialState = { 
-  // rows: [ ]
+  rows: undefined,      // [{ }]
+  progress: { }         // See Progress.js
+}
+
+const rows = (state, action) => {
+  return { 
+    rows: action.data.rows 
+  }
 }
 
 function documentList(state = initialState, action) {
   switch(action.type) {
-    case Keys.FETCH_ALL_DOCS_SUCCESS:
-      return Object.assign({ }, state, { 
-        rows: action.data.rows 
-      });
+    case Keys.FETCH_ALL_DOCS:
+      return withProgress(state, action, rows);
+    case Keys.RESET_PROGRESS:
+      return tryResetProgress(state, action);
     default:
       return state;
   }

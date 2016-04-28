@@ -4,7 +4,7 @@ import { Link } from 'react-router';
 import Clipboard from 'clipboard';
 import { serverApi } from '../../app';
 import { makePath, paramsOrProps } from '../../utils';
-import { fetchDoc } from '../../actions/Api';
+import { fetchDocRev } from '../../actions/Api';
 import { Button, DropdownButton, MenuItem } from 'react-bootstrap';
 import { Brace, Icon, Space } from '../ui';
 
@@ -18,7 +18,7 @@ class Revision extends React.Component {
   componentDidMount() {
     const { dispatch } = this.props;
     const { db, docId, revId } = paramsOrProps(this.props);
-    dispatch(fetchDoc(db, docId, revId));
+    dispatch(fetchDocRev(db, docId, revId));
 
     const that = this;
     this.clipboard = new Clipboard('#copy', {
@@ -28,6 +28,16 @@ class Revision extends React.Component {
         return null;
       }
     });
+  }
+
+  componentWillReceiveProps(nextProps) {
+    const { dispatch } = this.props;
+    const { db, docId, revId } = paramsOrProps(this.props);
+    const { db:newDb, docId:newDocId, revId:newRevId} = 
+      paramsOrProps(nextProps);
+    if (db !== newDb || docId !== newDocId || revId !== newRevId) {
+      dispatch(fetchDocRev(newDb, newDocId, newRevId));
+    }
   }
 
   componentWillUnMount() {
@@ -51,7 +61,7 @@ class Revision extends React.Component {
       return null;
 
     const { db, docId, revId } = paramsOrProps(this.props);
-    
+
     let attachmentsDropDown = null;
     if (rev._attachments) {
       const menuItems = [];
@@ -100,8 +110,9 @@ class Revision extends React.Component {
 
 const mapStateToProps = (state, ownProps) => {
   const { db, docId, revId } = paramsOrProps(ownProps);
-  const docRevInfo = state.revision[docId];
-  const rev = docRevInfo && docRevInfo.revs && docRevInfo.revs[revId];
+  const { docs } = state.revision;
+  const revs = docs && docs[docId];
+  const rev = revs && revs[revId];
   return { 
     db, docId, revId, rev
   };

@@ -17,7 +17,7 @@ class DocumentNew extends React.Component {
       cursorAt: { row:1, column:1 }
     };
     
-    this.onChange = this.onChange.bind(this);
+    this.onEditorChange = this.onEditorChange.bind(this);
     this.save = this.save.bind(this);
     this.cancel = this.cancel.bind(this);
   }
@@ -28,16 +28,14 @@ class DocumentNew extends React.Component {
   }
   
   componentDidUpdate() {
-    const { progress, onSave } = this.props;
+    const { progress } = this.props;
     if (progress && progress.success) {
-      if (onSave)
-        onSave();
       const { router } = this.context;
       router.goBack();
     }
   }
   
-  onChange(body) {
+  onEditorChange(body) {
     this.setState(Object.assign({ }, this.state, { 
       doc: body,
       cursorAt: null
@@ -47,14 +45,18 @@ class DocumentNew extends React.Component {
   save() {
     const { dispatch, params } = this.props;
     const { doc } = this.state;
-    dispatch(createDoc(params.db, doc));
+    let json;
+    try {
+      json = JSON.parse(doc);
+    } catch (error) {
+      // TODO: Show error
+      return;
+    }
+    dispatch(createDoc(params.db, json));
   }
   
   cancel() {
-    const { onCancel } = this.props;
     const { router } = this.context;
-    if (onCancel)
-      onCancel();
     router.goBack();
   }
 
@@ -82,7 +84,7 @@ class DocumentNew extends React.Component {
         <BoxBody>
           <div className="docEditor">
             <Brace name="docEditor" mode="json" value={doc} 
-              cursorAt={cursorAt} onChange={this.onChange}/>
+              cursorAt={cursorAt} onChange={this.onEditorChange}/>
           </div>
         </BoxBody>
       </Box>
@@ -91,15 +93,12 @@ class DocumentNew extends React.Component {
 }
 
 DocumentNew.propTypes = {
-  onSave: PropTypes.func,
-  onCancel: PropTypes.func,
   progress: PropTypes.object
 }
 
 DocumentNew.contextTypes = {
   router: PropTypes.object.isRequired
 };
-
 
 export default connect(state => {
   return { progress: state.document.progress[Keys.CREATE_DOC] }

@@ -2,7 +2,8 @@ import React, { PropTypes } from 'react';
 import { connect } from 'react-redux'
 import { Link } from 'react-router';
 import { makePath } from '../../utils';
-import { fetchDoc } from '../../actions/Api';
+import Keys from '../../actions/Keys';
+import { fetchDoc, resetFetchDocProgress } from '../../actions/Api';
 import Revision from './Revision';
 import RevisionList from './RevisionList';
 import { Button, DropdownButton, MenuItem } from 'react-bootstrap';
@@ -20,11 +21,21 @@ class Document extends React.Component {
   }
 
   componentWillReceiveProps(nextProps) {
-    const { dispatch, params } = this.props;
-    const { db, docId, revId } = params;
-    const { db:newDb, docId:newDocId, revId:newRevId} = nextProps.params;
-    if (db !== newDb || docId !== newDocId)
-      dispatch(fetchDoc(newDb, newDocId));
+    const { dispatch, fetchDocProgress } = nextProps;
+    if (fetchDocProgress) {
+      if (!fetchDocProgress.inProgress)
+        dispatch(resetFetchDocProgress());
+    } else {
+      const { dispatch, params } = nextProps;
+      const { db, docId } = params;
+      dispatch(fetchDoc(db, docId));  
+    }
+  }
+
+  shouldComponentUpdate(nextProps, nextState) {
+    const { db, docId, doc } = nextProps;
+    const { db:oDb, docId:oDocId, doc:oDoc } = this.props;
+    return db !== oDb || docId !== oDocId || doc != oDoc;
   }
 
   render() {
@@ -64,10 +75,12 @@ class Document extends React.Component {
 
 Document.propTypes = {
   doc: PropTypes.object,
+  fetchDocProgress: PropTypes.object
 }
 
 export default connect((state, ownProps) => {
   return { 
-    doc: state.document.docs[ownProps.params.docId]
+    doc: state.document.docs[ownProps.params.docId],
+    fetchDocProgress: state.document.progress[Keys.FETCH_DOC]
   };
 })(Document);
