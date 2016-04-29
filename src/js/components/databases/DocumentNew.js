@@ -1,8 +1,7 @@
 import React, { PropTypes } from 'react';
 import { connect } from 'react-redux'
 import { Link } from 'react-router';
-import Keys from '../../actions/Keys';
-import { createDoc, resetProgress } from '../../actions/Api';
+import { Keys, createDoc } from '../../actions/Api';
 import { Button, ButtonToolbar, Col, Row, Table } from 'react-bootstrap';
 import { Box, BoxHeader, BoxBody, BoxTools, BoxFooter, Brace, Icon } from '../ui';
 
@@ -23,8 +22,9 @@ class DocumentNew extends React.Component {
   }
   
   componentWillMount() {
-    const { dispatch } = this.props;
-    dispatch(resetProgress(Keys.CREATE_DOC));
+    const { dispatch, progress } = this.props;
+    if (progress)
+      progress.mayReset(dispatch);
   }
   
   componentDidUpdate() {

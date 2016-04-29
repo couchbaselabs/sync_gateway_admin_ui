@@ -14,7 +14,7 @@ class DatabaseList extends React.Component {
   
   componentDidMount() {
     const { dispatch } = this.props;
-    dispatch(fetchAllDatabases());
+    this.fetchToken = dispatch(fetchAllDatabases());
   }
   
   componentDidUpdate() {
@@ -24,6 +24,10 @@ class DatabaseList extends React.Component {
         dispatch(fetchDatabase(db));
       }
     }
+  }
+
+  componentWillUnmount() {
+    this.fetchToken.abort();
   }
   
   render() {
@@ -78,7 +82,8 @@ class DatabaseList extends React.Component {
 
 DatabaseList.propTypes = { 
   dbNames: PropTypes.arrayOf(PropTypes.string).isRequired,
-  dbInfo: PropTypes.object
+  dbInfo: PropTypes.object,
+  fetchProgress: PropTypes.object
 }
 
 export default connect((state) => {

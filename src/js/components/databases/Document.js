@@ -2,8 +2,7 @@ import React, { PropTypes } from 'react';
 import { connect } from 'react-redux'
 import { Link } from 'react-router';
 import { makePath } from '../../utils';
-import Keys from '../../actions/Keys';
-import { fetchDoc, resetFetchDocProgress } from '../../actions/Api';
+import { Keys, fetchDoc } from '../../actions/Api';
 import Revision from './Revision';
 import RevisionList from './RevisionList';
 import { Button, DropdownButton, MenuItem } from 'react-bootstrap';
@@ -12,6 +11,10 @@ import { Box, BoxHeader, BoxBody, Icon, Space } from '../ui';
 class Document extends React.Component {
   constructor(props) {
     super(props);
+
+    this.state = {
+      shouldRefresh: true
+    }
   }
 
   componentDidMount() {
@@ -21,14 +24,18 @@ class Document extends React.Component {
   }
 
   componentWillReceiveProps(nextProps) {
-    const { dispatch, fetchDocProgress } = nextProps;
+    const { shouldRefresh } = this.state;
+
+    const { dispatch, params, fetchDocProgress } = nextProps;
     if (fetchDocProgress) {
-      if (!fetchDocProgress.inProgress)
-        dispatch(resetFetchDocProgress());
-    } else {
-      const { dispatch, params } = nextProps;
+      fetchDocProgress.mayReset(dispatch);
+    } else
+      this.setState({ shouldRefresh: true });
+
+    if (shouldRefresh) {
+      this.setState({ shouldRefresh: false });
       const { db, docId } = params;
-      dispatch(fetchDoc(db, docId));  
+      dispatch(fetchDoc(db, docId));
     }
   }
 

@@ -2,7 +2,7 @@ import React, { PropTypes } from 'react';
 import { connect } from 'react-redux'
 import { Link } from 'react-router';
 import { makePath } from '../../utils';
-import { fetchAllDocs } from '../../actions/Api';
+import { Keys, fetchDocs } from '../../actions/Api';
 import { Button, Table } from 'react-bootstrap';
 import { Box, BoxHeader, BoxTools, BoxBody, BoxFooter, 
   Icon, Space } from '../ui';
@@ -10,16 +10,78 @@ import { Box, BoxHeader, BoxTools, BoxBody, BoxFooter,
 class DocumentList extends React.Component {
   constructor(props) {
     super(props);
+ 
+    this.previousOnClick = this.previousOnClick.bind(this);
+    this.nextOnClick = this.nextOnClick.bind(this);
+
+    this.state = {
+      pageSize: 10,
+      refreshing: false
+    }
   }
 
-  componentDidMount() {
-    const { dispatch, params } = this.props;
-    dispatch(fetchAllDocs(params.db));
+  componentWillMount() {
+    this.refresh();
+  }
+
+  componentWillReceiveProps(nextProps) {
+    if (!this.refresh()) {
+      const { dispatch, documentListProgress } = nextProps;
+      if (documentListProgress)
+        documentListProgress.mayReset(dispatch);
+      else 
+        this.updateRefreshingState(false);  
+    }
+  }
+
+  updateRefreshingState(refreshing) {
+    if (refreshing !== this.state.refreshing) {
+      this.setState(Object.assign({ }, this.state, { 
+        refreshing 
+      }));
+    }
+  }
+
+  refresh() {
+    const { refreshing, pageSize } = this.state;
+    if (!refreshing) {
+      const { dispatch, params, rows, curPage, startKeys } = this.props;
+      const startKey = (startKeys && curPage) && startKeys[curPage];
+      updateRefreshingState(true);
+      dispatch(fetchDocs(params.db, pageSize, curPage, startKey));
+      return true;
+    }
+    return false;
+  }
+
+  previousOnClick() {
+    const { pageSize } = this.state;
+    const { dispatch, params, curPage, startKeys } = this.props;
+    const page = curPage - 1;
+    dispatch(fetchDocs(params.db, pageSize, page, startKeys[page]));
+  }
+
+  nextOnClick() {
+    const { pageSize } = this.state;
+    const { dispatch, params, curPage, startKeys } = this.props;
+    const page = curPage + 1;
+    dispatch(fetchDocs(params.db, pageSize, page, startKeys[page]));
+  }
+
+  hasNext() {
+    const { curPage, startKeys=[ ], rows =[] } = this.props;
+    return (rows && curPage + 1 < startKeys.length);
+  }
+
+  hasPrevious() {
+    const { curPage, rows =[] } = this.props;
+    return (rows && curPage > 0);
   }
 
   render() {
-    const { rows, params } = this.props;
+    const { rows=[], params, curPage, pageSize } = this.props;
     const { db } = params;
+
     const boxHeader = (
       <BoxHeader title="Documents">
         <BoxTools>
@@ -31,6 +93,16 @@ class DocumentList extends React.Component {
       </BoxHeader>
     );
 
+    let paginationLabel = '';
+    if (rows.length > 0) {
+      const start = (curPage * pageSize) + 1;
+      const end = start + rows.length - 1; 
+      paginationLabel = `${start} - ${end}`;
+    }
+
+    const previousEnabled = this.hasPrevious();
+    const nextEnabled = this.hasNext();
+    
     const toolbar = (
       <div className="box-controls">
         <Link to={makePath('databases', db, 'documents', 'new')}>
@@ -40,10 +112,14 @@ class DocumentList extends React.Component {
           <Button bsSize="sm"><Icon name="trash-o"/></Button>
         </Link>
         <div className="pull-right">
-          {'1 - 100 '}<Space/>
+          {paginationLabel}<Space/>
           <div className="btn-group">
-            <Button bsSize="sm"><Icon name="chevron-left"/></Button>
-            <Button bsSize="sm"><Icon name="chevron-right"/></Button>
+            <Button bsSize="sm" disabled={!previousEnabled} 
+              onClick={this.previousOnClick}><Icon name="chevron-left"/>
+            </Button>
+            <Button bsSize="sm" disabled={!nextEnabled} 
+              onClick={this.nextOnClick}><Icon name="chevron-right"/>
+            </Button>
           </div>
         </div>
       </div>
@@ -90,10 +166,14 @@ class DocumentList extends React.Component {
         <div className="box-controls">
           <Button bsSize="sm" style={{visibility: 'hidden'}}>noops</Button>
           <div className="pull-right">
-            {'1 - 100 '}<Space/>
+            {paginationLabel}<Space/>
             <div className="btn-group">
-              <Button bsSize="sm"><Icon name="chevron-left"/></Button>
-              <Button bsSize="sm"><Icon name="chevron-right"/></Button>
+              <Button bsSize="sm" disabled={!previousEnabled} 
+                onClick={this.previousOnClick}><Icon name="chevron-left"/>
+              </Button>
+              <Button bsSize="sm" disabled={!nextEnabled} 
+                onClick={this.nextOnClick}><Icon name="chevron-right"/>
+              </Button>
             </div>
           </div>
         </div>
@@ -111,9 +191,16 @@ class DocumentList extends React.Component {
 }
 
 DocumentList.propTypes = {
-  rows: PropTypes.array.isRequired 
+  rows: PropTypes.array,
+  curPage: PropTypes.number,
+  startKeys: PropTypes.array,
+  pageSize: PropTypes.number,
+  documentListProgress: PropTypes.object
 }
 
 export default connect(state => { 
-  return { rows: (state.documentList.rows || []) }
+  const { rows, curPage, startKeys, pageSize, progress } = state.documentList;
+  const documentListProgress = progress[Keys.FETCH_DOCS];
+  const timestamp = new Date().getMilliseconds();
+  return { rows, curPage, startKeys, pageSize, documentListProgress, timestamp }
 })(DocumentList);

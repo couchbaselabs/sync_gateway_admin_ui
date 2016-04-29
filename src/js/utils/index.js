@@ -9,8 +9,10 @@ export function makePath(...comps) {
   let path = paths.length > 0 ? '/' + paths.join('/') : '';
   if (query) {
     let keys = Object.keys(query);
-    if (keys.length > 0)
+    if (keys.length > 0) {
+      keys = keys.filter((k) => query[k] !== undefined);
       path += '?' + keys.map((k) => k + '=' + query[k]).join('&');
+    }
   }
   return path;
 }

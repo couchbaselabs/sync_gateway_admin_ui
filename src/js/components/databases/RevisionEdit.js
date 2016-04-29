@@ -1,8 +1,7 @@
 import React, { PropTypes } from 'react';
 import { connect } from 'react-redux'
 import { paramsOrProps, makePath } from '../../utils';
-import Keys from '../../actions/Keys';
-import { resetUpdateDocProgress, fetchDoc, updateDoc } from '../../actions/Api';
+import { Keys, fetchDoc, updateDoc } from '../../actions/Api';
 import { Button, DropdownButton, MenuItem } from 'react-bootstrap';
 import { Brace, Icon, Space } from '../ui';
 
@@ -20,8 +19,9 @@ class RevisionEdit extends React.Component {
   }
 
   componentWillMount() {
-    const { dispatch } = this.props;
-    dispatch(resetUpdateDocProgress());
+    const { dispatch, updateProgress} = this.props;
+    if (updateProgress)
+      updateProgress.mayReset(dispatch);
   }
 
   componentDidMount() {
@@ -50,8 +50,8 @@ class RevisionEdit extends React.Component {
           router.replace(makePath('databases', db, 'documents', docId));
         } else
           alert('Error : ' + updateProgress.error);
-        dispatch(resetUpdateDocProgress());
       }
+      updateProgress.mayReset(dispatch);
     }
   }
 

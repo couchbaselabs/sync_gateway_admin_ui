@@ -5,6 +5,7 @@ const initialState = {
   dbNames: [ ],
   dbInfo: { }, 
   dbInfoStale: false,
+  currentDb: undefined,
   progress: { }         // See Progress.js
 }
 
@@ -28,6 +29,8 @@ const dbInfo = (state, action) => {
 
 function database(state = initialState, action) {
   switch(action.type) {
+    case Keys.SELECT_DATABASE:
+      return Object.assign({ }, state, { currentDb: action.db } );
     case Keys.FETCH_ALL_DATABASES:
       return withProgress(state, action, dbNames);
     case Keys.FETCH_DATABASE:

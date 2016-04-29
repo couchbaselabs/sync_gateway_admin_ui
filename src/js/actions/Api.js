@@ -3,6 +3,8 @@ import Keys from './Keys';
 import { serverApi } from '../app';
 import { makePath } from '../utils';
 
+export { Keys } ;
+
 export function setAppSidebarEnabled(enabled) {
   return { 
     type: Keys.SET_APP_SIDEBAR_ENABLED, 
@@ -40,13 +42,29 @@ export function fetchDatabase(db) {
   return { type, request, payload };
 }
 
-export function fetchAllDocs(db) {
-  const type = Keys.FETCH_ALL_DOCS;
-  const query = { access: true, channels: true, include_docs: true };
+export function selectDatabase(db) {
+  return {
+    type: Keys.SELECT_DATABASE,
+    db
+  };
+}
+
+export function fetchDocs(db, pageSize, page, startkey) {
+  const type = Keys.FETCH_DOCS;
+  const query = { 
+    access: true, channels: true, include_docs: true, 
+    limit: (pageSize + 1), startkey
+  };
   const path = makePath(db, '_all_docs', query);
   const request = Axios.get(serverApi(path));
-  const payload = { db };
+  const payload = { db, pageSize, page, startkey };
   return { type, request, payload };
+}
+
+export function resetDocs() {
+  return {
+    type: Keys.RESET_DOCS
+  };
 }
 
 export function fetchDoc(db, docId) {
@@ -56,10 +74,6 @@ export function fetchDoc(db, docId) {
   const request = Axios.get(serverApi(path));
   const payload = { db, docId };
   return { type, request, payload }
-}
-
-export function resetFetchDocProgress() {
-  return resetProgress(Keys.FETCH_DOC);
 }
 
 export function fetchDocRev(db, docId, revId) {
@@ -91,10 +105,6 @@ export function updateDoc(db, docId, revId, json) {
   });
   const payload = { db, docId, revId, body };
   return { type, request, payload };
-}
-
-export function resetUpdateDocProgress() {
-  return resetProgress(Keys.UPDATE_DOC);
 }
 
 export function deleteDoc(db, docId, revId) {

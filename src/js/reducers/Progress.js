@@ -1,8 +1,14 @@
 import Keys from '../actions/Keys';
+import { resetProgress } from '../actions/Api';
 
 // progress: {
-//   <KEY>: { inProgress:bool, success:bool?, error:string?, 
-//            status:number?, data:object? } 
+//   <KEY>: { inProgress:bool, 
+//            success:bool?, 
+//            error:string?, 
+//            status:number?, 
+//            data:object?,
+//            mayReset(dispatch)
+//   } 
 // }
 
 export function progress(state, action) {
@@ -17,7 +23,12 @@ export function progress(state, action) {
       success: action.success,
       error: action.error, 
       status: action.status,
-      data: action.data
+      data: action.data,
+      mayReset(dispatch) {
+        if (!action.inProgress) {
+          dispatch(resetProgress(type));
+        }
+      }
     }
   });
 

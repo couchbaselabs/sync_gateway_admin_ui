@@ -16,8 +16,18 @@ function thunk({ dispatch, getState }) {
       inProgress: true
     }));
 
+    const abortToken = { 
+      isAborted: false,
+      abort() {
+        this.isAborted = true;
+      }
+    };
+
     request
       .then((res) => {
+        if (abortToken.isAborted)
+          return;
+        
         dispatch(Object.assign({ }, { 
           type,
           payload,
@@ -28,6 +38,9 @@ function thunk({ dispatch, getState }) {
         }));
       })
       .catch((error) => {
+        if (abortToken.isAborted)
+          return;
+
         console.log(`Error dispatching action ${type}: ${error}`);
         dispatch(Object.assign({ }, { 
           type,
@@ -39,8 +52,7 @@ function thunk({ dispatch, getState }) {
           data: error.data
         }));
       });
-
-    return { type };
+    return abortToken;
   };
 }
 
