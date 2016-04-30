@@ -1,7 +1,6 @@
 import React, { PropTypes } from 'react';
-import { connect } from 'react-redux'
 import { Link } from 'react-router';
-import { Keys, createDoc } from '../../actions/Api';
+import { createDoc } from '../../api';
 import { Button, ButtonToolbar, Col, Row, Table } from 'react-bootstrap';
 import { Box, BoxHeader, BoxBody, BoxTools, BoxFooter, Brace, Icon } from '../ui';
 
@@ -13,18 +12,14 @@ class DocumentNew extends React.Component {
     
     this.state = {
       doc: '{\n\t\n}',
+      isCreating: false,
+      error: undefined,
       cursorAt: { row:1, column:1 }
     };
     
     this.onEditorChange = this.onEditorChange.bind(this);
     this.save = this.save.bind(this);
     this.cancel = this.cancel.bind(this);
-  }
-  
-  componentWillMount() {
-    const { dispatch, progress } = this.props;
-    if (progress)
-      progress.mayReset(dispatch);
   }
   
   componentDidUpdate() {
@@ -34,30 +29,50 @@ class DocumentNew extends React.Component {
       router.goBack();
     }
   }
-  
-  onEditorChange(body) {
-    this.setState(Object.assign({ }, this.state, { 
-      doc: body,
-      cursorAt: null
-    }));
+
+  setCreateStatus(isCreating, error) {
+    this.setState(state => {
+      return Object.assign({ }, state, { isCreating, error });
+    });
   }
   
   save() {
-    const { dispatch, params } = this.props;
     const { doc } = this.state;
     let json;
     try {
       json = JSON.parse(doc);
     } catch (error) {
-      // TODO: Show error
+      this.setCreateStatus(false, error);
       return;
     }
-    dispatch(createDoc(params.db, json));
+
+    const { db } = this.props.params;
+    this.setCreateStatus(true);
+    createDoc(db, json)
+      .then(result => {
+        this.setCreateStatus(true);
+        this.done();
+      })
+      .catch(error => {
+        this.setCreateStatus(false, error);
+      });
+  }
+
+  done() {
+    const { router } = this.context;
+    router.goBack();
   }
   
   cancel() {
     const { router } = this.context;
     router.goBack();
+  }
+
+  onEditorChange(body) {
+    this.setState(Object.assign({ }, this.state, { 
+      doc: body,
+      cursorAt: null
+    }));
   }
 
   render() {
@@ -92,14 +107,8 @@ class DocumentNew extends React.Component {
   }
 }
 
-DocumentNew.propTypes = {
-  progress: PropTypes.object
-}
-
 DocumentNew.contextTypes = {
   router: PropTypes.object.isRequired
 };
 
-export default connect(state => {
-  return { progress: state.document.progress[Keys.CREATE_DOC] }
-})(DocumentNew);
+export default DocumentNew

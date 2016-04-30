@@ -1,8 +1,7 @@
 import React, { PropTypes } from 'react';
-import { connect } from 'react-redux'
 import { Link } from 'react-router';
 import { makePath } from '../../utils';
-import { Keys, fetchDoc } from '../../actions/Api';
+import { fetchDoc } from '../../api';
 import Revision from './Revision';
 import RevisionList from './RevisionList';
 import { Button, DropdownButton, MenuItem } from 'react-bootstrap';
@@ -13,40 +12,57 @@ class Document extends React.Component {
     super(props);
 
     this.state = {
-      shouldRefresh: true
-    }
+      doc: undefined,
+      isFetching: false,
+      error: undefined
+    };
   }
 
   componentDidMount() {
-    const { dispatch, params } = this.props;
-    const { db, docId, revId } = params;
-    dispatch(fetchDoc(db, docId));
+    const { db, docId } = this.props.params;
+    this.fetchDocument(db, docId);
   }
 
   componentWillReceiveProps(nextProps) {
-    const { shouldRefresh } = this.state;
-
-    const { dispatch, params, fetchDocProgress } = nextProps;
-    if (fetchDocProgress) {
-      fetchDocProgress.mayReset(dispatch);
-    } else
-      this.setState({ shouldRefresh: true });
-
-    if (shouldRefresh) {
-      this.setState({ shouldRefresh: false });
-      const { db, docId } = params;
-      dispatch(fetchDoc(db, docId));
-    }
+    const { db, docId } = nextProps.params;
+    this.fetchDocument(db, docId);
   }
 
   shouldComponentUpdate(nextProps, nextState) {
-    const { db, docId, doc } = nextProps;
-    const { db:oDb, docId:oDocId, doc:oDoc } = this.props;
+    const { db, docId } = nextProps.params;
+    const { db:oDb, docId:oDocId } = this.props.params;
+    const { doc } = nextState;
+    const { oDoc } = this.state;
     return db !== oDb || docId !== oDocId || doc != oDoc;
   }
 
+  setFetchStatus(isFetching, error) {
+    this.setState(state => {
+      return Object.assign({ }, state, { isFetching, error });
+    });
+  }
+
+  setDoc(doc) {
+    this.setState(state => {
+      return Object.assign({ }, state, { doc });
+    });
+  }
+
+  fetchDocument(db, docId) {
+    this.setFetchStatus(true);
+
+    fetchDoc(db, docId)
+      .then(result => {
+        this.setFetchStatus(false);
+        this.setDoc(result.data);
+      })
+      .catch(error => {
+        this.setFetchStatus(false, error);
+      });
+  }
+
   render() {
-    const { doc, params } = this.props;
+    const { doc } = this.state;
     if (!doc)
       return null;
 
@@ -56,7 +72,7 @@ class Document extends React.Component {
       return revId;
     })
     
-    const { db, revId } = params; 
+    const { db, revId } = this.props.params;
     const children = revId ? this.props.children : 
         <Revision db={db} docId={doc._id} revId={doc._rev}/>
     const docRevId = revId || doc._rev;
@@ -80,14 +96,4 @@ class Document extends React.Component {
   }
 }
 
-Document.propTypes = {
-  doc: PropTypes.object,
-  fetchDocProgress: PropTypes.object
-}
-
-export default connect((state, ownProps) => {
-  return { 
-    doc: state.document.docs[ownProps.params.docId],
-    fetchDocProgress: state.document.progress[Keys.FETCH_DOC]
-  };
-})(Document);
+export default Document;

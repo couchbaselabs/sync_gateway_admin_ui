@@ -1,7 +1,6 @@
-import Keys from '../actions/Keys';
+import { Keys } from '../actions';
 
 const initialState = { 
-  sidebarEnabled: false,
   contentHeader: { /* 
     primary:string, 
     secondary:string */ 
@@ -10,10 +9,6 @@ const initialState = {
 
 function app(state = initialState, action) {
   switch(action.type) {
-    case Keys.SET_APP_SIDEBAR_ENABLED:
-      return Object.assign({ }, state, { 
-        sidebarEnabled: action.sidebarEnabled 
-      });
     case Keys.SET_APP_CONTENT_HEADER:
       const header = { 
         primary: action.primaryHeader, 
