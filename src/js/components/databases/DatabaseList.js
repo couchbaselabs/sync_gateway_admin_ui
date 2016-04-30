@@ -92,7 +92,7 @@ class DatabaseList extends React.Component {
     });
     
     const boxBody = (
-      <BoxBody>
+      <BoxBody withPadding={false}>
         <Table striped>
           <tbody>
             {tableHeader}

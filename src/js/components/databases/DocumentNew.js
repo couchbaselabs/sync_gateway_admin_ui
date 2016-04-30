@@ -94,9 +94,9 @@ class DocumentNew extends React.Component {
     );
     
     return (
-      <Box>
+      <Box topLine={false}>
         {boxHeader}
-        <BoxBody>
+        <BoxBody withPadding={false}>
           <div className="docEditor">
             <Brace name="docEditor" mode="json" value={doc} 
               cursorAt={cursorAt} onChange={this.onEditorChange}/>
@@ -111,4 +111,4 @@ DocumentNew.contextTypes = {
   router: PropTypes.object.isRequired
 };
 
-export default DocumentNew
+export default DocumentNew;
