@@ -1,6 +1,6 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import { setAppContentHeader } from '../../actions/Api';
+import { setAppContentHeader } from '../../redux/actions';
 import { Tabs } from '../ui'
 
 class Database extends React.Component {

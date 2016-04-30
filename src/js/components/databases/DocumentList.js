@@ -1,8 +1,7 @@
 import React, { PropTypes } from 'react';
-import { connect } from 'react-redux'
 import { Link } from 'react-router';
 import { makePath } from '../../utils';
-import { Keys, fetchDocs } from '../../actions/Api';
+import { fetchDocs } from '../../api';
 import { Button, Table } from 'react-bootstrap';
 import { Box, BoxHeader, BoxTools, BoxBody, BoxFooter, 
   Icon, Space } from '../ui';
@@ -16,78 +15,95 @@ class DocumentList extends React.Component {
 
     this.state = {
       pageSize: 10,
-      refreshing: false
+      rows: [ ],
+      curPage: 0,
+      startKeys: [ ],
+      isFetching: false,
+      error: undefined
     }
   }
 
-  componentWillMount() {
-    this.refresh();
+  componentDidMount() {
+    this.fetchDocuments(0);
   }
 
-  componentWillReceiveProps(nextProps) {
-    if (!this.refresh()) {
-      const { dispatch, documentListProgress } = nextProps;
-      if (documentListProgress)
-        documentListProgress.mayReset(dispatch);
-      else 
-        this.updateRefreshingState(false);  
-    }
+  setFetchStatus(isFetching, error) {
+    this.setState(state => {
+      return Object.assign({ }, state, { isFetching, error });
+    });
   }
 
-  updateRefreshingState(refreshing) {
-    if (refreshing !== this.state.refreshing) {
-      this.setState(Object.assign({ }, this.state, { 
-        refreshing 
-      }));
-    }
+  fetchDocuments(pageOffset) {
+    const { db } = this.props.params;
+    const { pageSize, curPage, startKeys } = this.state;
+    const page = curPage + pageOffset;
+    const startKey = (startKeys && page) && startKeys[page];
+
+    this.setFetchStatus(true);
+    fetchDocs(db, pageSize, curPage, startKey)
+      .then(result => {
+        this.setFetchStatus(false);
+        this.updateRows(page, result.data.rows);
+      }).catch((error) => {
+        this.setFetchStatus(false, error);
+      });
   }
 
-  refresh() {
-    const { refreshing, pageSize } = this.state;
-    if (!refreshing) {
-      const { dispatch, params, rows, curPage, startKeys } = this.props;
-      const startKey = (startKeys && curPage) && startKeys[curPage];
-      updateRefreshingState(true);
-      dispatch(fetchDocs(params.db, pageSize, curPage, startKey));
-      return true;
+  updateRows(page, rows) {
+    const {pageSize, startKeys } = this.state;
+    let displayRows = rows;
+    let newStartKeys = [ ];
+    if (displayRows && displayRows.length > 0) {
+      if (page === 0)
+        newStartKeys = [ undefined ];
+      else {
+        newStartKeys = startKeys.slice(0, page);
+        newStartKeys.push(displayRows[0].id);
+      }
+
+      if (displayRows.length > pageSize) {
+        newStartKeys.push(displayRows[pageSize].id);
+        displayRows = displayRows.slice(0, -1);
+      }
     }
-    return false;
+
+    this.setState(state => {
+      return Object.assign({ }, state, { 
+        rows: displayRows, 
+        curPage: page, 
+        startKeys: newStartKeys });
+    });
   }
 
   previousOnClick() {
-    const { pageSize } = this.state;
-    const { dispatch, params, curPage, startKeys } = this.props;
-    const page = curPage - 1;
-    dispatch(fetchDocs(params.db, pageSize, page, startKeys[page]));
+    this.fetchDocuments(-1);
   }
 
   nextOnClick() {
-    const { pageSize } = this.state;
-    const { dispatch, params, curPage, startKeys } = this.props;
-    const page = curPage + 1;
-    dispatch(fetchDocs(params.db, pageSize, page, startKeys[page]));
+    this.fetchDocuments(+1);
   }
 
   hasNext() {
-    const { curPage, startKeys=[ ], rows =[] } = this.props;
+    const { curPage, startKeys, rows } = this.state;
     return (rows && curPage + 1 < startKeys.length);
   }
 
   hasPrevious() {
-    const { curPage, rows =[] } = this.props;
+    const { curPage, rows } = this.state;
     return (rows && curPage > 0);
   }
 
   render() {
-    const { rows=[], params, curPage, pageSize } = this.props;
-    const { db } = params;
+    const { rows, curPage, pageSize } = this.state;
+    const { db } = this.props.params;
 
     const boxHeader = (
       <BoxHeader title="Documents">
         <BoxTools>
           <div>
-            <input type="text" className="form-control input-sm" placeholder="Document ID"/>
-            <span className="glyphicon glyphicon-search form-control-feedback"></span>
+            <input type="text" className="form-control input-sm" 
+              placeholder="Document ID"/>
+            <span className="glyphicon glyphicon-search form-control-feedback"/>
           </div>
         </BoxTools>
       </BoxHeader>
@@ -190,17 +206,4 @@ class DocumentList extends React.Component {
   }
 }
 
-DocumentList.propTypes = {
-  rows: PropTypes.array,
-  curPage: PropTypes.number,
-  startKeys: PropTypes.array,
-  pageSize: PropTypes.number,
-  documentListProgress: PropTypes.object
-}
-
-export default connect(state => { 
-  const { rows, curPage, startKeys, pageSize, progress } = state.documentList;
-  const documentListProgress = progress[Keys.FETCH_DOCS];
-  const timestamp = new Date().getMilliseconds();
-  return { rows, curPage, startKeys, pageSize, documentListProgress, timestamp }
-})(DocumentList);
+export default DocumentList;

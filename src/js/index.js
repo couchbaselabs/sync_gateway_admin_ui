@@ -1,6 +1,17 @@
+// Polyfill:
+import 'babel-polyfill'
+
+// react and releated modules:
 import React from 'react';
 import { render } from 'react-dom';
+
+// redux:
 import { Provider } from 'react-redux'
+import { createStore, applyMiddleware } from 'redux';
+import thunk from 'redux-thunk'
+import reducers from './redux/reducers';
+
+// react-router:
 import { Router, Route, IndexRoute, IndexRedirect } from 'react-router';
 import { browserHistory } from './app'
 
@@ -17,11 +28,6 @@ import 'font-awesome/css/font-awesome.css';
 import '../../vendors/AdminLTE/css/AdminLTE.css';
 import '../../vendors/AdminLTE/css/skins/_all-skins.css';
 import '../../vendors/AdminLTE/js/app.js';
-
-// Redux:
-import { createStore, applyMiddleware } from 'redux';
-import thunk from './actions/Thunk';
-import reducers from './reducers';
 
 // Route Components:
 // - App:

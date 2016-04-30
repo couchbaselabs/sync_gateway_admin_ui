@@ -1,37 +1,72 @@
 import React, { PropTypes } from 'react';
-import { connect } from 'react-redux'
 import { Link } from 'react-router';
-import { setAppContentHeader } from '../../actions/Api';
-import { fetchAllDatabases, fetchDatabase } from '../../actions/Api';
 import { makePath } from '../../utils';
+import { fetchAllDatabases, fetchDatabase } from '../../api';
 import { Row, Col, Table, Button } from 'react-bootstrap';
 import { Box, BoxHeader, BoxBody, BoxTools, Icon} from '../ui';
 
 class DatabaseList extends React.Component {
   constructor(props) {
     super(props);
+
+    this.state = {
+      dbNames: [ ],
+      dbInfo: { },
+      isFetching: false,
+      error: undefined
+    };
   }
   
   componentDidMount() {
-    const { dispatch } = this.props;
-    this.fetchToken = dispatch(fetchAllDatabases());
-  }
-  
-  componentDidUpdate() {
-    if (this.props.dbInfoStale) {
-      const { dbNames, dispatch } = this.props;
-      for (let db of this.props.dbNames) {
-        dispatch(fetchDatabase(db));
-      }
-    }
+    this.fetchDatabases();
   }
 
-  componentWillUnmount() {
-    this.fetchToken.abort();
+  setFetchStatus(isFetching, error) {
+    this.setState(state => {
+      return Object.assign({ }, state, { isFetching, error });
+    });
+  }
+
+  setDatabaseNames(dbNames) {
+    this.setState(state => {
+      return Object.assign({ }, state, { dbNames });
+    });
+  }
+
+  setDatabaseInfo(dbInfo) {
+    this.setState(state => {
+      return Object.assign({ }, state, { dbInfo });
+    });
+  }
+
+  fetchDatabases() {
+    this.setFetchStatus(true);
+    fetchAllDatabases()
+      .then(result => {
+        this.setDatabaseNames(result.data);
+        this.fetchDatabasesInfo(result.data)
+      }).catch(error => {
+        this.setFetchStatus(false, error);
+      });
+  }
+
+  fetchDatabasesInfo(dbNames) {
+    let fetches = dbNames.map(db => fetchDatabase(db));
+    Promise.all(fetches)
+      .then(results => {
+        this.setFetchStatus(false);
+        const dbInfo = { };
+        for (const { data } of results) {
+          dbInfo[data.db_name] = data;
+        }
+        this.setDatabaseInfo(dbInfo);
+      }).catch(error => {
+        this.setFetchStatus(false, error);
+      });
   }
   
   render() {
-    const { dbNames, dbInfo } = this.props;
+    const { dbNames, dbInfo } = this.state;
     
     const boxHeader = (
       <BoxHeader title="All Databases"/>
@@ -80,13 +115,4 @@ class DatabaseList extends React.Component {
   }
 }
 
-DatabaseList.propTypes = { 
-  dbNames: PropTypes.arrayOf(PropTypes.string).isRequired,
-  dbInfo: PropTypes.object,
-  fetchProgress: PropTypes.object
-}
-
-export default connect((state) => {
-  const { dbNames, dbInfo, dbInfoStale } = state.database;
-  return { dbNames, dbInfo, dbInfoStale };
-})(DatabaseList);
+export default DatabaseList;
