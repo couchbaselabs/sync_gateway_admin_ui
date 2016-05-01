@@ -1,4 +1,9 @@
 import React, { PropTypes } from 'react';
 
-const DatabasesPage = (props) => props.children
+class DatabasesPage extends React.Component {
+  render() {
+    return this.props.children;
+  }
+}
+
 export default DatabasesPage;

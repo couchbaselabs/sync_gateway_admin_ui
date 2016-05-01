@@ -1,6 +1,7 @@
 import React, { PropTypes } from 'react';
 import { Link } from 'react-router';
 import { makePath } from '../../utils';
+import DatabaseListStore from '../../stores/DatabaseListStore';
 import { fetchAllDatabases, fetchDatabase } from '../../api';
 import { Row, Col, Table, Button } from 'react-bootstrap';
 import { Box, BoxHeader, BoxBody, BoxTools, Icon} from '../ui';
@@ -9,14 +10,17 @@ class DatabaseList extends React.Component {
   constructor(props) {
     super(props);
 
+    const dbNames = DatabaseListStore.getNames();
+    const dbInfo = DatabaseListStore.getInfo();
+
     this.state = {
-      dbNames: [ ],
-      dbInfo: { },
+      dbNames,
+      dbInfo,
       isFetching: false,
       error: undefined
     };
   }
-  
+
   componentDidMount() {
     this.fetchDatabases();
   }
@@ -28,12 +32,14 @@ class DatabaseList extends React.Component {
   }
 
   setDatabaseNames(dbNames) {
+    DatabaseListStore.setNames(dbNames);
     this.setState(state => {
       return Object.assign({ }, state, { dbNames });
     });
   }
 
   setDatabaseInfo(dbInfo) {
+    DatabaseListStore.setInfo(dbInfo);
     this.setState(state => {
       return Object.assign({ }, state, { dbInfo });
     });

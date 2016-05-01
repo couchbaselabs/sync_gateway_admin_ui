@@ -1,7 +1,7 @@
 var webpack = require('webpack');
 
 module.exports = {
-  devtool: 'source-map',
+  devtool: 'eval-cheap-module-source-map',
   entry: [
     './src/js/index.js', './src/index.html'
   ],

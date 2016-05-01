@@ -1,6 +1,6 @@
 import React, { PropTypes } from 'react';
-import { connect } from 'react-redux'
 import { Link } from 'react-router';
+import AppStore  from '../../stores/AppStore'
 import AppHeader from './AppHeader';
 import AppSidebar from './AppSidebar';
 import AppContent from './AppContent';
@@ -13,43 +13,65 @@ const setBodyClass = () => {
   document.body.classList.add('sidebar-mini');
 }
 
-const App = (props) => {
-  const { theme, sidebarEnabled, sidebar, contentHeader, 
-    routes, params, children } = props;
+class App extends React.Component {
+  constructor(props) {
+    super(props);
 
-  setAppTheme(theme);
-  setBodyClass();
-  
-  const { primary, secondary } = contentHeader || { };
-  
-  return (
-    <div className="wrapper">
-      <AppHeader/>
-      <AppSidebar/>
-      <AppContent 
-        primaryHeader={primary} 
-        secondaryHeader={secondary} 
-        routes={routes} 
-        params={params}>
-        {children}
-      </AppContent>
-    </div>
-  );
+    this.appStoreOnChange = this.appStoreOnChange.bind(this);
+
+    this.state = {
+      contentHeader: undefined
+    }
+  }
+
+  componentWillMount() {
+    AppStore.addListener(this.appStoreOnChange);
+    this.appStoreOnChange();
+  }
+
+  componentWillUnmount() {
+    AppStore.remoteListener(this.appStoreOnChange);
+  }
+
+  appStoreOnChange() {
+    const contentHeader = AppStore.getContentHeader();
+    this.setState(state => {
+      return Object.assign({ }, this.state, { contentHeader });
+    });
+  }
+
+  render() {
+    const { theme, routes, params, children } = this.props;
+
+    const { contentHeader } = this.state;
+
+    setAppTheme(theme);
+    setBodyClass();
+    
+    const { primary, secondary } = contentHeader || { };
+    
+    return (
+      <div className="wrapper">
+        <AppHeader/>
+        <AppSidebar/>
+        <AppContent 
+          primaryHeader={primary} 
+          secondaryHeader={secondary} 
+          routes={routes} 
+          params={params}>
+          {children}
+        </AppContent>
+      </div>
+    );
+  }
 }
 
 App.propTypes = {
   theme: PropTypes.string,
-  contentHeader: PropTypes.shape({ 
-    primary: PropTypes.string, 
-    secondary: PropTypes.string 
-  })
 }
 
 App.defaultProps = { 
   theme: 'skin-black',
 }
 
-export default connect((state) => {
-  const { theme, contentHeader } = state.app;
-  return { theme, contentHeader };
-})(App);
+export default App;

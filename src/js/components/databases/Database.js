@@ -1,6 +1,5 @@
 import React from 'react';
-import { connect } from 'react-redux';
-import { setAppContentHeader } from '../../redux/actions';
+import AppStore from '../../stores/AppStore'
 import { Tabs } from '../ui'
 
 class Database extends React.Component {
@@ -9,8 +8,8 @@ class Database extends React.Component {
   }
 
   componentDidMount() {
-    const { dispatch, params} = this.props;
-    dispatch(setAppContentHeader(params.db));
+    const { db } = this.props.params;
+    AppStore.setContentHeader(db);
   }
 
   render() {
@@ -29,4 +28,4 @@ class Database extends React.Component {
   }
 }
 
-export default connect()(Database);
+export default Database;
