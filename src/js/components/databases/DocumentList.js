@@ -1,7 +1,7 @@
 import React, { PropTypes } from 'react';
 import { Link } from 'react-router';
 import { makePath } from '../../utils';
-import { fetchDocs, deleteDoc } from '../../api';
+import { fetchDocs, fetchDoc, deleteDoc } from '../../api';
 import { Button, Table, Checkbox } from 'react-bootstrap';
 import { Box, BoxHeader, BoxTools, BoxBody, BoxFooter, 
   Icon, Space } from '../ui';
@@ -15,8 +15,13 @@ class DocumentList extends React.Component {
     this.allRowsCheckedOnChange = this.allRowsCheckedOnChange.bind(this);
     this.singleRowCheckedOnChange = this.singleRowCheckedOnChange.bind(this);
     this.deleteOnClick = this.deleteOnClick.bind(this);
-
-    this.state = {
+    this.searchOnKeyPress = this.searchOnKeyPress.bind(this);
+    
+    this.state = this.getInitState();
+  }
+  
+  getInitState() {
+    return {
       pageSize: 10,
       rows: [ ],
       curPage: 0,
@@ -24,6 +29,7 @@ class DocumentList extends React.Component {
       isFetching: false,
       isDeleting: false,
       error: undefined,
+      searchDocId: undefined,
       allRowsChecked: { },  // { <page-index>: <true|undefined> }
       selectedRows: { }     // { <page-index>: { <row.id> : <row.value.rev> } }
     }
@@ -32,10 +38,16 @@ class DocumentList extends React.Component {
   componentDidMount() {
     this.fetchDocuments(0);
   }
-
-  setFetchStatus(isFetching, error) {
+  
+  componentWillReceiveProps(nextProps) {
+    this.reload();
+  }
+  
+  reload() {
     this.setState(state => {
-      return Object.assign({ }, state, { isFetching, error });
+      return this.getInitState();
+    }, () => {
+      this.fetchDocuments(0)  
     });
   }
 
@@ -50,11 +62,17 @@ class DocumentList extends React.Component {
       .then(result => {
         this.setFetchStatus(false);
         this.updateRows(page, result.data.rows);
-      }).catch((error) => {
+      }).catch(error => {
         this.setFetchStatus(false, error);
       });
   }
-
+  
+  setFetchStatus(isFetching, error) {
+    this.setState(state => {
+      return Object.assign({ }, state, { isFetching, error });
+    });
+  }
+  
   updateRows(page, rows) {
     const {pageSize, startKeys } = this.state;
     let displayRows = rows;
@@ -82,30 +100,12 @@ class DocumentList extends React.Component {
         startKeys: newStartKeys });
     });
     
-    validateSelectedRows(page, displayRows);
-  }
-
-  previousOnClick() {
-    this.fetchDocuments(-1);
-  }
-
-  nextOnClick() {
-    this.fetchDocuments(+1);
-  }
-
-  hasNext() {
-    const { curPage, startKeys, rows } = this.state;
-    return (rows && curPage + 1 < startKeys.length);
-  }
-
-  hasPrevious() {
-    const { curPage, rows } = this.state;
-    return (rows && curPage > 0);
+    this.validateSelectedRows(page, displayRows);
   }
   
   validateSelectedRows(curPage, rows) {
     let { selectedRows, allRowsChecked } = this.state;
-    let selectedMap = selectedRows[curPage];
+    let selectedMap = selectedRows[curPage] || { };
      
     const curSelectedRowIds = Object.getOwnPropertyNames(selectedMap);
     if (curSelectedRowIds.length > 0) {
@@ -142,6 +142,71 @@ class DocumentList extends React.Component {
         }); 
       }
     }
+  }
+  
+  previousOnClick() {
+    this.fetchDocuments(-1);
+  }
+
+  nextOnClick() {
+    this.fetchDocuments(+1);
+  }
+
+  hasNext() {
+    const { curPage, startKeys, rows } = this.state;
+    return (rows && curPage + 1 < startKeys.length);
+  }
+
+  hasPrevious() {
+    const { curPage, rows } = this.state;
+    return (rows && curPage > 0);
+  }
+  
+  searchOnKeyPress(event) {
+    if (event.key === 'Enter') {
+      const docId = event.target.value;
+      this.setSearchDocId(docId);
+      this.fetchDocument(docId);
+    }
+  }
+  
+  setSearchDocId(searchDocId) {
+    this.setState(state => {
+      return Object.assign({ }, state, { searchDocId });
+    })
+  }
+  
+  fetchDocument(docId) {
+    if (!docId || docId.length == 0) {
+      this.reload();
+    } else {
+      const { db } = this.props.params;
+      this.setFetchStatus(true);
+      fetchDoc(db, docId)
+        .then(result => {
+          this.setFetchStatus(false);
+          const rows = this.createRowsFromDoc(result.data);
+          this.updateRows(0, rows);
+        }).catch(error => {
+          debugger;
+          this.setState(state => {
+            return Object.assign({ }, this.getInitState())
+          });
+          this.setFetchStatus(false, error);
+        });
+    }
+  }
+  
+  createRowsFromDoc(doc) {
+    const row = {
+      key: doc._id,
+      id: doc._id,
+      value: {
+        rev: doc._rev,
+        doc  
+      }
+    }
+    return [ row ];
   }
   
   allRowsCheckedOnChange(event) {
@@ -209,12 +274,6 @@ class DocumentList extends React.Component {
     return selectedMap && Object.getOwnPropertyNames(selectedMap).length > 0;
   }
   
-  setDeleteStatus(isDeleting, error) {
-    this.setState(state => {
-      return Object.assign({ }, state, { isDeleting, error });
-    });
-  }
-  
   deleteOnClick() {
     const { db } = this.props.params;
     const { curPage, selectedRows } = this.state;
@@ -234,9 +293,15 @@ class DocumentList extends React.Component {
         this.setDeleteStatus(false, error);
       });
   }
+  
+  setDeleteStatus(isDeleting, error) {
+    this.setState(state => {
+      return Object.assign({ }, state, { isDeleting, error });
+    });
+  }
 
   render() {
-    const { rows, curPage, pageSize } = this.state;
+    const { rows, curPage, pageSize, searchDocId } = this.state;
     const { db } = this.props.params;
 
     const boxHeader = (
@@ -244,7 +309,8 @@ class DocumentList extends React.Component {
         <BoxTools>
           <div>
             <input type="text" className="form-control input-sm" 
-              placeholder="Document ID"/>
+              placeholder="Document ID" value={searchDocId} 
+              onKeyPress={this.searchOnKeyPress}/>
             <span className="glyphicon glyphicon-search form-control-feedback"/>
           </div>
         </BoxTools>
