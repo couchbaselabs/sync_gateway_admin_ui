@@ -122,13 +122,27 @@ class RevisionEdit extends React.Component {
   }
   
   deleteOnClick() {
-    
+    const { db, docId, revId } = paramsOrProps(this.props);
+    deleteDoc(db, docId, revId)
+      .then(result => {
+        this.setUpdateStatus(false);
+        this.gotoDocuments();
+      })
+      .catch(error => {
+        this.setUpdateStatus(false, error);
+      });
   }
 
   done() {
     const { db, docId } = paramsOrProps(this.props);
     const { router } = this.context;
     router.replace(makePath('databases', db, 'documents', docId));
+  }
+  
+  gotoDocuments() {
+    const { db, docId } = paramsOrProps(this.props);
+    const { router } = this.context;
+    router.replace(makePath('databases', db, 'documents'));
   }
 
   cancel() {
