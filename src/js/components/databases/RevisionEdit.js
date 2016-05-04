@@ -1,6 +1,7 @@
 import React, { PropTypes } from 'react';
 import { paramsOrProps, makePath } from '../../utils';
-import { fetchRevision, updateRevision } from '../../api';
+import { fetchRevision, updateRevision, uploadAttachment, deleteDoc } 
+  from '../../api';
 import { Button, DropdownButton, MenuItem } from 'react-bootstrap';
 import { Brace, Icon, Space } from '../ui';
 
@@ -11,7 +12,7 @@ class RevisionEdit extends React.Component {
     this.onEditorChange = this.onEditorChange.bind(this);
     this.saveOnClick = this.saveOnClick.bind(this);
     this.cancelOnClick = this.cancelOnClick.bind(this);
-    this.attachmentOnClick = this.attachmentOnClick.bind(this);
+    this.attachmentOnChange = this.attachmentOnChange.bind(this);
     this.deleteOnClick = this.deleteOnClick.bind(this);
 
     this.state = {
@@ -106,13 +107,22 @@ class RevisionEdit extends React.Component {
   cancelOnClick() {
     this.cancel();
   }
-
-  attachmentOnClick() {
-
+  
+  attachmentOnChange(event) {
+    const { db, docId, revId } = paramsOrProps(this.props);
+    const file = event.target.files[0];
+    uploadAttachment(db, docId, revId, file)
+      .then(result => {
+        this.setUpdateStatus(false);
+        this.done();
+      })
+      .catch(error => {
+        this.setUpdateStatus(false, error);
+      });
   }
-
+  
   deleteOnClick() {
-
+    
   }
 
   done() {
@@ -157,9 +167,11 @@ class RevisionEdit extends React.Component {
         <Button bsSize="sm" onClick={this.cancelOnClick}>
           <Icon name="close"/> Cancel
         </Button><Space/>
-        <Button bsSize="sm" onClick={this.attachmentOnClick}>
+        <div className="btn btn-default btn-sm btn-file">
           <Icon name="paperclip"/> Attachment
-        </Button><Space/>
+          <input type="file" name="attachment" 
+            onChange={this.attachmentOnChange}/>
+        </div><Space/>
         <Button bsSize="sm" onClick={this.deleteOnClick}>
           <Icon name="trash-o"/> Delete
         </Button>

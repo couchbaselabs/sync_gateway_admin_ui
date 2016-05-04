@@ -79,6 +79,15 @@ export function updateRevision(db, docId, revId, json) {
   });
 }
 
+export function uploadAttachment(db, docId, revId, file) {
+  const query = { rev: revId };
+  const path = makePath(db, docId, file.name, query);
+  return _fetch(serverApi(path), {
+    method: 'PUT',
+    body: file
+  });
+}
+
 export function deleteDoc(db, docId, revId) {
   const query = { rev: revId };
   const path = makePath(db, docId, query);
