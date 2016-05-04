@@ -307,7 +307,7 @@ class DocumentList extends React.Component {
     const boxHeader = (
       <BoxHeader title="Documents">
         <BoxTools>
-          <div>
+          <div className="has-feedback">
             <input type="text" className="form-control input-sm" 
               placeholder="Document ID" value={searchDocId} 
               onKeyPress={this.searchOnKeyPress}/>
