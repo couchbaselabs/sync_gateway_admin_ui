@@ -4,7 +4,6 @@ import classNames from 'classnames';
 import { makePath } from '../../utils';
 import { fetchDoc } from '../../api';
 import Revision from './Revision';
-import RevisionList from './RevisionList';
 import { Button, DropdownButton, MenuItem } from 'react-bootstrap';
 import { Box, BoxHeader, BoxTools, BoxBody, Icon, Space } from '../ui';
 
