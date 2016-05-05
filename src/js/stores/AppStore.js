@@ -16,8 +16,9 @@ class AppStore extends Store {
 
   setContentHeader(primary, secondary) {
     const contentHeader = { primary, secondary };
-    this.data = Object.assign({ }, this.data, { contentHeader });
-    this.emitChange();
+    this.setData(data => {
+      return Object.assign({ }, data, { contentHeader });
+    })
   }
 
   getContentHeader() {
@@ -25,9 +26,10 @@ class AppStore extends Store {
   }
 
   setTheme(theme) {
-    if (!theme)
-      theme = defaultTheme;
-    this.data = Object.assign({ }, this.data, { theme });
+    const newTheme = theme || defaultTheme;
+    this.setData(data => {
+      return Object.assign({ }, data, { theme: newTheme });
+    })
   }
 
   getTheme() {

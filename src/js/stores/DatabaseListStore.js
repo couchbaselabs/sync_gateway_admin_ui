@@ -10,13 +10,15 @@ class DatabaseListStore extends Store {
   }
 
   setNames(names) {
-    this.data = Object.assign({ }, this.data, { names });
-    this.emitChange();
+    this.setData(data => {
+      return Object.assign({ }, data, { names });
+    });
   }
 
   setInfo(info) {
-    this.data = Object.assign({ }, this.data, { info });
-    this.emitChange();
+    this.setData(data => {
+      return Object.assign({ }, data, { names });
+    });
   }
 
   getNames() {

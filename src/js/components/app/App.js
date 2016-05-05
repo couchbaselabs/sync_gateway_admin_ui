@@ -25,12 +25,12 @@ class App extends React.Component {
   }
 
   componentWillMount() {
-    AppStore.addListener(this.appStoreOnChange);
+    AppStore.addChangeListener(this.appStoreOnChange);
     this.appStoreOnChange();
   }
 
   componentWillUnmount() {
-    AppStore.remoteListener(this.appStoreOnChange);
+    AppStore.removeChangeListener(this.appStoreOnChange);
   }
 
   appStoreOnChange() {

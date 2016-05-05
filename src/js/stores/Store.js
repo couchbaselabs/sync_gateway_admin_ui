@@ -7,12 +7,21 @@ class Store extends EventEmitter {
     this.emit(EVENT);
   }
 
-  addListener(listener) {
+  addChangeListener(listener) {
     this.on(EVENT, listener);
   }
 
-  removeListener(listener) {
-    this.removeListener(EVENT, listener);
+  removeChangeListener(listener) {
+    super.removeListener(EVENT, listener);
+  }
+  
+  setData(update) {
+    this.data = update(this.data);
+    this.emitChange();
+  }
+  
+  getData() {
+    return Object.assign({ }, this.data);
   }
 }
 
