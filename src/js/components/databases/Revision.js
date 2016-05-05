@@ -78,7 +78,7 @@ class Revision extends React.Component {
     this.editor = editor;
   }
 
-  attachmentsOnSelect(event, key) {
+  attachmentsOnSelect(key) {
     const { db, docId, revId } = paramsOrProps(this.props);
     const path = makePath(db, docId, key, {rev: revId});
     window.open(serverApi(path), '_blank');
