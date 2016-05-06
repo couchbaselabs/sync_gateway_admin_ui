@@ -82,17 +82,25 @@ class DatabaseList extends React.Component {
       <tr>
         <th>Name</th>
         <th>Update Seq</th>
-        <th>Start Time (Micro Secs)</th>
+        <th>Start Time</th>
       </tr>
     );
     
     const dbList = dbNames.map(db => {
-      const { update_seq = '', instance_start_time = '' } = dbInfo[db] || { };
+      const { update_seq = '', instance_start_time } = dbInfo[db] || { };
+      
+      let startTime;
+      if (instance_start_time) {
+        const date = new Date((instance_start_time / 1000));
+        startTime = date.toUTCString();
+      } else
+        startTime = '';
+      
       return (
         <tr key={db}>
           <td><Link to={makePath('databases', db)}>{db}</Link></td>
           <td>{update_seq}</td>
-          <td>{instance_start_time}</td>
+          <td>{startTime}</td>
         </tr>
       );
     });
