@@ -17,7 +17,7 @@ class DatabaseListStore extends Store {
 
   setInfo(info) {
     this.setData(data => {
-      return Object.assign({ }, data, { names });
+      return Object.assign({ }, data, { info });
     });
   }
 
