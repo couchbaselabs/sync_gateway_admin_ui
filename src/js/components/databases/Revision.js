@@ -12,8 +12,7 @@ class Revision extends React.Component {
     super(props);
 
     this.braceOnLoad = this.braceOnLoad.bind(this);
-    this.attachmentsOnSelect = this.attachmentsOnSelect.bind(this);
-
+    
     this.state = {
       rev: undefined,
       isFetching: false,
@@ -78,30 +77,25 @@ class Revision extends React.Component {
     this.editor = editor;
   }
 
-  attachmentsOnSelect(event, key) {
-    const { db, docId, revId } = paramsOrProps(this.props);
-    const path = makePath(db, docId, key, {rev: revId});
-    window.open(serverApi(path), '_blank');
-  }
-
   render() {
     const { rev } = this.state;
     if (!rev)
       return null;
 
     const { db, docId, revId } = paramsOrProps(this.props);
-
+    
     let attachmentsDropDown = null;
     if (rev._attachments) {
       const menuItems = [];
       Object.keys(rev._attachments).forEach(key => {
-        menuItems.push(<MenuItem key={key} eventKey={key}>{key}</MenuItem>);
+        const path = makePath(db, docId, key, {rev: revId});
+        const url = serverApi(path);
+        menuItems.push(<MenuItem href={url} target="_blank">{key}</MenuItem>);
       });
 
       attachmentsDropDown = (
         <div className="pull-right">
-          <DropdownButton title="View Attachments" id="attachments" bsSize="sm" 
-            onSelect={this.attachmentsOnSelect}>
+          <DropdownButton title="View Attachments" id="attachments" bsSize="sm">
             {menuItems}
           </DropdownButton>
         </div>        
