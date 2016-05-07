@@ -71,7 +71,7 @@ App.propTypes = {
 }
 
 App.defaultProps = { 
-  theme: 'skin-black',
+  theme: 'skin-red-light',
 }
 
 export default App;
