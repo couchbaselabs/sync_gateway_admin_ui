@@ -1,40 +1,62 @@
 import Store from './Store'
+import { fetchAllDatabases, fetchDatabase } from '../api';
 
 class DatabaseListStore extends Store {
   constructor() {
     super();
-    this.data = {
-      names: [],
-      info: {}
+  }
+  
+  getInitialData() {
+    return {
+      dbNames: [],
+      dbInfo: {},
+      isFetching: false,
+      error: undefined
     };
   }
-
-  setNames(names) {
+  
+  fetchDatabases() {
+    this._setFetchStatus(true);
+    fetchAllDatabases()
+      .then(result => {
+        this._setNames(result.data);
+        this._fetchDatabasesInfo(result.data)
+      }).catch(error => {
+        this._setFetchStatus(false, error);
+      });
+  }
+  
+  _fetchDatabasesInfo(dbNames) {
+    let fetches = dbNames.map(db => fetchDatabase(db));
+    Promise.all(fetches)
+      .then(results => {
+        this._setFetchStatus(false);
+        const dbInfo = { };
+        for (const { data } of results) {
+          dbInfo[data.db_name] = data;
+        }
+        this._setInfo(dbInfo);
+      }).catch(error => {
+        this._setFetchStatus(false, error);
+      });
+  }
+  
+  _setFetchStatus(isFetching, error) {
     this.setData(data => {
-      return Object.assign({ }, data, { names });
+      return Object.assign({ }, data, { isFetching, error });
+    });
+  }  
+
+  _setNames(dbNames) {
+    this.setData(data => {
+      return Object.assign({ }, data, { dbNames });
     });
   }
 
-  setInfo(info) {
+  _setInfo(dbInfo) {
     this.setData(data => {
-      return Object.assign({ }, data, { info });
+      return Object.assign({ }, data, { dbInfo });
     });
-  }
-
-  getNames() {
-    const { names } = this.data;
-    if (names)
-      return names.slice();
-    else
-      return [ ];
-  }
-
-  getInfo() {
-    const { info } = this.data;
-    if (info)
-      return Object.assign({ }, info);
-    else
-      return { };
   }
 }
 

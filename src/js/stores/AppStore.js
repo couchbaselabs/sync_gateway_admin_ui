@@ -1,11 +1,14 @@
 import Store from './Store'
 
-const defaultTheme = 'skin-black';
+const defaultTheme = 'skin-red-light';
 
 class AppStore extends Store {
   constructor() {
     super();
-    this.data = {
+  }
+  
+  getInitialData() {
+    return {
       theme: defaultTheme,
       contentHeader: {
         primary: undefined,   // string
@@ -20,20 +23,12 @@ class AppStore extends Store {
       return Object.assign({ }, data, { contentHeader });
     })
   }
-
-  getContentHeader() {
-    return Object.assign({ }, this.data.contentHeader);
-  }
-
+  
   setTheme(theme) {
     const newTheme = theme || defaultTheme;
     this.setData(data => {
       return Object.assign({ }, data, { theme: newTheme });
     })
-  }
-
-  getTheme() {
-    return this.data.theme;
   }
 }
 

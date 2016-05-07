@@ -10,7 +10,7 @@ class DocumentList extends React.Component {
   constructor(props) {
     super(props);
     
-    this.documentListStoreOnChange = this.documentListStoreOnChange.bind(this);
+    this.dataStoreOnChange = this.dataStoreOnChange.bind(this);
     this.previousOnClick = this.previousOnClick.bind(this);
     this.nextOnClick = this.nextOnClick.bind(this);
     this.allRowsSelectedOnChange = this.allRowsSelectedOnChange.bind(this);
@@ -22,11 +22,11 @@ class DocumentList extends React.Component {
   }
   
   componentWillMount() {
-    DocumentListStore.addChangeListener(this.documentListStoreOnChange);
+    DocumentListStore.addChangeListener(this.dataStoreOnChange);
   }
   
   componentWillUnmount() {
-    DocumentListStore.removeChangeListener(this.documentListStoreOnChange);
+    DocumentListStore.removeChangeListener(this.dataStoreOnChange);
   }
   
   componentDidMount() {
@@ -38,7 +38,7 @@ class DocumentList extends React.Component {
     this.reload();
   }
   
-  documentListStoreOnChange() {
+  dataStoreOnChange() {
     this.setState(state => {
       return DocumentListStore.getData();
     })

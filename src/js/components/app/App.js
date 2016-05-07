@@ -16,17 +16,12 @@ const setBodyClass = () => {
 class App extends React.Component {
   constructor(props) {
     super(props);
-
-    this.appStoreOnChange = this.appStoreOnChange.bind(this);
-
-    this.state = {
-      contentHeader: undefined
-    }
+    this.appStoreOnChange = this.appStoreOnChange.bind(this)
+    this.state = AppStore.getData();
   }
 
   componentWillMount() {
     AppStore.addChangeListener(this.appStoreOnChange);
-    this.appStoreOnChange();
   }
 
   componentWillUnmount() {
@@ -34,21 +29,18 @@ class App extends React.Component {
   }
 
   appStoreOnChange() {
-    const contentHeader = AppStore.getContentHeader();
     this.setState(state => {
-      return Object.assign({ }, this.state, { contentHeader });
+      return AppStore.getData();
     });
   }
 
   render() {
-    const { theme, routes, params, children } = this.props;
-
-    const { contentHeader } = this.state;
-
+    const { routes, params, children } = this.props;
+    const { contentHeader, theme } = this.state;
+    const { primary, secondary } = contentHeader || { };
+    
     setAppTheme(theme);
     setBodyClass();
-    
-    const { primary, secondary } = contentHeader || { };
     
     return (
       <div className="wrapper">
@@ -64,14 +56,6 @@ class App extends React.Component {
       </div>
     );
   }
-}
-
-App.propTypes = {
-  theme: PropTypes.string,
-}
-
-App.defaultProps = { 
-  theme: 'skin-red-light',
 }
 
 export default App;

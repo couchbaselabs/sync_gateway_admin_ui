@@ -1,14 +1,12 @@
 import Store from './Store'
-
 import { fetchDocs, fetchDoc, deleteDoc } from '../api';
 
 class DocumentListStore extends Store {
   constructor() {
     super();
-    this.data = this._getInitData();
   }
   
-  _getInitData() {
+  getInitialData() {
     return {
       pageSize: 10,
       rows: [ ],
@@ -23,34 +21,28 @@ class DocumentListStore extends Store {
     }
   }
   
-  reset() {
-    this.setData(data => {
-      return this._getInitData();
-    });
-  }
-  
   fetchDocuments(db, pageOffset) {
     const { pageSize, curPage, startKeys } = this.data;
     const page = curPage + pageOffset;
     const startKey = (startKeys && page) && startKeys[page];
 
-    this._updateFetchStatus(true);
+    this._setFetchStatus(true);
     fetchDocs(db, pageSize, curPage, startKey)
       .then(result => {
-        this._updateFetchStatus(false);
-        this._updateRows(page, result.data.rows);
+        this._setFetchStatus(false);
+        this._setRows(page, result.data.rows);
       }).catch(error => {
-        this._updateFetchStatus(false, error);
+        this._setFetchStatus(false, error);
       });
   }
   
-  _updateFetchStatus(isFetching, error) {
+  _setFetchStatus(isFetching, error) {
     this.setData(data => {
       return Object.assign({ }, data, { isFetching, error });
     })
   }
   
-  _updateRows(page, rows) {
+  _setRows(page, rows) {
     const { pageSize, startKeys } = this.data;
     let displayRows = rows;
     let newStartKeys = [ ];
@@ -123,17 +115,17 @@ class DocumentListStore extends Store {
   
   searchDocumentById(db, docId) {
     this._setSearchDocId(docId);
-    this._updateFetchStatus(true);
+    this._setFetchStatus(true);
     fetchDoc(db, docId)
       .then(result => {
-        this._updateFetchStatus(false);
+        this._setFetchStatus(false);
         const rows = this._createRowsFromDoc(result.data);
-        this._updateRows(0, rows);
+        this._setRows(0, rows);
       }).catch(error => {
         this.setData(data => {
-          return this._getInitData();
+          return this._getInitialData();
         });
-        this._updateFetchStatus(false, error);
+        this._setFetchStatus(false, error);
       });
   }
   
