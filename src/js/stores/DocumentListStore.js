@@ -83,14 +83,13 @@ class DocumentListStore extends Store {
         rowIds.add(row.id);
       });
       
-      let newSelectedMap;
-      
       // Remove the selected rows that do not exist on the page anymore:
+      let newSelectedMap;
       curSelectedRowIds.forEach(selectedRowId => {
         if (!rowIds.has(selectedRowId)) {
           if (!newSelectedMap)
             newSelectedMap = Object.assign({ }, selectedMap);
-          newSelectedMap[selectedRowId] = undefined;
+          delete newSelectedMap[selectedRowId];
         }
       });
       
@@ -106,7 +105,7 @@ class DocumentListStore extends Store {
           })
         }
         
-        this.data(data => {
+        this.setData(data => {
           return Object.assign({ }, data, { selectedRows, allRowsSelected } );
         }); 
       }
