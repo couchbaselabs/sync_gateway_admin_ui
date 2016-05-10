@@ -165,7 +165,7 @@ class RevisionEdit extends React.Component {
 
       attachmentsDropDown = (
         <div className="pull-right">
-          <DropdownButton title="View Attachments" id="attachments" bsSize="sm" 
+          <DropdownButton title="Attachments" id="attachments" bsSize="sm" 
             onSelect={this.attachmentsOnSelect}>
             {menuItems}
           </DropdownButton>
