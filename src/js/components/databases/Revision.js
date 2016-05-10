@@ -3,21 +3,26 @@ import { Link } from 'react-router';
 import Clipboard from 'clipboard';
 import { serverApi } from '../../app';
 import { makePath, paramsOrProps } from '../../utils';
-import { fetchRevision } from '../../api';
+import RevisionStore from '../../stores/RevisionStore';
 import { Button, DropdownButton, MenuItem } from 'react-bootstrap';
 import { Brace, Icon, Space } from '../ui';
 
 class Revision extends React.Component {
   constructor(props) {
     super(props);
-
+    this.dataStoreOnChange = this.dataStoreOnChange.bind(this);
     this.braceOnLoad = this.braceOnLoad.bind(this);
-    
-    this.state = {
-      rev: undefined,
-      isFetching: false,
-      error: undefined
-    };
+    this.state = RevisionStore.getData();
+  }
+  
+  componentWillMount() {
+    RevisionStore.addChangeListener(this.dataStoreOnChange);
+  }
+  
+  componentWillUnmount() {
+    RevisionStore.removeChangeListener(this.dataStoreOnChange);
+    this.clipboard && this.clipboard.destroy();
+    this.editor = null;
   }
 
   componentDidMount() {
@@ -31,7 +36,7 @@ class Revision extends React.Component {
     });
 
     const { db, docId, revId } = paramsOrProps(this.props);
-    this.fetchRevision(db, docId, revId);
+    RevisionStore.fetchRevision(db, docId, revId);
   }
 
   componentWillReceiveProps(nextProps) {
@@ -39,38 +44,14 @@ class Revision extends React.Component {
     const { db:newDb, docId:newDocId, revId:newRevId} = 
       paramsOrProps(nextProps);
     if (db !== newDb || docId !== newDocId || revId !== newRevId) {
-      this.fetchRevision(newDb, newDocId, newRevId);
+      RevisionStore.fetchRevision(newDb, newDocId, newRevId);
     }
   }
-
-  componentWillUnMount() {
-    this.clipboard && this.clipboard.destroy();
-    this.editor = null;
-  }
-
-  setFetchStatus(isFetching, error) {
+  
+  dataStoreOnChange() {
     this.setState(state => {
-      return Object.assign({ }, state, { isFetching, error });
-    });
-  }
-
-  setRevision(rev) {
-    this.setState(state => {
-      return Object.assign({ }, state, { rev });
-    });
-  }
-
-  fetchRevision(db, docId, revId) {
-    this.setFetchStatus(true);
-
-    fetchRevision(db, docId, revId)
-      .then(result => {
-        this.setFetchStatus(false);
-        this.setRevision(result.data);
-      })
-      .catch(error => {
-        this.setFetchStatus(false, error);
-      });
+      return RevisionStore.getData();
+    })
   }
 
   braceOnLoad(editor) {
@@ -95,7 +76,7 @@ class Revision extends React.Component {
 
       attachmentsDropDown = (
         <div className="pull-right">
-          <DropdownButton title="View Attachments" id="attachments" bsSize="sm">
+          <DropdownButton title="Attachments" id="attachments" bsSize="sm">
             {menuItems}
           </DropdownButton>
         </div>        

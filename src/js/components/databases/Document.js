@@ -2,7 +2,7 @@ import React, { PropTypes } from 'react';
 import { Link } from 'react-router';
 import classNames from 'classnames';
 import { makePath } from '../../utils';
-import { fetchDoc } from '../../api';
+import DocumentStore from '../../stores/DocumentStore';
 import Revision from './Revision';
 import { Button, DropdownButton, MenuItem } from 'react-bootstrap';
 import { Box, BoxHeader, BoxTools, BoxBody, Icon, Space } from '../ui';
@@ -10,62 +10,32 @@ import { Box, BoxHeader, BoxTools, BoxBody, Icon, Space } from '../ui';
 class Document extends React.Component {
   constructor(props) {
     super(props);
-
-    this.state = {
-      doc: undefined,
-      history: undefined,
-      isFetching: false,
-      error: undefined
-    };
+    this.dataStoreOnChange = this.dataStoreOnChange.bind(this);
+    this.state = DocumentStore.getData();
   }
-
+  
+  componentWillMount() {
+    DocumentStore.addChangeListener(this.dataStoreOnChange);
+  }
+  
+  componentWillUnmount() {
+    DocumentStore.removeChangeListener(this.dataStoreOnChange);
+  }
+  
   componentDidMount() {
     const { db, docId } = this.props.params;
-    this.fetchDocument(db, docId);
+    DocumentStore.fetchDocument(db, docId);
   }
 
   componentWillReceiveProps(nextProps) {
     const { db, docId } = nextProps.params;
-    this.fetchDocument(db, docId);
-  }
-
-  shouldComponentUpdate(nextProps, nextState) {
-    const { db, docId } = nextProps.params;
-    const { db:oDb, docId:oDocId } = this.props.params;
-    const { doc } = nextState;
-    const { oDoc } = this.state;
-    return db !== oDb || docId !== oDocId || doc != oDoc;
-  }
-
-  fetchDocument(db, docId) {
-    this.setFetchStatus(true);
-
-    fetchDoc(db, docId)
-      .then(result => {
-        this.setFetchStatus(false);
-        this.setDoc(result.data);
-      })
-      .catch(error => {
-        this.setFetchStatus(false, error);
-      });
+    DocumentStore.fetchDocument(db, docId);
   }
   
-  setFetchStatus(isFetching, error) {
+  dataStoreOnChange() {
     this.setState(state => {
-      return Object.assign({ }, state, { isFetching, error });
-    });
-  }
-
-  setDoc(doc) {
-    let seq = doc._revisions.start;
-    const history = doc._revisions.ids.map(id => {
-      const revId = ((seq--) + '-' + id);
-      return revId;
+      return DocumentStore.getData();
     })
-    
-    this.setState(state => {
-      return Object.assign({ }, state, { doc, history });
-    });
   }
   
   currentRevId() {
