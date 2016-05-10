@@ -48,10 +48,25 @@ class Revision extends React.Component {
     }
   }
   
+  componentDidUpdate() {
+    this.foldRevisions();
+  }
+  
   dataStoreOnChange() {
     this.setState(state => {
       return RevisionStore.getData();
     })
+  }
+  
+  foldRevisions() {
+    if (this.editor) {
+      let begin = this.editor.find('"_revisions":');
+      if (begin) {
+        let end = this.editor.find('}', { begin });
+        if (end)
+          this.editor.getSession().foldAll(begin.start.row, end.end.row, 0);
+      }
+    }
   }
 
   braceOnLoad(editor) {
