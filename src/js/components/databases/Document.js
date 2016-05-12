@@ -2,6 +2,7 @@ import React, { PropTypes } from 'react';
 import { Link } from 'react-router';
 import classNames from 'classnames';
 import { makePath } from '../../utils';
+import AppStore from '../../stores/AppStore';
 import DocumentStore from '../../stores/DocumentStore';
 import Revision from './Revision';
 import { Button, DropdownButton, MenuItem } from 'react-bootstrap';
@@ -18,18 +19,25 @@ class Document extends React.Component {
     DocumentStore.addChangeListener(this.dataStoreOnChange);
   }
   
-  componentWillUnmount() {
-    DocumentStore.removeChangeListener(this.dataStoreOnChange);
-  }
-  
   componentDidMount() {
     const { db, docId } = this.props.params;
     DocumentStore.fetchDocument(db, docId);
   }
-
+  
   componentWillReceiveProps(nextProps) {
     const { db, docId } = nextProps.params;
     DocumentStore.fetchDocument(db, docId);
+  }
+  
+  componentWillUpdate(nextProps, nextState) {
+    const { isFetching } = nextState;
+    AppStore.setActivityIndicatorVisible(isFetching, 'Document');
+  }
+  
+  componentWillUnmount() {
+    DocumentStore.cancelFetchDocument();
+    AppStore.setActivityIndicatorVisible(false, 'Document');
+    DocumentStore.removeChangeListener(this.dataStoreOnChange);
   }
   
   dataStoreOnChange() {

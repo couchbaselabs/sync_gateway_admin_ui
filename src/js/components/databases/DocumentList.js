@@ -1,6 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router';
 import { makePath } from '../../utils';
+import AppStore from '../../stores/AppStore';
 import DocumentListStore from '../../stores/DocumentListStore';
 import { Button, Table, Checkbox } from 'react-bootstrap';
 import { Box, BoxHeader, BoxTools, BoxBody, BoxFooter, 
@@ -25,17 +26,23 @@ class DocumentList extends React.Component {
     DocumentListStore.addChangeListener(this.dataStoreOnChange);
   }
   
-  componentWillUnmount() {
-    DocumentListStore.removeChangeListener(this.dataStoreOnChange);
-  }
-  
   componentDidMount() {
-    const { db } = this.props.params;
-    DocumentListStore.fetchDocuments(db, 0);
+    this.fetchDocuments(0);
   }
   
   componentWillReceiveProps(nextProps) {
-    this.reload();
+    this.resetAndReload();
+  }
+  
+  componentWillUpdate(nextProps, nextState) {
+    const { isFetching } = nextState;
+    AppStore.setActivityIndicatorVisible(isFetching, 'DocumentList');
+  }
+  
+  componentWillUnmount() {
+    DocumentListStore.cancelFetchDocuments();
+    AppStore.setActivityIndicatorVisible(false, 'DocumentList');
+    DocumentListStore.removeChangeListener(this.dataStoreOnChange);
   }
   
   dataStoreOnChange() {
@@ -44,11 +51,9 @@ class DocumentList extends React.Component {
     })
   }
   
-  reload() {
+  resetAndReload() {
     DocumentListStore.reset();
-    
-    const { db } = this.props.params;
-    DocumentListStore.fetchDocuments(db, 0);
+    this.fetchDocuments(0);
   }
 
   fetchDocuments(pageOffset) {
@@ -78,7 +83,7 @@ class DocumentList extends React.Component {
     if (event.key === 'Enter') {
       const docId = event.target.value;
       if (docId.length === 0) {
-        this.reload();
+        this.resetAndReload();
       } else {
         const { db } = this.props.params;
         DocumentListStore.searchDocumentById(db, docId);

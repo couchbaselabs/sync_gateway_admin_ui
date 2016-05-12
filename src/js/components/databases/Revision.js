@@ -3,6 +3,7 @@ import { Link } from 'react-router';
 import Clipboard from 'clipboard';
 import { serverApi } from '../../app';
 import { makePath, paramsOrProps } from '../../utils';
+import AppStore from '../../stores/AppStore';
 import RevisionStore from '../../stores/RevisionStore';
 import { Button, DropdownButton, MenuItem } from 'react-bootstrap';
 import { Brace, Icon, Space } from '../ui';
@@ -17,12 +18,6 @@ class Revision extends React.Component {
   
   componentWillMount() {
     RevisionStore.addChangeListener(this.dataStoreOnChange);
-  }
-  
-  componentWillUnmount() {
-    RevisionStore.removeChangeListener(this.dataStoreOnChange);
-    this.clipboard && this.clipboard.destroy();
-    this.editor = null;
   }
 
   componentDidMount() {
@@ -44,12 +39,26 @@ class Revision extends React.Component {
     const { db:newDb, docId:newDocId, revId:newRevId} = 
       paramsOrProps(nextProps);
     if (db !== newDb || docId !== newDocId || revId !== newRevId) {
+      RevisionStore.cancelFetchRevision();
       RevisionStore.fetchRevision(newDb, newDocId, newRevId);
     }
   }
   
+  componentWillUpdate(nextProps, nextState) {
+    const { isFetching } = nextState;
+    AppStore.setActivityIndicatorVisible(isFetching, 'Revision');
+  }
+  
   componentDidUpdate() {
     this.foldRevisions();
+  }
+  
+  componentWillUnmount() {
+    RevisionStore.cancelFetchRevision();
+    AppStore.setActivityIndicatorVisible(false, 'Revision');
+    RevisionStore.removeChangeListener(this.dataStoreOnChange);
+    this.clipboard && this.clipboard.destroy();
+    this.editor = null;
   }
   
   dataStoreOnChange() {
