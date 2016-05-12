@@ -35,24 +35,24 @@ class AppStore extends Store {
   
   setActivityIndicatorVisible(visible, from) {
     const curVisible = this.activityIndicators[from] === true;
-    if (curVisible === visible)
+    if (curVisible === visible) 
       return;
     
     if (visible)
-        this.activityIndicators[from] = true;
+      this.activityIndicators[from] = true;
     else
       delete this.activityIndicators[from];
     
+    if (this.activityIndicatorTimeout)
+      clearTimeout(this.activityIndicatorTimeout);
+      
     const showIndicator = Object.keys(this.activityIndicators).length > 0;
-    
     const { activityIndicatorVisible } = this.data;
     if (activityIndicatorVisible != showIndicator) {
-      if (this.activityIndicatorTimeout)
-        clearTimeout(this.activityIndicatorTimeout);
-      
       const delay = visible ? 1000 : 0;
       this.activityIndicatorTimeout = setTimeout(() => {
-        this._setActivityIndicatorVisible(visible);
+        this._setActivityIndicatorVisible(showIndicator);
+        this.activityIndicatorTimeout = undefined;
       }, delay);
     }
   }
