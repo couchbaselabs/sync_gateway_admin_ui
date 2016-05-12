@@ -16,17 +16,24 @@ class RevisionStore extends Store {
 
   fetchRevision(db, docId, revId) {
     this._setFetchStatus(true);
-    fetchRevision(db, docId, revId)
-      .then(result => {
-        this._setFetchStatus(false);
-        this._setRevision(result.data);
-      })
-      .catch(error => {
-        this._setFetchStatus(false, error);
-      });
+    this.fetch = fetchRevision(db, docId, revId);
+    this.fetch.promise.then(result => {
+      this._setFetchStatus(false);
+      this._setRevision(result.data);
+    })
+    .catch(reason => {
+      this._setFetchStatus(false, reason);
+    });
   }
   
-  _setFetchStatus(isFetching, error) {
+  cancelFetchRevision() {
+    if (this.fetch)
+      this.fetch.cancel();
+    this._setFetchStatus(false);
+  }
+  
+  _setFetchStatus(isFetching, reason) {
+    const error = reason && !reason.isCanceled ? reason : undefined;
     this.setData(data => {
       return Object.assign({ }, data, { isFetching, error });
     });

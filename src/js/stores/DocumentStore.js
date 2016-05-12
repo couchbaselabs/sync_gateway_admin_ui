@@ -17,18 +17,24 @@ class DocumentStore extends Store {
   
   fetchDocument(db, docId) {
     this._setFetchStatus(true);
-
-    fetchDoc(db, docId)
-      .then(result => {
-        this._setFetchStatus(false);
-        this._setDoc(result.data);
-      })
-      .catch(error => {
-        this._setFetchStatus(false, error);
-      });
+    this.fetch = fetchDoc(db, docId);
+    this.fetch.promise.then(result => {
+      this._setFetchStatus(false);
+      this._setDoc(result.data);
+    })
+    .catch(reason => {
+      this._setFetchStatus(false, reason);
+    });
   }
   
-  _setFetchStatus(isFetching, error) {
+  cancelFetchDocument() {
+    if (this.fetch)
+      this.fetch.cancel();
+    this._setFetchStatus(false);
+  }
+  
+  _setFetchStatus(isFetching, reason) {
+    const error = reason && !reason.isCanceled ? reason : undefined;
     this.setData(data => {
       return Object.assign({ }, data, { isFetching, error });
     });

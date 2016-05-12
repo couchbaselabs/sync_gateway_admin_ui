@@ -27,16 +27,23 @@ class DocumentListStore extends Store {
     const startKey = (startKeys && page) && startKeys[page];
 
     this._setFetchStatus(true);
-    fetchDocs(db, pageSize, curPage, startKey)
-      .then(result => {
-        this._setFetchStatus(false);
-        this._setRows(page, result.data.rows);
-      }).catch(error => {
-        this._setFetchStatus(false, error);
-      });
+    this.fetch = fetchDocs(db, pageSize, curPage, startKey);
+    this.fetch.promise.then(result => {
+      this._setFetchStatus(false);
+      this._setRows(page, result.data.rows);
+    }).catch(reason => {
+      this._setFetchStatus(false, reason);
+    });
   }
   
-  _setFetchStatus(isFetching, error) {
+  cancelFetchDocuments() {
+    if (this.fetch)
+      this.fetch.cancel();  
+    this._setFetchStatus(false);
+  }
+  
+  _setFetchStatus(isFetching, reason) {
+    const error = reason && !reason.isCanceled ? reason : undefined;
     this.setData(data => {
       return Object.assign({ }, data, { isFetching, error });
     })

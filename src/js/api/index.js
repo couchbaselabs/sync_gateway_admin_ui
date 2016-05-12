@@ -3,10 +3,13 @@ import { serverApi } from '../app';
 import { makePath } from '../utils';
 
 function _fetch(...args) {
+  let isCanceled = false;
   const promise = new Promise((resolve, reject) => {
     fetch(...args)
       .then(res => {
-        if (res.status >= 200 && res.status < 300) {
+        if (isCanceled)
+          reject({ isCanceled });
+        else if (res.status >= 200 && res.status < 300) {
           return res.json().then(data => { 
             return { data, status: res.status }
           });
@@ -14,14 +17,19 @@ function _fetch(...args) {
           throw { message: res.statusText, status: res.status };
       })
       .then(result => {
-        resolve(result);
+        isCanceled ? reject({ isCanceled }) : resolve(result);
       })
-      .catch(error => {
-        console.log("Fetch Error: " + error.message);
-        reject(error);
+      .catch(reason => {
+        console.log("Fetch Error: " + reason.message);
+        isCanceled ? reject({ isCanceled }) : reject(reason);
       });
   });
-  return promise;
+  return { 
+    promise,
+    cancel() {
+      isCanceled = true;
+    } 
+  };
 }
 
 export function fetchAllDatabases() {

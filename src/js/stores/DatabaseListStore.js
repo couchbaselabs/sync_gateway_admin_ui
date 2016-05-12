@@ -17,27 +17,32 @@ class DatabaseListStore extends Store {
   
   fetchDatabases() {
     this._setFetchStatus(true);
-    fetchAllDatabases()
-      .then(result => {
-        this._setNames(result.data);
-        this._fetchDatabasesInfo(result.data)
-      }).catch(error => {
-        this._setFetchStatus(false, error);
-      });
-  }
-  
-  cancelFetchDatabases() {
-    this.setData(data => {
-      return Object.assign({ }, data, { 
-        isFetching: false, 
-        error: undefined 
-      });
+    this.fetch = fetchAllDatabases();
+    this.fetch.promise.then(result => {
+      this._setNames(result.data);
+      this._fetchDatabasesInfo(result.data)
+    }).catch(reason => {
+      this._setFetchStatus(false, reason);
     });
   }
   
+  cancelFetchDatabases() {
+    if (this.fetch) 
+      this.fetch.cancel();
+      
+    if (this.dbInfoFetches) {
+      this.dbInfoFetches.forEach(fetch => {
+        fetch.cancel();
+      })
+    }
+    
+    this._setFetchStatus(false);
+  }
+  
   _fetchDatabasesInfo(dbNames) {
-    let fetches = dbNames.map(db => fetchDatabase(db));
-    Promise.all(fetches)
+    this.dbInfoFetches = dbNames.map(db => fetchDatabase(db));
+    let promises = this.dbInfoFetches.map(fetch => fetch.promise);
+    Promise.all(promises)
       .then(results => {
         this._setFetchStatus(false);
         const dbInfo = { };
@@ -45,12 +50,13 @@ class DatabaseListStore extends Store {
           dbInfo[data.db_name] = data;
         }
         this._setInfo(dbInfo);
-      }).catch(error => {
-        this._setFetchStatus(false, error);
+      }).catch(reason => {
+        this._setFetchStatus(false, reason);
       });
   }
   
-  _setFetchStatus(isFetching, error) {
+  _setFetchStatus(isFetching, reason) {
+    const error = reason && !reason.isCanceled ? reason : undefined;
     this.setData(data => {
       return Object.assign({ }, data, { isFetching, error });
     });
