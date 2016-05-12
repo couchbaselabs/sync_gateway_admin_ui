@@ -36,7 +36,7 @@ class App extends React.Component {
 
   render() {
     const { routes, params, children } = this.props;
-    const { contentHeader, theme } = this.state;
+    const { contentHeader, theme, activityIndicatorVisible } = this.state;
     const { primary, secondary } = contentHeader || { };
     
     setAppTheme(theme);
@@ -44,7 +44,7 @@ class App extends React.Component {
     
     return (
       <div className="wrapper">
-        <AppHeader/>
+        <AppHeader spinnerVisible={activityIndicatorVisible}/>
         <AppSidebar/>
         <AppContent 
           primaryHeader={primary} 

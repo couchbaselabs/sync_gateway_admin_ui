@@ -1,6 +1,7 @@
 import React, { PropTypes } from 'react';
 import { Link } from 'react-router';
 import { makePath } from '../../utils';
+import AppStore from '../../stores/AppStore';
 import DatabaseListStore from '../../stores/DatabaseListStore';
 import { Row, Col, Table, Button } from 'react-bootstrap';
 import { Box, BoxHeader, BoxBody, BoxTools, Icon} from '../ui';
@@ -17,12 +18,19 @@ class DatabaseList extends React.Component {
     DatabaseListStore.addChangeListener(this.dataStoreOnChange);
   }
   
-  componentWillUnmount() {
-    DatabaseListStore.removeChangeListener(this.dataStoreOnChange);
-  }
-  
   componentDidMount() {
     DatabaseListStore.fetchDatabases();
+  }
+  
+  componentWillUpdate(nextProps, nextState) {
+    const { isFetching } = nextState;
+    AppStore.setActivityIndicatorVisible(isFetching, 'DatabaseList');
+  }
+  
+  componentWillUnmount() {
+    DatabaseListStore.cancelFetchDatabases();
+    AppStore.setActivityIndicatorVisible(false, 'DatabaseList');
+    DatabaseListStore.removeChangeListener(this.dataStoreOnChange);
   }
   
   dataStoreOnChange() {

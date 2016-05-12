@@ -26,6 +26,15 @@ class DatabaseListStore extends Store {
       });
   }
   
+  cancelFetchDatabases() {
+    this.setData(data => {
+      return Object.assign({ }, data, { 
+        isFetching: false, 
+        error: undefined 
+      });
+    });
+  }
+  
   _fetchDatabasesInfo(dbNames) {
     let fetches = dbNames.map(db => fetchDatabase(db));
     Promise.all(fetches)
