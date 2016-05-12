@@ -22,7 +22,8 @@ class DocumentNew extends React.Component {
     this.cancel = this.cancel.bind(this);
   }
 
-  setCreateStatus(isCreating, error) {
+  setCreateStatus(isCreating, reason) {
+    const error = reason && !reason.isCanceled ? reason : undefined;
     this.setState(state => {
       return Object.assign({ }, state, { isCreating, error });
     });
@@ -40,13 +41,13 @@ class DocumentNew extends React.Component {
 
     const { db } = this.props.params;
     this.setCreateStatus(true);
-    createDoc(db, json)
-      .then(result => {
+    const fetch = createDoc(db, json);
+      fetch.promise.then(result => {
         this.setCreateStatus(true);
         this.done();
       })
-      .catch(error => {
-        this.setCreateStatus(false, error);
+      .catch(reason => {
+        this.setCreateStatus(false, reason);
       });
   }
 

@@ -38,7 +38,8 @@ class RevisionEdit extends React.Component {
       db !== oDb || docId !== oDocId || revId !== oRevId);
   }
 
-  setFetchStatus(isFetching, error) {
+  setFetchStatus(isFetching, reason) {
+    const error = reason && !reason.isCanceled ? reason : undefined;
     this.setState(state => {
       return Object.assign({ }, state, { isFetching, error });
     });
@@ -52,7 +53,8 @@ class RevisionEdit extends React.Component {
     });
   }
 
-  setUpdateStatus(isUpdating, error) {
+  setUpdateStatus(isUpdating, reason) {
+    const error = reason && !reason.isCanceled ? reason : undefined;
     this.setState(state => {
       return Object.assign({ }, state, { isUpdating, error });
     });
@@ -61,26 +63,26 @@ class RevisionEdit extends React.Component {
   fetchRevision(db, docId, revId) {
     this.setFetchStatus(true);
 
-    fetchRevision(db, docId, revId)
-      .then(result => {
+    const fetch = fetchRevision(db, docId, revId);
+      fetch.promise.then(result => {
         this.setFetchStatus(false);
         this.setRevision(result.data);
       })
-      .catch(error => {
-        this.setFetchStatus(false, error);
+      .catch(reason => {
+        this.setFetchStatus(false, reason);
       });
   }
 
   updateRevision(db, docId, revId, json) {
     this.setUpdateStatus(true);
     
-    updateRevision(db, docId, revId, json)
-      .then(result => {
+    const fetch = updateRevision(db, docId, revId, json);
+      fetch.promise.then(result => {
         this.setUpdateStatus(false);
         this.done();
       })
-      .catch(error => {
-        this.setUpdateStatus(false, error);
+      .catch(reason => {
+        this.setUpdateStatus(false, reason);
       });
   }
 
