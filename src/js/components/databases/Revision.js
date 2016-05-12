@@ -95,7 +95,8 @@ class Revision extends React.Component {
       Object.keys(rev._attachments).forEach(key => {
         const path = makePath(db, docId, key, {rev: revId});
         const url = serverApi(path);
-        menuItems.push(<MenuItem href={url} target="_blank">{key}</MenuItem>);
+        menuItems.push(
+          <MenuItem key={key} href={url} target="_blank">{key}</MenuItem>);
       });
 
       attachmentsDropDown = (
