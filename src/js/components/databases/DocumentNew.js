@@ -21,14 +21,6 @@ class DocumentNew extends React.Component {
     this.save = this.save.bind(this);
     this.cancel = this.cancel.bind(this);
   }
-  
-  componentDidUpdate() {
-    const { progress } = this.props;
-    if (progress && progress.success) {
-      const { router } = this.context;
-      router.goBack();
-    }
-  }
 
   setCreateStatus(isCreating, error) {
     this.setState(state => {

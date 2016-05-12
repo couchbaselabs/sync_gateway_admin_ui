@@ -1,6 +1,6 @@
 import React, { PropTypes } from 'react';
 import { Link } from 'react-router';
-import Spinner from '../ui/Spinner';
+import { Spinner } from '../ui';
 
 const AppHeader = ({ spinnerVisible }) => {
   return (
