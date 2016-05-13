@@ -1,14 +1,16 @@
 import React, { PropTypes } from 'react';
 import { paramsOrProps, makePath } from '../../utils';
-import { fetchRevision, updateRevision, uploadAttachment, deleteDoc } 
-  from '../../api';
+import AppStore from '../../stores/AppStore';
+import RevisionStore from '../../stores/RevisionStore';
+import { updateRevision, uploadAttachment, deleteDoc } from '../../api';
 import { Button, DropdownButton, MenuItem } from 'react-bootstrap';
 import { Brace, Icon, Space } from '../ui';
 
 class RevisionEdit extends React.Component {
   constructor(props, context) {
     super(props, context);
-
+    
+    this.revisionStoreOnChange = this.revisionStoreOnChange.bind(this);
     this.onEditorChange = this.onEditorChange.bind(this);
     this.saveOnClick = this.saveOnClick.bind(this);
     this.cancelOnClick = this.cancelOnClick.bind(this);
@@ -24,35 +26,47 @@ class RevisionEdit extends React.Component {
     };
   }
   
+  componentWillMount() {
+    RevisionStore.addChangeListener(this.revisionStoreOnChange);
+  }
+  
   componentDidMount() {
-    const { dispatch } = this.props;
-    const { db, docId, revId } = paramsOrProps(this.props);
-    this.fetchRevision(db, docId, revId);
+    const { db, docId, revId } = this.props.params;
+    RevisionStore.fetchRevision(db, docId, revId);
   }
-
+  
   shouldComponentUpdate(nextProps, nextState) {
-    const { db, docId, revId } = paramsOrProps(nextProps);
-    const { db:oDb, docId:oDocId, revId:oRevId } = paramsOrProps(this.props);
-    const { rev } = this.state;
-    return (!rev || 
-      db !== oDb || docId !== oDocId || revId !== oRevId);
+    return (nextState.rev !== this.state.rev || 
+            nextState.isFetching !== this.state.isFetching || 
+            nextState.isUpdating !== this.state.isUpdating || 
+            nextState.error !== this.state.error);
   }
-
-  setFetchStatus(isFetching, reason) {
-    const error = reason && !reason.isCanceled ? reason : undefined;
+  
+  componentWillUpdate(nextProps, nextState) {
+    const { isFetching, isUpdating } = nextState;
+    const indicatorVisible = isFetching || isUpdating;
+    AppStore.setActivityIndicatorVisible(indicatorVisible, 'RevisionEdit');
+  }
+  
+  componentWillUnmount() {
+    this.fetch && this.fetch.cancel();
+    RevisionStore.cancelFetchRevision();
+    AppStore.setActivityIndicatorVisible(false, 'RevisionEdit');
+    RevisionStore.removeChangeListener(this.revisionStoreOnChange);
+  }
+  
+  revisionStoreOnChange() {
     this.setState(state => {
-      return Object.assign({ }, state, { isFetching, error });
+      const { rev, isFetching, error } = RevisionStore.getData();
+      let jsonStr;
+      if (rev) {
+        const editRev = Object.assign({ }, rev, { _revisions: undefined });
+        jsonStr = JSON.stringify(editRev, null, '\t');
+      }
+      return Object.assign({ }, state, { rev, jsonStr, isFetching, error });
     });
   }
-
-  setRevision(rev) {
-    const editRev = Object.assign({ }, rev, { _revisions: undefined });
-    const jsonStr = JSON.stringify(editRev, null, '\t');
-    this.setState(state => {
-      return Object.assign({ }, state, { rev, jsonStr });
-    });
-  }
-
+  
   setUpdateStatus(isUpdating, reason) {
     const error = reason && !reason.isCanceled ? reason : undefined;
     this.setState(state => {
@@ -60,30 +74,16 @@ class RevisionEdit extends React.Component {
     });
   }
 
-  fetchRevision(db, docId, revId) {
-    this.setFetchStatus(true);
-
-    const fetch = fetchRevision(db, docId, revId);
-      fetch.promise.then(result => {
-        this.setFetchStatus(false);
-        this.setRevision(result.data);
-      })
-      .catch(reason => {
-        this.setFetchStatus(false, reason);
-      });
-  }
-
   updateRevision(db, docId, revId, json) {
     this.setUpdateStatus(true);
-    
-    const fetch = updateRevision(db, docId, revId, json);
-      fetch.promise.then(result => {
-        this.setUpdateStatus(false);
-        this.done();
-      })
-      .catch(reason => {
-        this.setUpdateStatus(false, reason);
-      });
+    this.fetch = updateRevision(db, docId, revId, json);
+    this.fetch.promise.then(result => {
+      this.setUpdateStatus(false);
+      this.done();
+    })
+    .catch(reason => {
+      this.setUpdateStatus(false, reason);
+    });
   }
 
   onEditorChange(jsonStr) {
@@ -113,26 +113,26 @@ class RevisionEdit extends React.Component {
   attachmentOnChange(event) {
     const { db, docId, revId } = paramsOrProps(this.props);
     const file = event.target.files[0];
-    uploadAttachment(db, docId, revId, file)
-      .then(result => {
-        this.setUpdateStatus(false);
-        this.done();
-      })
-      .catch(error => {
-        this.setUpdateStatus(false, error);
-      });
+    this.fetch = uploadAttachment(db, docId, revId, file);
+    this.fetch.promise.then(result => {
+      this.setUpdateStatus(false);
+      this.done();
+    })
+    .catch(error => {
+      this.setUpdateStatus(false, error);
+    });
   }
   
   deleteOnClick() {
     const { db, docId, revId } = paramsOrProps(this.props);
-    deleteDoc(db, docId, revId)
-      .then(result => {
-        this.setUpdateStatus(false);
-        this.gotoDocuments();
-      })
-      .catch(error => {
-        this.setUpdateStatus(false, error);
-      });
+    this.fetch = deleteDoc(db, docId, revId);
+    this.fetch.promise.then(result => {
+      this.setUpdateStatus(false);
+      this.gotoDocuments();
+    })
+    .catch(error => {
+      this.setUpdateStatus(false, error);
+    });
   }
 
   done() {
