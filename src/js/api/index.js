@@ -13,15 +13,17 @@ function _fetch(...args) {
           return res.json().then(data => { 
             return { data, status: res.status }
           });
-        } else
+        } else {
           throw { message: res.statusText, status: res.status };
+        }
       })
       .then(result => {
         isCanceled ? reject({ isCanceled }) : resolve(result);
       })
       .catch(reason => {
         console.log("Fetch Error: " + reason.message);
-        isCanceled ? reject({ isCanceled }) : reject(reason);
+        isCanceled ? 
+          reject({ isCanceled }) : reject({ message: reason.message });
       });
   });
   return { 

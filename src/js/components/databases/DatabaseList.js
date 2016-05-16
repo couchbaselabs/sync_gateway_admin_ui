@@ -22,15 +22,22 @@ class DatabaseList extends React.Component {
     DatabaseListStore.fetchDatabases();
   }
   
+  componentWillReceiveProps(nextProps) {
+    DatabaseListStore.reset();
+    DatabaseListStore.fetchDatabases();
+  }
+  
   componentWillUpdate(nextProps, nextState) {
-    const { isFetching } = nextState;
+    const { isFetching, error } = nextState;
     AppStore.setActivityIndicatorVisible(isFetching, 'DatabaseList');
+    AppStore.setAlert(error && { type: 'error', message: error.message });
   }
   
   componentWillUnmount() {
     DatabaseListStore.cancelFetchDatabases();
-    AppStore.setActivityIndicatorVisible(false, 'DatabaseList');
     DatabaseListStore.removeChangeListener(this.dataStoreOnChange);
+    AppStore.setActivityIndicatorVisible(false, 'DatabaseList');
+    AppStore.setAlert(undefined);
   }
   
   dataStoreOnChange() {

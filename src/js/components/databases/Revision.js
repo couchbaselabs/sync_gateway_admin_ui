@@ -29,7 +29,7 @@ class Revision extends React.Component {
         return null;
       }
     });
-
+    
     const { db, docId, revId } = paramsOrProps(this.props);
     RevisionStore.fetchRevision(db, docId, revId);
   }
@@ -45,8 +45,9 @@ class Revision extends React.Component {
   }
   
   componentWillUpdate(nextProps, nextState) {
-    const { isFetching } = nextState;
+    const { isFetching, error } = nextState;
     AppStore.setActivityIndicatorVisible(isFetching, 'Revision');
+    AppStore.setAlert(error && { type: 'error', message: error.message });
   }
   
   componentDidUpdate() {
@@ -54,9 +55,13 @@ class Revision extends React.Component {
   }
   
   componentWillUnmount() {
-    RevisionStore.cancelFetchRevision();
-    AppStore.setActivityIndicatorVisible(false, 'Revision');
     RevisionStore.removeChangeListener(this.dataStoreOnChange);
+    RevisionStore.cancelFetchRevision();
+    RevisionStore.reset();
+    
+    AppStore.setActivityIndicatorVisible(false, 'Revision');
+    AppStore.setAlert(undefined);
+    
     this.clipboard && this.clipboard.destroy();
     this.editor = null;
   }
@@ -64,7 +69,7 @@ class Revision extends React.Component {
   dataStoreOnChange() {
     this.setState(state => {
       return RevisionStore.getData();
-    })
+    });
   }
   
   foldRevisions() {
@@ -86,7 +91,7 @@ class Revision extends React.Component {
     const { rev } = this.state;
     if (!rev)
       return null;
-
+    
     const { db, docId, revId } = paramsOrProps(this.props);
     
     let attachmentsDropDown = null;

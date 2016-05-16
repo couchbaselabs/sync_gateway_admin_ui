@@ -44,12 +44,12 @@ class DatabaseListStore extends Store {
     let promises = this.dbInfoFetches.map(fetch => fetch.promise);
     Promise.all(promises)
       .then(results => {
-        this._setFetchStatus(false);
         const dbInfo = { };
         for (const { data } of results) {
           dbInfo[data.db_name] = data;
         }
         this._setInfo(dbInfo);
+        this._setFetchStatus(false);
       }).catch(reason => {
         this._setFetchStatus(false, reason);
       });

@@ -43,16 +43,19 @@ class RevisionEdit extends React.Component {
   }
   
   componentWillUpdate(nextProps, nextState) {
-    const { isFetching, isUpdating } = nextState;
+    const { isFetching, isUpdating, error } = nextState;
     const indicatorVisible = isFetching || isUpdating;
     AppStore.setActivityIndicatorVisible(indicatorVisible, 'RevisionEdit');
+    AppStore.setAlert(error && { type: 'error', message: error.message });
   }
   
   componentWillUnmount() {
     this.fetch && this.fetch.cancel();
     RevisionStore.cancelFetchRevision();
-    AppStore.setActivityIndicatorVisible(false, 'RevisionEdit');
     RevisionStore.removeChangeListener(this.revisionStoreOnChange);
+    
+    AppStore.setActivityIndicatorVisible(false, 'RevisionEdit');
+    AppStore.setAlert(undefined);
   }
   
   revisionStoreOnChange() {

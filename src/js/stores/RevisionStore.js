@@ -15,13 +15,14 @@ class RevisionStore extends Store {
   }
 
   fetchRevision(db, docId, revId) {
-    this._setFetchStatus(true);
+    this._setFetchStatus(true, undefined);
     this.fetch = fetchRevision(db, docId, revId);
     this.fetch.promise.then(result => {
-      this._setFetchStatus(false);
       this._setRevision(result.data);
+      this._setFetchStatus(false);
     })
     .catch(reason => {
+      console.log('fetchRev Error')
       this._setFetchStatus(false, reason);
     });
   }
