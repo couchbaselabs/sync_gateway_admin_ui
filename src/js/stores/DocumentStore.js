@@ -19,8 +19,8 @@ class DocumentStore extends Store {
     this._setFetchStatus(true);
     this.fetch = fetchDoc(db, docId);
     this.fetch.promise.then(result => {
-      this._setFetchStatus(false);
       this._setDoc(result.data);
+      this._setFetchStatus(false);
     })
     .catch(reason => {
       this._setFetchStatus(false, reason);

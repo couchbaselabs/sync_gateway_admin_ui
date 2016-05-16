@@ -29,8 +29,8 @@ class DocumentListStore extends Store {
     this._setFetchStatus(true);
     this.fetch = fetchDocs(db, pageSize, curPage, startKey);
     this.fetch.promise.then(result => {
-      this._setFetchStatus(false);
       this._setRows(page, result.data.rows);
+      this._setFetchStatus(false);
     }).catch(reason => {
       this._setFetchStatus(false, reason);
     });

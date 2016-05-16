@@ -36,7 +36,8 @@ class App extends React.Component {
 
   render() {
     const { routes, params, children } = this.props;
-    const { contentHeader, theme, activityIndicatorVisible } = this.state;
+    const { contentHeader, theme, activityIndicatorVisible, alert } = 
+      this.state;
     const { primary, secondary } = contentHeader || { };
     
     setAppTheme(theme);
@@ -48,7 +49,8 @@ class App extends React.Component {
         <AppSidebar/>
         <AppContent 
           primaryHeader={primary} 
-          secondaryHeader={secondary} 
+          secondaryHeader={secondary}
+          alert={alert} 
           routes={routes} 
           params={params}>
           {children}

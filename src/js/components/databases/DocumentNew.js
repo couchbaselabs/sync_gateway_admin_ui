@@ -1,5 +1,6 @@
 import React, { PropTypes } from 'react';
 import { Link } from 'react-router';
+import AppStore from '../../stores/AppStore';
 import { createDoc } from '../../api';
 import { Button, ButtonToolbar, Col, Row, Table } from 'react-bootstrap';
 import { Box, BoxHeader, BoxBody, BoxTools, BoxFooter, Brace, Icon } from '../ui';
@@ -21,7 +22,18 @@ class DocumentNew extends React.Component {
     this.save = this.save.bind(this);
     this.cancel = this.cancel.bind(this);
   }
-
+  
+  componentWillUpdate(nextProps, nextState) {
+    const { isCreating, error } = nextState;
+    AppStore.setActivityIndicatorVisible(isCreating, 'DocumentNew');
+    AppStore.setAlert(error && { type: 'error', message: error.message });
+  }
+  
+  componentWillUnmount() {
+    AppStore.setActivityIndicatorVisible(false, 'DocumentNew');
+    AppStore.setAlert(undefined);
+  }
+  
   setCreateStatus(isCreating, reason) {
     const error = reason && !reason.isCanceled ? reason : undefined;
     this.setState(state => {

@@ -30,14 +30,18 @@ class Document extends React.Component {
   }
   
   componentWillUpdate(nextProps, nextState) {
-    const { isFetching } = nextState;
+    const { isFetching, error } = nextState;
     AppStore.setActivityIndicatorVisible(isFetching, 'Document');
+    AppStore.setAlert(error && { type: 'error', message: error.message });
   }
   
   componentWillUnmount() {
-    DocumentStore.cancelFetchDocument();
-    AppStore.setActivityIndicatorVisible(false, 'Document');
     DocumentStore.removeChangeListener(this.dataStoreOnChange);
+    DocumentStore.cancelFetchDocument();
+    DocumentStore.reset();
+    
+    AppStore.setActivityIndicatorVisible(false, 'Document');
+    AppStore.setAlert(undefined);
   }
   
   dataStoreOnChange() {
@@ -66,10 +70,18 @@ class Document extends React.Component {
   
   render() {
     const { doc } = this.state;
-    if (!doc)
-      return null;
+    if (!doc) {
+      // Display an empty box content with the document ID:
+      const { docId } = this.props.params;
+      return (
+        <Box topLine={false}>
+          <BoxHeader title={docId}/>
+          <BoxBody><p></p></BoxBody>
+        </Box>
+      );
+    }
     
-    const { db, revId } = this.props.params;
+    const { db, docId, revId } = this.props.params;
     const children = revId ? this.props.children : 
         <Revision db={db} docId={doc._id} revId={doc._rev}/>
     
@@ -106,7 +118,7 @@ class Document extends React.Component {
     }
     
     const boxHeader = (
-      <BoxHeader title={doc._id}>
+      <BoxHeader title={docId}>
         {revNav}
       </BoxHeader>
     );

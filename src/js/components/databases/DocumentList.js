@@ -35,14 +35,16 @@ class DocumentList extends React.Component {
   }
   
   componentWillUpdate(nextProps, nextState) {
-    const { isFetching } = nextState;
+    const { isFetching, error } = nextState;
     AppStore.setActivityIndicatorVisible(isFetching, 'DocumentList');
+    AppStore.setAlert(error && { type: 'error', message: error.message });
   }
   
   componentWillUnmount() {
     DocumentListStore.cancelFetchDocuments();
-    AppStore.setActivityIndicatorVisible(false, 'DocumentList');
     DocumentListStore.removeChangeListener(this.dataStoreOnChange);
+    AppStore.setActivityIndicatorVisible(false, 'DocumentList');
+    AppStore.setAlert(undefined);
   }
   
   dataStoreOnChange() {
