@@ -12,9 +12,12 @@ class AppStore extends Store {
     return {
       theme: defaultTheme,
       contentHeader: {
-        primary: undefined,   // string
-        secondary: undefined  // string
+        primary: undefined,     // string
+        secondary: undefined,   // string
       },
+      alert: undefined,         // { type: ['info', 'warning', 'error', 
+                                //          'primary', 'success'], 
+                                //   message: string }
       activityIndicatorVisible: false
     };
   }
@@ -61,6 +64,12 @@ class AppStore extends Store {
     this.setData(data => {
       return Object.assign({ }, data, { activityIndicatorVisible: visible });
     })
+  }
+  
+  setAlert(alert) {
+    this.setData(data => {
+      return Object.assign({ }, data, { alert });
+    });
   }
 }
 

@@ -1,3 +1,4 @@
+import AlertBox from './AlertBox';
 import Box from './Box'
 import BoxHeader from './BoxHeader'
 import BoxBody from './BoxBody'
@@ -10,6 +11,7 @@ import Space from './Space'
 import Tabs from './Tabs'
 
 export {
+  AlertBox,
   Box,
   BoxHeader,
   BoxBody,
