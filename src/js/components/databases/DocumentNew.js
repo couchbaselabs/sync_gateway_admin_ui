@@ -3,7 +3,8 @@ import { Link } from 'react-router';
 import AppStore from '../../stores/AppStore';
 import { createDoc } from '../../api';
 import { Button, ButtonToolbar, Col, Row, Table } from 'react-bootstrap';
-import { Box, BoxHeader, BoxBody, BoxTools, BoxFooter, Brace, Icon } from '../ui';
+import { AhDiv, Box, BoxHeader, BoxBody, BoxTools, BoxFooter, Brace, Icon } 
+  from '../ui';
 
 import 'brace/mode/json';
 
@@ -15,6 +16,7 @@ class DocumentNew extends React.Component {
       doc: '{\n\t\n}',
       isCreating: false,
       error: undefined,
+      wHeight: window.innerHeight,
       cursorAt: { row:1, column:1 }
     };
     
@@ -24,6 +26,7 @@ class DocumentNew extends React.Component {
   }
   
   componentWillUpdate(nextProps, nextState) {
+    console.log('componentWillUpdate');
     const { isCreating, error } = nextState;
     AppStore.setActivityIndicatorVisible(isCreating, 'DocumentNew');
     AppStore.setAlert(error && { type: 'error', message: error.message });
@@ -32,6 +35,12 @@ class DocumentNew extends React.Component {
   componentWillUnmount() {
     AppStore.setActivityIndicatorVisible(false, 'DocumentNew');
     AppStore.setAlert(undefined);
+  }
+  
+  handleResize() {
+    this.setState(state => {
+      return Object.assign({ }, state, { wHeight: window.innerHeight });
+    });
   }
   
   setCreateStatus(isCreating, reason) {
@@ -81,7 +90,7 @@ class DocumentNew extends React.Component {
   }
 
   render() {
-    const { doc, cursorAt } = this.state;
+    const { doc, cursorAt, wHeight } = this.state;
     
     const boxHeader = (
       <BoxHeader title="Create New Document">
@@ -102,10 +111,10 @@ class DocumentNew extends React.Component {
       <Box topLine={false}>
         {boxHeader}
         <BoxBody withPadding={false}>
-          <div className="docEditor">
+          <AhDiv className="docEditor" offset={210}>
             <Brace name="docEditor" mode="json" value={doc} 
               cursorAt={cursorAt} onChange={this.onEditorChange}/>
-          </div>
+          </AhDiv>
         </BoxBody>
       </Box>
     );

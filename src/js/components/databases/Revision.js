@@ -6,7 +6,7 @@ import { makePath, paramsOrProps } from '../../utils';
 import AppStore from '../../stores/AppStore';
 import RevisionStore from '../../stores/RevisionStore';
 import { Button, DropdownButton, MenuItem } from 'react-bootstrap';
-import { Brace, Icon, Space } from '../ui';
+import { AhDiv, Brace, Icon, Space } from '../ui';
 
 class Revision extends React.Component {
   constructor(props) {
@@ -127,10 +127,10 @@ class Revision extends React.Component {
 
     const json = JSON.stringify(rev, null, '\t');
     const editor = (
-      <div className="docEditor">
+      <AhDiv className="docEditor" offset={250}>
         <Brace name="docEditor" mode="json" value={json} readOnly={true} 
           onLoad={this.braceOnLoad}/>
-      </div>
+      </AhDiv>
     );
 
     return (

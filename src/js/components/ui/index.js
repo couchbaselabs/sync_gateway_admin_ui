@@ -1,3 +1,4 @@
+import AhDiv from './AhDiv';
 import AlertBox from './AlertBox';
 import Box from './Box'
 import BoxHeader from './BoxHeader'
@@ -11,6 +12,7 @@ import Space from './Space'
 import Tabs from './Tabs'
 
 export {
+  AhDiv,
   AlertBox,
   Box,
   BoxHeader,
