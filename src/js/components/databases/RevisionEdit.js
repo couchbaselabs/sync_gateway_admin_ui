@@ -201,7 +201,7 @@ class RevisionEdit extends React.Component {
     return (
       <div>
         {toolbar}
-        <AhDiv className="docEditor" offset={250}>
+        <AhDiv className="docEditor" offset={270}>
           <Brace name="docEditor" mode="json" value={jsonStr} 
             onChange={this.onEditorChange} />
         </AhDiv>

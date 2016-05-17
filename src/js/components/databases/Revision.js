@@ -127,7 +127,7 @@ class Revision extends React.Component {
 
     const json = JSON.stringify(rev, null, '\t');
     const editor = (
-      <AhDiv className="docEditor" offset={250}>
+      <AhDiv className="docEditor" offset={270}>
         <Brace name="docEditor" mode="json" value={json} readOnly={true} 
           onLoad={this.braceOnLoad}/>
       </AhDiv>

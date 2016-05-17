@@ -111,7 +111,7 @@ class DocumentNew extends React.Component {
       <Box topLine={false}>
         {boxHeader}
         <BoxBody withPadding={false}>
-          <AhDiv className="docEditor" offset={210}>
+          <AhDiv className="docEditor" offset={230}>
             <Brace name="docEditor" mode="json" value={doc} 
               cursorAt={cursorAt} onChange={this.onEditorChange}/>
           </AhDiv>
