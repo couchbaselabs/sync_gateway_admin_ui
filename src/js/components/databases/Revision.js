@@ -6,7 +6,9 @@ import { makePath, paramsOrProps } from '../../utils';
 import AppStore from '../../stores/AppStore';
 import RevisionStore from '../../stores/RevisionStore';
 import { Button, DropdownButton, MenuItem } from 'react-bootstrap';
-import { AhDiv, Brace, Icon, Space } from '../ui';
+import { Brace, Icon, Space, WinDiv } from '../ui';
+
+const FOLD_REVISIONS_ENABLED = false;
 
 class Revision extends React.Component {
   constructor(props) {
@@ -73,12 +75,14 @@ class Revision extends React.Component {
   }
   
   foldRevisions() {
-    if (this.editor) {
-      let begin = this.editor.find('"_revisions":');
-      if (begin) {
-        let end = this.editor.find('}', { begin });
-        if (end)
-          this.editor.getSession().foldAll(begin.start.row, end.end.row, 0);
+    if (FOLD_REVISIONS_ENABLED) {
+      if (this.editor) {
+        let begin = this.editor.find('"_revisions":');
+        if (begin) {
+          let end = this.editor.find('}', { begin });
+          if (end)
+            this.editor.getSession().foldAll(begin.start.row, end.end.row, 0);
+        }
       }
     }
   }
@@ -127,10 +131,10 @@ class Revision extends React.Component {
 
     const json = JSON.stringify(rev, null, '\t');
     const editor = (
-      <AhDiv className="docEditor" offset={270}>
+      <WinDiv className="docEditor" offset={270}>
         <Brace name="docEditor" mode="json" value={json} readOnly={true} 
           onLoad={this.braceOnLoad}/>
-      </AhDiv>
+      </WinDiv>
     );
 
     return (

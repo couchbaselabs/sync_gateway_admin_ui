@@ -1,21 +1,17 @@
 import React, { PropTypes } from 'react';
 import classNames from 'classnames'; 
 
-const BoxTools = ({ pullRight, children }) => {
+const BoxTools = ({ style, children }) => {
   const clazz = classNames({
     'box-tools': true,
-    'pull-right': pullRight
+    'pull-right': true
   });
   
   return (
-    <div className={clazz}>
+    <div className={clazz} style={style}>
       {children}
     </div>
   );
-}
-
-BoxTools.propTypes = {
-  pullRight: PropTypes.bool
 }
 
 export default BoxTools;

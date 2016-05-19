@@ -1,7 +1,7 @@
 import React, { PropTypes } from 'react';
 import classNames from 'classnames'; 
 
-class AhDiv extends React.Component {
+class WinDiv extends React.Component {
   constructor(props) {
     super(props);
     this.handleResize = this.handleResize.bind(this);
@@ -34,12 +34,12 @@ class AhDiv extends React.Component {
   }
 }
 
-AhDiv.propTypes = {
+WinDiv.propTypes = {
   offset: PropTypes.number
 }
 
-AhDiv.defaultProps = { 
+WinDiv.defaultProps = { 
   offset: 0 
 }
 
-export default AhDiv;
+export default WinDiv;

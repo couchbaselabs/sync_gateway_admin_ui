@@ -108,3 +108,14 @@ export function deleteDoc(db, docId, revId) {
     }
   });
 }
+
+export function fetchChangesFeed(db, params) {
+  const path = makePath(db, '_changes');
+  return _fetch(serverApi(path), {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(params)
+  });
+}

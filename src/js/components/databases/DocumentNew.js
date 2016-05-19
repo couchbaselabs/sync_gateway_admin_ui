@@ -3,7 +3,7 @@ import { Link } from 'react-router';
 import AppStore from '../../stores/AppStore';
 import { createDoc } from '../../api';
 import { Button, ButtonToolbar, Col, Row, Table } from 'react-bootstrap';
-import { AhDiv, Box, BoxHeader, BoxBody, BoxTools, BoxFooter, Brace, Icon } 
+import { Box, BoxHeader, BoxBody, BoxTools, BoxFooter, Brace, Icon, WinDiv } 
   from '../ui';
 
 import 'brace/mode/json';
@@ -111,10 +111,10 @@ class DocumentNew extends React.Component {
       <Box topLine={false}>
         {boxHeader}
         <BoxBody withPadding={false}>
-          <AhDiv className="docEditor" offset={230}>
+          <WinDiv className="docEditor" offset={230}>
             <Brace name="docEditor" mode="json" value={doc} 
               cursorAt={cursorAt} onChange={this.onEditorChange}/>
-          </AhDiv>
+          </WinDiv>
         </BoxBody>
       </Box>
     );

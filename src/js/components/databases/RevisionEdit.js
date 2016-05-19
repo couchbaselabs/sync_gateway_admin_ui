@@ -4,7 +4,7 @@ import AppStore from '../../stores/AppStore';
 import RevisionStore from '../../stores/RevisionStore';
 import { updateRevision, uploadAttachment, deleteDoc } from '../../api';
 import { Button, DropdownButton, MenuItem } from 'react-bootstrap';
-import { AhDiv, Brace, Icon, Space } from '../ui';
+import { Brace, Icon, Space, WinDiv } from '../ui';
 
 class RevisionEdit extends React.Component {
   constructor(props, context) {
@@ -201,10 +201,10 @@ class RevisionEdit extends React.Component {
     return (
       <div>
         {toolbar}
-        <AhDiv className="docEditor" offset={270}>
+        <WinDiv className="docEditor" offset={270}>
           <Brace name="docEditor" mode="json" value={jsonStr} 
             onChange={this.onEditorChange} />
-        </AhDiv>
+        </WinDiv>
       </div>
     );
   }
