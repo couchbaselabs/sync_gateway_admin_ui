@@ -22,7 +22,8 @@ class RevisionStore extends Store {
       this._setFetchStatus(false);
     })
     .catch(reason => {
-      console.log('fetchRev Error')
+      debugger;
+      console.log('fetchRev Error:' + reason);
       this._setFetchStatus(false, reason);
     });
   }

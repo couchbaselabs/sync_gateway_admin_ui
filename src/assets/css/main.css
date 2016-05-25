@@ -4,9 +4,14 @@
   padding-bottom: 2px;
 }
 
-/* Regular box without the top line */
+/* Box without the top line */
 .box.box-no-top-line { 
   border-top: 0;
+}
+
+/* Box without default bottom-margin */
+.box.box-no-bottom-margin { 
+  margin-bottom: 0;
 }
 
 /* Custom box header toolbar that can be use with pull-left and pull-right */
@@ -20,10 +25,92 @@
 .box-controls {
   padding: 5px;
 }
+
 .box-controls.with-border {
   border-bottom: 1px solid #f4f4f4;
 }
+
 .box-controls > .pull-right .dropdown-menu {
   right: 0;
   left: auto;
+}
+
+/* Channel container */
+
+.channels {
+  background-color: #ecf0f0;
+  white-space: nowrap;
+  overflow: auto;
+}
+
+/* Channel feed container */
+
+.channel {
+  width: 360px;
+  margin: 10px;
+  display: inline-block;
+  vertical-align:top;
+}
+
+/* Channel feed */
+.channel-feed {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.channel-feed > .item {
+  border-radius: 3px;
+  -webkit-box-shadow: 0 1px 1px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 1px 1px rgba(0, 0, 0, 0.1);
+  padding: 10px 0;
+  background: #fff;
+}
+
+.channel-feed > .item:before,
+.channel-feed > .item:after {
+  content: " ";
+  display: table;
+}
+
+.channel-feed > .item:after {
+  clear: both;
+}
+
+.channel-feed .feed-info {
+  margin: 0px 10px 0px 10px;
+}
+
+.channel-feed .feed-label {
+  float: right;
+  margin-top: 11px;
+}
+
+.channel-feed .feed-title {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.channel-feed .feed-title-disabled {
+  color: #999;
+}
+
+.channel-feed .feed-description {
+  display: block;
+  color: #999;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.channel-feed-in-box > .item {
+  -webkit-box-shadow: none;
+  box-shadow: none;
+  border-radius: 0;
+  border-bottom: 1px solid #f4f4f4;
+}
+
+.channel-feed-in-box > .item:last-of-type {
+  border-bottom-width: 0;
 }

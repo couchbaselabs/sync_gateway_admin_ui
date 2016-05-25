@@ -1,14 +1,14 @@
 import React, { PropTypes } from 'react';
 import classNames from 'classnames';
 
-const BoxFooter = ({ withPadding, children }) => {
+const BoxFooter = ({ withPadding, style, children }) => {
   const clazz = classNames({
     ['box-footer']: true,
     ['no-padding']: !withPadding
   });
 
   return (
-    <div className={clazz}>
+    <div className={clazz} style={style}>
       {children}
     </div>
   );

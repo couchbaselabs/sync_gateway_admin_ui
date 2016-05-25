@@ -9,7 +9,6 @@ import { Box, BoxHeader, BoxBody, BoxTools, Icon} from '../ui';
 class DatabaseList extends React.Component {
   constructor(props) {
     super(props);
-    
     this.dataStoreOnChange = this.dataStoreOnChange.bind(this);
     this.state = DatabaseListStore.getData();
   }

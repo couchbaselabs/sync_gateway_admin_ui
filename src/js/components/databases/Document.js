@@ -96,7 +96,8 @@ class Document extends React.Component {
       const prevRevLinkTo = makePath('databases', db, 'documents', 
         doc._id, prevRev);
       const prevRevLink = (
-        <Link to={prevRevLinkTo} className={prevRevLinkClazz}>
+        <Link to={prevRevLinkTo} className={prevRevLinkClazz} 
+          onClick={event => {event.target.parentElement.blur();}}>
           <Icon name="chevron-left"/>
         </Link>
       );
@@ -105,7 +106,8 @@ class Document extends React.Component {
       const nextRevLinkTo = makePath('databases', db, 'documents', 
         doc._id, nextRev);
       const nextRevLink = (
-        <Link to={nextRevLinkTo} className={nextRevLinkClazz}>
+        <Link to={nextRevLinkTo} className={nextRevLinkClazz} 
+          onClick={event => {event.target.parentElement.blur();}}>
           <Icon name="chevron-right"/>
         </Link>
       );
