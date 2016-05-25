@@ -1,4 +1,5 @@
 import fetch from 'isomorphic-fetch'
+import request from 'superagent'
 import { serverApi } from '../app';
 import { makePath } from '../utils';
 
@@ -30,6 +31,39 @@ function _fetch(...args) {
     promise,
     cancel() {
       isCanceled = true;
+    } 
+  };
+}
+
+function _request(req) {
+  if (!req)
+    return null;
+  
+  let rej;
+  let isCanceled = false;
+  const promise = new Promise((resolve, reject) => {
+    if (isCanceled)
+      reject({ isCanceled });
+    else {
+      rej = reject;
+      req.end((err, res) => {
+        if (err)
+          reject({ message: err.message, status: err.status });
+        else
+          resolve({ data: res.body, status: res.status });
+      });  
+    }  
+  });
+  
+  return { 
+    promise,
+    cancel() {
+      if (!isCanceled) {
+        isCanceled = true;
+        req.abort();
+        if (rej) 
+          rej({ isCanceled });  
+      }
     } 
   };
 }
@@ -110,6 +144,14 @@ export function deleteDoc(db, docId, revId) {
 }
 
 export function fetchChangesFeed(db, params) {
+  const path = makePath(db, '_changes');
+  const req = request.post(serverApi(path))
+    .set('Content-Type', 'application/json')
+    .send(params);
+  return _request(req);
+}
+
+export function _fetchChangesFeed(db, params) {
   const path = makePath(db, '_changes');
   return _fetch(serverApi(path), {
     method: 'POST',
