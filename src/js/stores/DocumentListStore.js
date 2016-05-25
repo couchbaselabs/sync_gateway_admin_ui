@@ -201,13 +201,13 @@ class DocumentListStore extends Store {
     const { curPage, selectedRows } = this.data;
     const selectedMap = selectedRows[curPage];
     
-    let deleteDocs = Object.keys(selectedMap).map(docId => {
+    let deleteDocPromises = Object.keys(selectedMap).map(docId => {
       const revId = selectedMap[docId];
-      return deleteDoc(db, docId, revId);
+      return deleteDoc(db, docId, revId).promise;
     });
     
     this._updateDeleteStatus(true);
-    Promise.all(deleteDocs)
+    Promise.all(deleteDocPromises)
       .then(results => {
         this._updateDeleteStatus(false);
         this.fetchDocuments(db, 0);
