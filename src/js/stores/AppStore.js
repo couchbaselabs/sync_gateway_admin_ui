@@ -67,8 +67,6 @@ class AppStore extends Store {
   }
   
   setAlert(alert) {
-    if (alert)
-      debugger;
     this.setData(data => {
       return Object.assign({ }, data, { alert });
     });
