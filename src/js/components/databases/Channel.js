@@ -58,7 +58,7 @@ class Channel extends React.Component {
     
     const allChanges = this.state.changes || [ ];
     const changeItems = allChanges.map(change => {
-      const { id, seq, changes, deleted } = change;
+      const { id, seq, changes, deleted, removed } = change;
       const { rev } = changes[0];
       
       let title, label;
@@ -68,6 +68,10 @@ class Channel extends React.Component {
       } else {
         const link = makePath('databases', db, 'documents', id, rev);
         title = <Link to={link} className="feed-title">{seq}. {id}</Link>;
+        if (removed) {
+          label = 
+            <span className="feed-label label label-primary">Removed</span>;
+        }
       }
       
       return ( 
