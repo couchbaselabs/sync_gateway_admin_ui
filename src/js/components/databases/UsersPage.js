@@ -1,20 +1,41 @@
 import React, { PropTypes } from 'react';
-import { Box, BoxHeader, BoxBody, BoxTools, BoxFooter } from '../ui';
+import UserList from './UserList';
+import User from './User';
+import { Row, Col } from 'react-bootstrap';
+import { WinDiv } from '../ui';
 
-const UsersPage = (props) => {
-  return (
-    <div>
-      <Box topLine={false}>
-        <BoxHeader title="Users"/>
-        <BoxBody>
-          <div style={{height: '320px'}}></div>
-        </BoxBody>
-        <BoxFooter>
-          <div><p> </p></div>
-        </BoxFooter>
-      </Box>
-      {props.children}
-    </div>
-  );
+class UsersPage extends React.Component {
+  constructor(props) {
+    super(props);
+  }
+  
+  render() {
+    const style = {
+      marginTop: '0px', padding: '0px', backgroundColor: '#ecf0f0'
+    };
+    
+    const { params, routes } = this.props;
+    const { path } = routes[routes.length - 1];
+    
+    let children;
+    if (params.userId || path.endsWith('/_new'))
+      children = this.props.children;
+    else
+      children = <WinDiv offset={186} style={{backgroundColor: '#fff'}}/>
+    
+    return (
+      <div style={style}>
+        <Row>
+          <Col xs={4} md={3} style={{paddingRight: "4px"}}>  
+            <UserList {...this.props} />
+          </Col>
+          <Col xs={8} md={9} style={{paddingLeft: "4px"}}>
+            {children}
+          </Col>
+        </Row>
+      </div>
+    );
+  }
 }
+
 export default UsersPage;

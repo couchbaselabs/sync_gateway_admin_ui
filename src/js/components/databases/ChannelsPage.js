@@ -3,7 +3,7 @@ import ReactDOM from 'react-dom';
 import AppStore from '../../stores/AppStore';
 import ChannelsStore from '../../stores/ChannelsStore';
 import Channel from './Channel';
-import { FormControl, InputGroup, Button, Modal } from 'react-bootstrap';
+import { FormControl, InputGroup, Button } from 'react-bootstrap';
 import { Box, BoxHeader, BoxBody, BoxTools, Icon, WinDiv } from '../ui';
 
 const MAX_CHANNEL_FEEDS = 4;

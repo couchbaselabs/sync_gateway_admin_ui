@@ -9,9 +9,6 @@ import { render } from 'react-dom';
 import { Router, Route, IndexRoute, IndexRedirect } from 'react-router';
 import { browserHistory } from './app'
 
-// CSS:
-import '../assets/css/main.css'
-
 // Bootstrap:
 import 'bootstrap/dist/css/bootstrap.css';
 
@@ -22,6 +19,9 @@ import 'font-awesome/css/font-awesome.css';
 import '../../vendors/AdminLTE/css/AdminLTE.css';
 import '../../vendors/AdminLTE/css/skins/_all-skins.css';
 import '../../vendors/AdminLTE/js/app.js';
+
+// CSS:
+import '../assets/css/main.css'
 
 // Route Components:
 // - App:
@@ -38,6 +38,8 @@ import Revision from './components/databases/Revision';
 import RevisionEdit from './components/databases/RevisionEdit';
 import ChannelsPage from './components/databases/ChannelsPage';
 import UsersPage from './components/databases/UsersPage';
+import User from './components/databases/User';
+import UserEdit from './components/databases/UserEdit';
 
 render((
   <Router history={browserHistory}>
@@ -60,7 +62,11 @@ render((
           /* >> Channels: */
           <Route path='/databases/:db/channels' component={ChannelsPage}></Route>
           /* >> Users: */
-          <Route path='/databases/:db/users' component={UsersPage}></Route>
+          <Route path='/databases/:db/users' component={UsersPage}>
+            <Route path='/databases/:db/users/_new' component={UserEdit}/>
+            <Route path='/databases/:db/users/:userId' component={User}/>
+            <Route path='/databases/:db/users/:userId/edit' component={UserEdit}/>
+          </Route>
         </Route>
       </Route>
     </Route>

@@ -1,3 +1,12 @@
+/* Bootstrap override */
+.nav-pills > li.active > a,
+.nav-pills > li.active > a:hover,
+.nav-pills > li.active > a:focus {
+  color: #444;
+  background-color: transparent;
+}
+
+/* document editor */
 .docEditor {
   height:480px;
   width: 100%;
@@ -114,3 +123,4 @@
 .channel-feed-in-box > .item:last-of-type {
   border-bottom-width: 0;
 }
+
