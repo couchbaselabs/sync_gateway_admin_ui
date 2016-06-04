@@ -26,7 +26,6 @@ class DocumentNew extends React.Component {
   }
   
   componentWillUpdate(nextProps, nextState) {
-    console.log('componentWillUpdate');
     const { isCreating, error } = nextState;
     AppStore.setActivityIndicatorVisible(isCreating, 'DocumentNew');
     AppStore.setAlert(error && { type: 'error', message: error.message });

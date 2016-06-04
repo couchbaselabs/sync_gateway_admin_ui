@@ -11,9 +11,13 @@ function _fetch(...args) {
         if (isCanceled)
           reject({ isCanceled });
         else if (res.status >= 200 && res.status < 300) {
-          return res.json().then(data => { 
-            return { data, status: res.status }
-          });
+          return res.json()
+            .then(data => { 
+              return { data, status: res.status }
+            })
+            .catch(reason => {
+              return { status: res.status }
+            });
         } else {
           throw { message: res.statusText, status: res.status };
         }
@@ -29,6 +33,7 @@ function _fetch(...args) {
   });
   return { 
     promise,
+    p: promise,
     cancel() {
       isCanceled = true;
     } 
@@ -57,6 +62,7 @@ function _request(req) {
   
   return { 
     promise,
+    p: promise,
     cancel() {
       if (!isCanceled) {
         isCanceled = true;
@@ -103,9 +109,7 @@ export function createDoc(db, json) {
   const path = makePath(db, '');
   return _fetch(serverApi(path), {
     method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
+    headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(json)
   });
 }
@@ -116,9 +120,7 @@ export function updateRevision(db, docId, revId, json) {
   const body = Object.assign({ }, json, { _id: undefined, _rev: undefined });
   return _fetch(serverApi(path), {
     method: 'PUT',
-    headers: {
-      'Content-Type': 'application/json',
-    },
+    headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(body)
   });
 }
@@ -137,9 +139,7 @@ export function deleteDoc(db, docId, revId) {
   const path = makePath(db, docId, query);
   return _fetch(serverApi(path), {
     method: 'DELETE',
-    headers: {
-      'Content-Type': 'application/json',
-    }
+    headers: { 'Content-Type': 'application/json' }
   });
 }
 
@@ -155,9 +155,43 @@ export function _fetchChangesFeed(db, params) {
   const path = makePath(db, '_changes');
   return _fetch(serverApi(path), {
     method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
+    headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(params)
+  });
+}
+
+export function fetchUsers(db) {
+  const path = makePath(db, '_user');
+  return _fetch(serverApi(path));
+}
+
+export function fetchUser(db, user) {
+  const path = makePath(db, '_user', user);
+  return _fetch(serverApi(path));
+}
+
+export function createUser(db, info) {
+  const path = makePath(db, '_user', '');
+  return _fetch(serverApi(path), {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(info)
+  });
+}
+
+export function updateUser(db, user, info) {
+  const path = makePath(db, '_user', user);
+  return _fetch(serverApi(path), {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(info)
+  });
+}
+
+export function deleteUser(db, user) {
+  const path = makePath(db, '_user', user);
+  return _fetch(serverApi(path), {
+    method: 'DELETE',
+    headers: { 'Content-Type': 'application/json' }
   });
 }

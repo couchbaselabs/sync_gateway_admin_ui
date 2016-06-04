@@ -17,7 +17,9 @@ const BoxHeader = (props) => {
 }
 
 BoxHeader.propTypes = {
-  title: PropTypes.string,
+  title: React.PropTypes.oneOfType([
+    PropTypes.string, PropTypes.element
+  ]),
   withBorder: PropTypes.bool
 }
 
