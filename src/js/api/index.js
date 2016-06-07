@@ -195,3 +195,55 @@ export function deleteUser(db, user) {
     headers: { 'Content-Type': 'application/json' }
   });
 }
+
+export function fetchRoles(db) {
+  const path = makePath(db, '_role');
+  return _fetch(serverApi(path));
+}
+
+export function fetchRole(db, role) {
+  const path = makePath(db, '_role', role);
+  return _fetch(serverApi(path));
+}
+
+export function createRole(db, info) {
+  const path = makePath(db, '_role', '');
+  return _fetch(serverApi(path), {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(info)
+  });
+}
+export function updateUser(db, user, info) {
+  const path = makePath(db, '_user', user);
+  return _fetch(serverApi(path), {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(info)
+  });
+}
+
+export function deleteUser(db, user) {
+  const path = makePath(db, '_user', user);
+  return _fetch(serverApi(path), {
+    method: 'DELETE',
+    headers: { 'Content-Type': 'application/json' }
+  });
+}
+
+export function updateRole(db, role, info) {
+  const path = makePath(db, '_role', role);
+  return _fetch(serverApi(path), {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(info)
+  });
+}
+
+export function deleteRole(db, role) {
+  const path = makePath(db, '_role', role);
+  return _fetch(serverApi(path), {
+    method: 'DELETE',
+    headers: { 'Content-Type': 'application/json' }
+  });
+}
