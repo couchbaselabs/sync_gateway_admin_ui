@@ -18,7 +18,8 @@ class Database extends React.Component {
     const tabs = [
       { id: 'documents', name: 'Documents', to: `/databases/${db}/documents` },
       { id: 'channels', name: 'Channels', to: `/databases/${db}/channels` },
-      { id: 'users', name: 'Users', to: `/databases/${db}/users` }
+      { id: 'users', name: 'Users', to: `/databases/${db}/users` },
+      { id: 'roles', name: 'Roles', to: `/databases/${db}/roles` }
     ];
     return (
       <Tabs tabs={tabs} routes={routes} params={params}>

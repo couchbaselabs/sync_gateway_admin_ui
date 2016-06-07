@@ -2,12 +2,12 @@ import React, { PropTypes } from 'react';
 import { Link } from 'react-router';
 import { makePath } from '../../utils';
 import AppStore from '../../stores/AppStore';
-import UserStore from '../../stores/UserStore';
+import RoleStore from '../../stores/RoleStore';
 import { FormGroup, FormControl, ControlLabel, Checkbox, Button } 
   from 'react-bootstrap';
 import { Box, BoxHeader, BoxBody, BoxFooter, Icon, Space, WinDiv } from '../ui';
   
-class User extends React.Component {
+class Role extends React.Component {
   constructor(props) {
     super(props);
     this.dataStoreOnChange = this.dataStoreOnChange.bind(this);
@@ -15,55 +15,54 @@ class User extends React.Component {
   }
   
   componentWillMount() {
-    UserStore.addChangeListener(this.dataStoreOnChange);
+    RoleStore.addChangeListener(this.dataStoreOnChange);
   }
   
   componentDidMount() {
-    const { db, userId } = this.props.params;
-    UserStore.fetchUser(db, userId);
+    const { db, roleId } = this.props.params;
+    RoleStore.fetchRole(db, roleId);
   }
   
   componentWillReceiveProps(nextProps) {
-    const { db, userId } = this.props.params;
-    const { db:nDb, userId:nUserId } = nextProps.params;
-    if (db !== nDb || userId !== nUserId)
-      UserStore.fetchUser(nDb, nUserId);
+    const { db, roleId } = this.props.params;
+    const { db:nDb, roleId:nRoleId } = nextProps.params;
+    if (db !== nDb || roleId !== nRoleId)
+      RoleStore.fetchRole(nDb, nRoleId);
   }
   
   componentWillUpdate(nextProps, nextState) {
     const { isFetching, error } = nextState;
-    AppStore.setActivityIndicatorVisible(isFetching, 'User');
+    AppStore.setActivityIndicatorVisible(isFetching, 'Role');
     AppStore.setAlert(error && { type: 'error', message: error.message });
   }
   
   componentWillUnmount() {
-    UserStore.cancelFetch();
-    UserStore.removeChangeListener(this.dataStoreOnChange);
-    UserStore.reset();
+    RoleStore.cancelFetch();
+    RoleStore.removeChangeListener(this.dataStoreOnChange);
+    RoleStore.reset();
     
-    AppStore.setActivityIndicatorVisible(false, 'User');
+    AppStore.setActivityIndicatorVisible(false, 'Role');
     AppStore.setAlert(undefined);
   }
   
   dataStoreOnChange() {
     this.setState(state => {
-      return Object.assign({ }, state, UserStore.getData());
+      return Object.assign({ }, state, RoleStore.getData());
     })
   }
   
   render() {
-    const { db, userId } = this.props.params;
-    const { user } = this.state;
+    const { db, roleId } = this.props.params;
+    const { role } = this.state;
 
     let body;
-    if (user) {
-      const { name, email } = user;
-      const { admin_roles:adminRoles, roles } = user;
-      const { admin_channels:adminChannels, all_channels:allChannels } = user;
+    if (role) {
+      const { name } = role;
+      const { admin_channels:adminChannels, all_channels:allChannels } = role;
       
       const toolbar = (
         <div className="box-controls">
-          <Link to={makePath('databases', db, 'users', userId, 'edit')}>
+          <Link to={makePath('databases', db, 'roles', roleId, 'edit')}>
             <Button bsSize="sm"><Icon name="edit"/> Edit</Button>
           </Link>
         </div>
@@ -77,18 +76,6 @@ class User extends React.Component {
               <FormGroup controlId="name">
                 <ControlLabel>Name</ControlLabel>
                 <div>{name}</div>
-              </FormGroup>
-              <FormGroup controlId="email">
-                <ControlLabel>Email</ControlLabel>
-                <div>{email || 'None'}</div>
-              </FormGroup>
-              <FormGroup controlId="adminRoles">
-                <ControlLabel>Admin Roles</ControlLabel>
-                <div>{adminRoles ? adminRoles.join(', ') : 'None'}</div>
-              </FormGroup>
-              <FormGroup controlId="roles">
-                <ControlLabel>Roles</ControlLabel>
-                <div>{roles ? roles.join(', ') : 'None'}</div>
               </FormGroup>
               <FormGroup controlId="adminChannels">
                 <ControlLabel>Admin Channels</ControlLabel>
@@ -111,15 +98,8 @@ class User extends React.Component {
     }
     
     let title;
-    if (user) {
-      let disabledLabel;
-      if (user.disabled) {
-        disabledLabel = (
-          <span className="label label-default" style={{marginLeft: '10px'}}>
-            Disabled
-          </span>);
-      }
-      title = <div><span>{user.name}</span>{disabledLabel}</div>;
+    if (role) {
+      title = <div><span>{role.name}</span></div>;
     } else
       title = <div> </div>;
     
@@ -133,4 +113,4 @@ class User extends React.Component {
   }
 }
 
-export default User;
+export default Role;

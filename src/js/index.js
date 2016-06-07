@@ -40,6 +40,9 @@ import ChannelsPage from './components/databases/ChannelsPage';
 import UsersPage from './components/databases/UsersPage';
 import User from './components/databases/User';
 import UserEdit from './components/databases/UserEdit';
+import RolesPage from './components/databases/RolesPage';
+import Role from './components/databases/Role';
+import RoleEdit from './components/databases/RoleEdit';
 
 render((
   <Router history={browserHistory}>
@@ -66,6 +69,12 @@ render((
             <Route path='/databases/:db/users/_new' component={UserEdit}/>
             <Route path='/databases/:db/users/:userId' component={User}/>
             <Route path='/databases/:db/users/:userId/edit' component={UserEdit}/>
+          </Route>
+          /* >> Roles: */
+          <Route path='/databases/:db/roles' component={RolesPage}>
+            <Route path='/databases/:db/roles/_new' component={RoleEdit}/>
+            <Route path='/databases/:db/roles/:roleId' component={Role}/>
+            <Route path='/databases/:db/roles/:roleId/edit' component={RoleEdit}/>
           </Route>
         </Route>
       </Route>

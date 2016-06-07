@@ -1,9 +1,9 @@
 import React, { PropTypes } from 'react';
-import UserList from './UserList';
+import RoleList from './RoleList';
 import { Row, Col } from 'react-bootstrap';
 import { WinDiv } from '../ui';
 
-class UsersPage extends React.Component {
+class RolesPage extends React.Component {
   constructor(props) {
     super(props);
   }
@@ -17,7 +17,7 @@ class UsersPage extends React.Component {
     const { path } = routes[routes.length - 1];
     
     let children;
-    if (params.userId || path.endsWith('/_new'))
+    if (params.roleId || path.endsWith('/_new'))
       children = this.props.children;
     else
       children = <WinDiv offset={186} style={{backgroundColor: '#fff'}}/>
@@ -26,7 +26,7 @@ class UsersPage extends React.Component {
       <div style={style}>
         <Row>
           <Col xs={4} md={3} style={{paddingRight: "4px"}}>  
-            <UserList {...this.props} />
+            <RoleList {...this.props} />
           </Col>
           <Col xs={8} md={9} style={{paddingLeft: "4px"}}>
             {children}
@@ -37,4 +37,4 @@ class UsersPage extends React.Component {
   }
 }
 
-export default UsersPage;
+export default RolesPage;

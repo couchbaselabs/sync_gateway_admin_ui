@@ -2,92 +2,92 @@ import React, { PropTypes } from 'react';
 import { Link } from 'react-router';
 import { makePath } from '../../utils';
 import AppStore from '../../stores/AppStore';
-import UserListStore from '../../stores/UserListStore';
+import RoleListStore from '../../stores/RoleListStore';
 import { Row, Col, Button, FormControl, Nav, NavItem } from 'react-bootstrap';
 import { Box, BoxHeader, BoxBody, BoxFooter, WinDiv } 
   from '../ui';
 
-class UserList extends React.Component {
+class RoleList extends React.Component {
   constructor(props) {
     super(props);
     this.dataStoreOnChange = this.dataStoreOnChange.bind(this);
-    this.userFilterOnChange = this.userFilterOnChange.bind(this);
-    this.usersOnSelect = this.usersOnSelect.bind(this);
-    this.state = UserListStore.getData();
+    this.roleFilterOnChange = this.roleFilterOnChange.bind(this);
+    this.rolesOnSelect = this.rolesOnSelect.bind(this);
+    this.state = RoleListStore.getData();
   }
   
   componentWillMount() {
-    UserListStore.addChangeListener(this.dataStoreOnChange);
+    RoleListStore.addChangeListener(this.dataStoreOnChange);
   }
   
   componentDidMount() {
-    this.reloadUserList();
+    this.reloadRoleList();
   }
   
   componentWillUpdate(nextProps, nextState) {
     const { isFetching, error, isStale } = nextState;
-    AppStore.setActivityIndicatorVisible(isFetching, 'UserList');
+    AppStore.setActivityIndicatorVisible(isFetching, 'RoleList');
     AppStore.setAlert(error && { type: 'error', message: error.message });
     
     if (isStale && !isFetching && !error)
-      setTimeout(() => { this.reloadUserList() }, 0);
+      setTimeout(() => { this.reloadRoleList() }, 0);
   }
   
   componentWillUnmount() {
-    UserListStore.cancelFetch();
-    UserListStore.removeChangeListener(this.dataStoreOnChange);
+    RoleListStore.cancelFetch();
+    RoleListStore.removeChangeListener(this.dataStoreOnChange);
     
-    AppStore.setActivityIndicatorVisible(false, 'UserList');
+    AppStore.setActivityIndicatorVisible(false, 'RoleList');
     AppStore.setAlert(undefined);
   }
   
   dataStoreOnChange() {
     this.setState(state => {
-      return Object.assign({ }, state, UserListStore.getData());
+      return Object.assign({ }, state, RoleListStore.getData());
     })
   }
   
-  reloadUserList() {
+  reloadRoleList() {
     const { db } = this.props.params;
-    UserListStore.fetchUserList(db);
+    RoleListStore.fetchRoleList(db);
   }
   
-  userFilterOnChange(event) {
+  roleFilterOnChange(event) {
     const filter = event.target.value;
-    UserListStore.setFilter(filter);
+    RoleListStore.setFilter(filter);
   }
   
-  usersOnSelect(index) {
-    const { users } = this.state;
-    const user = index < users.length ? users[index] : undefined;
-    if (user) {
+  rolesOnSelect(index) {
+    const { roles } = this.state;
+    const role = index < roles.length ? roles[index] : undefined;
+    if (role) {
       const { db } = this.props.params;
       const { router } = this.context;
-      router.push(makePath('databases', db, 'users', user));
+      router.push(makePath('databases', db, 'roles', role));
     }
   }
   
   render() {
-    let { db, userId } = this.props.params;
+    let { db, roleId } = this.props.params;
     
-    let users;
+    let roles;
     if (this.state.filter)
-      users = this.state.filteredUsers; 
+      roles = this.state.filteredRoles; 
     else
-      users = this.state.users;
+      roles = this.state.roles;
     
     let selectedIndex;
-    let userList;
-    if (users) {
-      const userItems = users.map((user, index) => {
-        if (user === userId)
+    let roleList;
+    if (roles) {
+      const roleItems = roles.map((role, index) => {
+        if (role === roleId)
           selectedIndex = index;
-        return <NavItem key={index} eventKey={index}>{user}</NavItem>;
+        return <NavItem key={index} eventKey={index}>{role}</NavItem>;
       })
-      userList = (
+      roleList = (
         <Nav bsStyle="pills" stacked={true} activeKey={selectedIndex} 
-          onSelect={this.usersOnSelect}>
-          {userItems}
+          onSelect={this.rolesOnSelect}>
+          {roleItems}
         </Nav>
       );
     }
@@ -98,17 +98,17 @@ class UserList extends React.Component {
         <BoxHeader>
           <Row>
             <Col xs={12}>
-              <FormControl type="text" placeholder="Username" 
-                onChange={this.userFilterOnChange}/>
+              <FormControl type="text" placeholder="Role name" 
+                onChange={this.roleFilterOnChange}/>
             </Col>
           </Row>
           <Row style={{marginTop: '10px'}}>
             <Col xs={12}>
-              <Link to={makePath('databases', db, 'users', '_new')}>
+              <Link to={makePath('databases', db, 'roles', '_new')}>
                 <Button 
                   bsClass="btn btn-block btn-default btn-flat" 
                   style={{width: '100%'}}>
-                  Create New User
+                  Create New Role
                 </Button>
               </Link>
             </Col>
@@ -116,7 +116,7 @@ class UserList extends React.Component {
         </BoxHeader>
         <BoxBody withPadding={false}>
           <WinDiv offset={285} style={{overflow: 'auto'}}>
-            {userList}
+            {roleList}
           </WinDiv>
         </BoxBody>
       </Box>
@@ -124,8 +124,8 @@ class UserList extends React.Component {
   }
 }
 
-UserList.contextTypes = {
+RoleList.contextTypes = {
   router: PropTypes.object.isRequired
 };
 
-export default UserList;
+export default RoleList;
