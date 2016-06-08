@@ -265,7 +265,7 @@ class RoleEdit extends React.Component {
       
       body = (
         <BoxBody withPadding={false}>
-          <WinDiv offset={227} style={{overflow: 'auto'}}>
+          <WinDiv offset={210} style={{overflow: 'auto'}}>
             { toolbar }
             <form style={{padding: '10px'}}>
               <FormGroup controlId="name">
@@ -295,7 +295,7 @@ class RoleEdit extends React.Component {
     } else {
       body = (
         <BoxBody withPadding={false}>
-          <WinDiv offset={300} style={{padding: '10px'}}></WinDiv>
+          <WinDiv offset={210} style={{padding: '10px'}}></WinDiv>
         </BoxBody>
       );
     }
@@ -305,7 +305,7 @@ class RoleEdit extends React.Component {
       title = 'New Role';
     } else {
       const { oRole } = this.state;
-      title = oRole ? oRole.name: '';
+      title = oRole ? oRole.name: <span></span>;
     }
     
     return (

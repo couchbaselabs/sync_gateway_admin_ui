@@ -115,7 +115,7 @@ class RoleList extends React.Component {
           </Row>
         </BoxHeader>
         <BoxBody withPadding={false}>
-          <WinDiv offset={285} style={{overflow: 'auto'}}>
+          <WinDiv offset={268} style={{overflow: 'auto'}}>
             {roleList}
           </WinDiv>
         </BoxBody>
