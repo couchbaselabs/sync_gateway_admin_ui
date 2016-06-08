@@ -72,7 +72,7 @@ class User extends React.Component {
       body = (
         <BoxBody withPadding={false}>
           { toolbar }
-          <WinDiv offset={267} style={{padding: '10px'}}>
+          <WinDiv offset={250} style={{padding: '10px'}}>
             <form>
               <FormGroup controlId="name">
                 <ControlLabel>Name</ControlLabel>
@@ -105,7 +105,7 @@ class User extends React.Component {
     } else {
       body = (
         <BoxBody withPadding={false}>
-          <WinDiv offset={227} style={{padding: '10px'}}></WinDiv>
+          <WinDiv offset={210} style={{padding: '10px'}}></WinDiv>
         </BoxBody>
       );
     }

@@ -20,7 +20,7 @@ class UsersPage extends React.Component {
     if (params.userId || path.endsWith('/_new'))
       children = this.props.children;
     else
-      children = <WinDiv offset={186} style={{backgroundColor: '#fff'}}/>
+      children = <WinDiv offset={169} style={{backgroundColor: '#fff'}}/>
     
     return (
       <div style={style}>

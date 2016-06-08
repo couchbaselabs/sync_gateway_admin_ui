@@ -8,12 +8,24 @@ class WinDiv extends React.Component {
     this.state = { height: window.innerHeight };
   }
   
+  componentWillMount() {
+    this.setState(state => {
+      return { height: window.innerHeight };
+    });
+  }
+  
   componentDidMount() {
     window.addEventListener('resize', this.handleResize);
   }
   
   componentWillUnmount() {
     window.removeEventListener('resize', this.handleResize);
+  }
+  
+  shouldComponentUpdate(nextProps, nextState) {
+    return (this.state.height !== nextState.height) || 
+           (this.props.offset !== nextProps.offset) || 
+           (this.props.children !== nextProps.children);
   }
   
   handleResize() {

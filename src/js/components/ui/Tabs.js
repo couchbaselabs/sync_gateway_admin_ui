@@ -117,7 +117,7 @@ class Tabs extends React.Component {
     });
 
     return (
-      <div className="nav-tabs-custom">
+      <div className="nav-tabs-custom" style={{marginBottom: '0px'}}>
         <ul className="nav nav-tabs">
           {tabItems}
         </ul>

@@ -104,7 +104,7 @@ class Channel extends React.Component {
           </BoxHeader>
           <BoxBody 
             matchWinHeight={true} 
-            matchWinHeightOffset={300} style={{overflow: 'auto'}}>
+            matchWinHeightOffset={280} style={{overflow: 'auto'}}>
             { alertBox }
             <ul className="channel-feed channel-feed-in-box">
               {changeItems}

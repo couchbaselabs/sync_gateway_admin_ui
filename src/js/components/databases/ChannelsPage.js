@@ -80,11 +80,11 @@ class ChannelsPage extends React.Component {
         <Channel key={feed.getChannel()} db={db} channel={feed.getChannel()}/>
       );
     else 
-      channels = <WinDiv offset={240} style={{backgroundColor: 'white'}}/>;
+      channels = <WinDiv offset={220} style={{backgroundColor: 'white'}}/>;
       
     return (
       <div>
-        <Box topLine={false}>
+        <Box topLine={false} bottomMargin={false}>
           <BoxHeader>
             <div className="row">
               <div className="col-xs-12">
