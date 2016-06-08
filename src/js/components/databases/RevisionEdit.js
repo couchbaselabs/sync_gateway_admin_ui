@@ -159,7 +159,7 @@ class RevisionEdit extends React.Component {
   render() {
     let { rev, jsonStr } = this.state;
     if (!rev)
-      return null;
+      return <WinDiv offset={210}></WinDiv>
 
     let attachmentsDropDown = null;
     if (rev._attachments) {
@@ -201,7 +201,7 @@ class RevisionEdit extends React.Component {
     return (
       <div>
         {toolbar}
-        <WinDiv className="docEditor" offset={270}>
+        <WinDiv className="docEditor" offset={250}>
           <Brace name="docEditor" mode="json" value={jsonStr} 
             onChange={this.onEditorChange} />
         </WinDiv>

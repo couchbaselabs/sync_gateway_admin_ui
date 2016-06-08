@@ -94,7 +94,7 @@ class Revision extends React.Component {
   render() {
     const { rev } = this.state;
     if (!rev)
-      return null;
+      return <WinDiv offset={210}></WinDiv>
     
     const { db, docId, revId } = paramsOrProps(this.props);
     
@@ -131,7 +131,7 @@ class Revision extends React.Component {
 
     const json = JSON.stringify(rev, null, '\t');
     const editor = (
-      <WinDiv className="docEditor" offset={270}>
+      <WinDiv className="docEditor" offset={250}>
         <Brace name="docEditor" mode="json" value={json} readOnly={true} 
           onLoad={this.braceOnLoad}/>
       </WinDiv>

@@ -107,10 +107,10 @@ class DocumentNew extends React.Component {
     );
     
     return (
-      <Box topLine={false}>
+      <Box topLine={false} bottomMargin={false}>
         {boxHeader}
         <BoxBody withPadding={false}>
-          <WinDiv className="docEditor" offset={230}>
+          <WinDiv className="docEditor" offset={210}>
             <Brace name="docEditor" mode="json" value={doc} 
               cursorAt={cursorAt} onChange={this.onEditorChange}/>
           </WinDiv>

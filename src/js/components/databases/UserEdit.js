@@ -446,7 +446,7 @@ class UserEdit extends React.Component {
       title = 'New User';
     } else {
       const { oUser } = this.state;
-      title = oUser ? oUser.name: (<span></span>);
+      title = oUser ? oUser.name : <span></span>;
     }
     
     return (

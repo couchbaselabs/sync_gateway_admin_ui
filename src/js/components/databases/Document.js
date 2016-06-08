@@ -6,7 +6,7 @@ import AppStore from '../../stores/AppStore';
 import DocumentStore from '../../stores/DocumentStore';
 import Revision from './Revision';
 import { Button, DropdownButton, MenuItem } from 'react-bootstrap';
-import { Box, BoxHeader, BoxTools, BoxBody, Icon, Space } from '../ui';
+import { Box, BoxHeader, BoxTools, BoxBody, Icon, Space, WinDiv } from '../ui';
 
 class Document extends React.Component {
   constructor(props) {
@@ -74,9 +74,9 @@ class Document extends React.Component {
       // Display an empty box content with the document ID:
       const { docId } = this.props.params;
       return (
-        <Box topLine={false}>
+        <Box topLine={false} bottomMargin={false}>
           <BoxHeader title={docId}/>
-          <BoxBody><p></p></BoxBody>
+          <BoxBody withPadding={false}><WinDiv offset={210}/></BoxBody>
         </Box>
       );
     }
@@ -132,7 +132,7 @@ class Document extends React.Component {
     );
     
     return (
-      <Box topLine={false}>
+      <Box topLine={false} bottomMargin={false}>
         {boxHeader}
         {boxBody}
       </Box>
