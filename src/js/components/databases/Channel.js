@@ -55,7 +55,9 @@ class Channel extends React.Component {
   
   render() {
     const { db, channel } = this.props;
-    
+
+    const channelTitle = channel.split(',').join(', ');
+
     const allChanges = this.state.changes || [ ];
     const changeItems = allChanges.map(change => {
       const { id, seq, changes, deleted, removed } = change;
@@ -95,7 +97,7 @@ class Channel extends React.Component {
     return (
       <div className="channel">
         <Box bottomMargin={false}>
-          <BoxHeader title={channel}>
+          <BoxHeader title={channelTitle}>
             <BoxTools>
               <Button bsClass="btn btn-box-tool" onClick={this.closeOnClick}>
                 <Icon name="times"/>

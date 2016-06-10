@@ -52,13 +52,13 @@ class ChannelsPage extends React.Component {
   
   addChannelFeed() {
     const input = ReactDOM.findDOMNode(this.refs.searchInputText);
-    const chName = input.value
-    if (chName.length > 0) {
+    let chNames = this.nomalizeChannelNames(input.value);
+    if (chNames.length > 0) {
       const { feeds } = this.state;
       if (!feeds || feeds.length < MAX_CHANNEL_FEEDS) {
-        ChannelsStore.getChannelFeed(chName);
+        ChannelsStore.getChannelFeed(chNames);
       } else {
-        if (!ChannelsStore.getExistingChannelFeed(chName)) {
+        if (!ChannelsStore.getExistingChannelFeed(chNames)) {
           AppStore.setAlert({ 
             type: 'info', 
             message: 'You have reached the maximum number of 4 channels limit.' 
@@ -68,6 +68,12 @@ class ChannelsPage extends React.Component {
     }
     input.value = '';
     input.blur();
+  }
+
+  nomalizeChannelNames(chNames) {
+    const names = chNames.split(',').map(n => n.trim());
+    let result = names.join(',');
+    return result;
   }
   
   render() {
@@ -89,7 +95,7 @@ class ChannelsPage extends React.Component {
             <div className="row">
               <div className="col-xs-12">
                 <InputGroup bsSize="sm">
-                  <FormControl type="text" placeholder="Channel Name"
+                  <FormControl type="text" placeholder="Channel Names (Use comma to separate names)"
                     ref="searchInputText" 
                     onKeyPress={this.searchOnKeyPress}/>
                   <InputGroup.Button>
