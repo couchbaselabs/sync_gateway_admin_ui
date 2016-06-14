@@ -20,13 +20,13 @@ class Document extends React.Component {
   }
   
   componentDidMount() {
-    const { db, docId } = this.props.params;
-    DocumentStore.fetchDocument(db, docId);
+    const { docId } = this.props.params;
+    DocumentStore.fetchDocument(docId);
   }
   
   componentWillReceiveProps(nextProps) {
-    const { db, docId } = nextProps.params;
-    DocumentStore.fetchDocument(db, docId);
+    const { docId } = nextProps.params;
+    DocumentStore.fetchDocument(docId);
   }
   
   componentWillUpdate(nextProps, nextState) {

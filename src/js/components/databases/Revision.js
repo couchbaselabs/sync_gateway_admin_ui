@@ -32,17 +32,17 @@ class Revision extends React.Component {
       }
     });
     
-    const { db, docId, revId } = paramsOrProps(this.props);
-    RevisionStore.fetchRevision(db, docId, revId);
+    const { docId, revId } = paramsOrProps(this.props);
+    RevisionStore.fetchRevision(docId, revId);
   }
 
   componentWillReceiveProps(nextProps) {
-    const { db, docId, revId } = paramsOrProps(this.props);
-    const { db:newDb, docId:newDocId, revId:newRevId} = 
+    const { docId, revId } = paramsOrProps(this.props);
+    const { docId:newDocId, revId:newRevId} = 
       paramsOrProps(nextProps);
-    if (db !== newDb || docId !== newDocId || revId !== newRevId) {
+    if (docId !== newDocId || revId !== newRevId) {
       RevisionStore.cancelFetchRevision();
-      RevisionStore.fetchRevision(newDb, newDocId, newRevId);
+      RevisionStore.fetchRevision(newDocId, newRevId);
     }
   }
   

@@ -1,7 +1,7 @@
-import Store from './Store'
+import DatabaseStore from './DatabaseStore'
 import { fetchRevision } from '../api';
 
-class RevisionStore extends Store {
+class RevisionStore extends DatabaseStore {
   constructor() {
     super();
   }
@@ -14,9 +14,9 @@ class RevisionStore extends Store {
     };
   }
 
-  fetchRevision(db, docId, revId) {
+  fetchRevision(docId, revId) {
     this._setFetchStatus(true, undefined);
-    this.fetch = fetchRevision(db, docId, revId);
+    this.fetch = fetchRevision(this.db, docId, revId);
     this.fetch.promise.then(result => {
       this._setRevision(result.data);
       this._setFetchStatus(false);

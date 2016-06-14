@@ -1,7 +1,7 @@
-import Store from './Store';
+import DatabaseStore from './DatabaseStore';
 import ChannelFeedStore from './ChannelFeedStore';
 
-class ChannelsStore extends Store {
+class ChannelsStore extends DatabaseStore {
   constructor() {
     super();
   }
@@ -14,15 +14,7 @@ class ChannelsStore extends Store {
   
   reset() {
     this._stopAllChannelFeeds();
-    this.setData(data => {
-      return this.getInitialData();
-    });
-  }
-  
-  setDatabase(db) {
-    if (this.db && this.db !== db)
-      reset();
-    this.db = db;
+    super.reset();
   }
   
   getExistingChannelFeed(name) {

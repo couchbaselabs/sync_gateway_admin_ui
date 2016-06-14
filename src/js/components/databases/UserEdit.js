@@ -45,9 +45,9 @@ class UserEdit extends React.Component {
   }
   
   componentDidMount() {
-    const { db, userId } = this.props.params;
+    const { userId } = this.props.params;
     if (userId)
-      UserStore.fetchUser(db, userId);
+      UserStore.fetchUser(userId);
     else {
       // For creating a new user:
       this.setState(state => {
@@ -57,12 +57,12 @@ class UserEdit extends React.Component {
   }
   
   componentWillReceiveProps(nextProps) {
-    const { db, userId } = this.props.params;
+    const { userId } = this.props.params;
     if (userId) {
-      const { db:newDb, userId:newUserId } = nextProps.params;
-      if (db !== newDb || userId !== newUserId) {
+      const { userId:newUserId } = nextProps.params;
+      if (userId !== newUserId) {
         UserStore.cancelFetch();
-        UserStore.fetchUser(newDb, newUserId);
+        UserStore.fetchUser(newUserId);
       }  
     }
   }

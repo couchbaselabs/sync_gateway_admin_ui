@@ -59,8 +59,7 @@ class DocumentList extends React.Component {
   }
 
   fetchDocuments(pageOffset) {
-    const { db } = this.props.params;
-    DocumentListStore.fetchDocuments(db, pageOffset);
+    DocumentListStore.fetchDocuments(pageOffset);
   }
   
   previousOnClick() {
@@ -88,7 +87,7 @@ class DocumentList extends React.Component {
         this.resetAndReload();
       } else {
         const { db } = this.props.params;
-        DocumentListStore.searchDocumentById(db, docId);
+        DocumentListStore.searchDocumentById(docId);
       }
     }
   }
@@ -121,8 +120,7 @@ class DocumentList extends React.Component {
   }
   
   deleteOnClick() {
-    const { db } = this.props.params;
-    DocumentListStore.deleteSelectedRows(db);
+    DocumentListStore.deleteSelectedRows();
   }
 
   render() {

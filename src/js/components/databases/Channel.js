@@ -25,16 +25,12 @@ class Channel extends React.Component {
   
   componentWillUpdate(nextProps, nextState) {
     const { isFetching, error } = nextState;
-    //const name = 'Channel-' + nextProps.channel;
-    //AppStore.setActivityIndicatorVisible(isFetching, name);
     AppStore.setAlert(error && { type: 'error', message: error.message });
   }
   
   componentWillUnmount() {
     this.feed.stop();
     this.feed.removeChangeListener(this.dataStoreOnChange);
-    //AppStore.setActivityIndicatorVisible(false, 'DatabaseList');
-    //AppStore.setAlert(undefined);
   }
   
   dataStoreOnChange() {

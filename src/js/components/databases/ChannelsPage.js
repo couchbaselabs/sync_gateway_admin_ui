@@ -19,7 +19,6 @@ class ChannelsPage extends React.Component {
   
   componentWillMount() {
     ChannelsStore.addChangeListener(this.dataStoreOnChange);
-    ChannelsStore.setDatabase(this.props.params.db);
   }
   
   componentWillUnmount() {

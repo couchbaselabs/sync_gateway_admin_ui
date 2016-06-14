@@ -19,15 +19,15 @@ class Role extends React.Component {
   }
   
   componentDidMount() {
-    const { db, roleId } = this.props.params;
-    RoleStore.fetchRole(db, roleId);
+    const { roleId } = this.props.params;
+    RoleStore.fetchRole(roleId);
   }
   
   componentWillReceiveProps(nextProps) {
-    const { db, roleId } = this.props.params;
-    const { db:nDb, roleId:nRoleId } = nextProps.params;
-    if (db !== nDb || roleId !== nRoleId)
-      RoleStore.fetchRole(nDb, nRoleId);
+    const { roleId } = this.props.params;
+    const { roleId:nRoleId } = nextProps.params;
+    if (roleId !== nRoleId)
+      RoleStore.fetchRole(nRoleId);
   }
   
   componentWillUpdate(nextProps, nextState) {
