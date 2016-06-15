@@ -1,7 +1,7 @@
-import Store from './Store'
+import DatabaseStore from './DatabaseStore'
 import { fetchDoc } from '../api';
 
-class DocumentStore extends Store {
+class DocumentStore extends DatabaseStore {
   constructor() {
     super();
   }
@@ -15,9 +15,9 @@ class DocumentStore extends Store {
     };
   }
   
-  fetchDocument(db, docId) {
+  fetchDocument(docId) {
     this._setFetchStatus(true);
-    this.fetch = fetchDoc(db, docId);
+    this.fetch = fetchDoc(this.db, docId);
     this.fetch.promise.then(result => {
       this._setDoc(result.data);
       this._setFetchStatus(false);

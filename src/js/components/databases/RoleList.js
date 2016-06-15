@@ -48,8 +48,7 @@ class RoleList extends React.Component {
   }
   
   reloadRoleList() {
-    const { db } = this.props.params;
-    RoleListStore.fetchRoleList(db);
+    RoleListStore.fetchRoleList();
   }
   
   roleFilterOnChange(event) {

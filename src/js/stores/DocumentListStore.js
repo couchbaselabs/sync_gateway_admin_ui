@@ -1,7 +1,7 @@
-import Store from './Store'
+import DatabaseStore from './DatabaseStore'
 import { fetchDocs, fetchDoc, deleteDoc } from '../api';
 
-class DocumentListStore extends Store {
+class DocumentListStore extends DatabaseStore {
   constructor() {
     super();
   }
@@ -21,13 +21,13 @@ class DocumentListStore extends Store {
     }
   }
   
-  fetchDocuments(db, pageOffset) {
+  fetchDocuments(pageOffset) {
     const { pageSize, curPage, startKeys } = this.data;
     const page = curPage + pageOffset;
     const startKey = (startKeys && page) && startKeys[page];
 
     this._setFetchStatus(true);
-    this.fetch = fetchDocs(db, pageSize, curPage, startKey);
+    this.fetch = fetchDocs(this.db, pageSize, curPage, startKey);
     this.fetch.promise.then(result => {
       this._setRows(page, result.data.rows);
       this._setFetchStatus(false);
@@ -119,10 +119,10 @@ class DocumentListStore extends Store {
     }
   }
   
-  searchDocumentById(db, docId) {
+  searchDocumentById(docId) {
     this._setSearchDocId(docId);
     this._setFetchStatus(true);
-    fetchDoc(db, docId)
+    fetchDoc(this.db, docId)
       .then(result => {
         this._setFetchStatus(false);
         const rows = this._createRowsFromDoc(result.data);
@@ -197,20 +197,20 @@ class DocumentListStore extends Store {
     });
   }
   
-  deleteSelectedRows(db) {
+  deleteSelectedRows() {
     const { curPage, selectedRows } = this.data;
     const selectedMap = selectedRows[curPage];
     
     let deleteDocPromises = Object.keys(selectedMap).map(docId => {
       const revId = selectedMap[docId];
-      return deleteDoc(db, docId, revId).promise;
+      return deleteDoc(this.db, docId, revId).promise;
     });
     
     this._updateDeleteStatus(true);
     Promise.all(deleteDocPromises)
       .then(results => {
         this._updateDeleteStatus(false);
-        this.fetchDocuments(db, 0);
+        this.fetchDocuments(this.db, 0);
       }).catch(error => {
         this._updateDeleteStatus(false, error);
       });

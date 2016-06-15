@@ -31,8 +31,8 @@ class RevisionEdit extends React.Component {
   }
   
   componentDidMount() {
-    const { db, docId, revId } = this.props.params;
-    RevisionStore.fetchRevision(db, docId, revId);
+    const { docId, revId } = this.props.params;
+    RevisionStore.fetchRevision(docId, revId);
   }
   
   shouldComponentUpdate(nextProps, nextState) {

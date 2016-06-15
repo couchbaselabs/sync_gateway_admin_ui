@@ -48,8 +48,7 @@ class UserList extends React.Component {
   }
   
   reloadUserList() {
-    const { db } = this.props.params;
-    UserListStore.fetchUserList(db);
+    UserListStore.fetchUserList();
   }
   
   userFilterOnChange(event) {

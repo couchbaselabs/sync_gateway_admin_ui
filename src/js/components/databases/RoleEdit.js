@@ -38,9 +38,9 @@ class RoleEdit extends React.Component {
   }
   
   componentDidMount() {
-    const { db, roleId } = this.props.params;
+    const { roleId } = this.props.params;
     if (roleId)
-      RoleStore.fetchRole(db, roleId);
+      RoleStore.fetchRole(roleId);
     else {
       // For creating a new role:
       this.setState(state => {
@@ -50,12 +50,12 @@ class RoleEdit extends React.Component {
   }
   
   componentWillReceiveProps(nextProps) {
-    const { db, roleId } = this.props.params;
+    const { roleId } = this.props.params;
     if (roleId) {
-      const { db:newDb, roleId:newRoleId } = nextProps.params;
-      if (db !== newDb || roleId !== newRoleId) {
+      const { roleId:newRoleId } = nextProps.params;
+      if (roleId !== newRoleId) {
         RoleStore.cancelFetch();
-        RoleStore.fetchRole(newDb, newRoleId);
+        RoleStore.fetchRole(newRoleId);
       }  
     }
   }

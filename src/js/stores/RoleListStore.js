@@ -1,7 +1,7 @@
-import Store from './Store'
+import DatabaseStore from './DatabaseStore'
 import { fetchRoles } from '../api';
 
-class RoleListStore extends Store {
+class RoleListStore extends DatabaseStore {
   constructor() {
     super();
   }
@@ -17,9 +17,9 @@ class RoleListStore extends Store {
     };
   }
   
-  fetchRoleList(db) {
+  fetchRoleList() {
     this._setFetchStatus(true);
-    this.fetch = fetchRoles(db);
+    this.fetch = fetchRoles(this.db);
     this.fetch.p.then(result => {
       this._setRoles(result.data);
       this._setFetchStatus(false);

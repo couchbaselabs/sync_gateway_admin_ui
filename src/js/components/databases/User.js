@@ -19,15 +19,15 @@ class User extends React.Component {
   }
   
   componentDidMount() {
-    const { db, userId } = this.props.params;
-    UserStore.fetchUser(db, userId);
+    const { userId } = this.props.params;
+    UserStore.fetchUser(userId);
   }
   
   componentWillReceiveProps(nextProps) {
-    const { db, userId } = this.props.params;
-    const { db:nDb, userId:nUserId } = nextProps.params;
-    if (db !== nDb || userId !== nUserId)
-      UserStore.fetchUser(nDb, nUserId);
+    const { userId } = this.props.params;
+    const { userId:nUserId } = nextProps.params;
+    if (userId !== nUserId)
+      UserStore.fetchUser(nUserId);
   }
   
   componentWillUpdate(nextProps, nextState) {
