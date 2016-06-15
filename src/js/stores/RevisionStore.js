@@ -1,9 +1,10 @@
 import DatabaseStore from './DatabaseStore'
-import { fetchRevision } from '../api';
+import { fetchRevision as fetchRevisionApi } from '../api';
 
 class RevisionStore extends DatabaseStore {
   constructor() {
     super();
+    this.cache = { };
   }
   
   getInitialData() {
@@ -14,11 +15,22 @@ class RevisionStore extends DatabaseStore {
     };
   }
 
+  reset() {
+    super.reset();
+    this.cache = { };
+  }
+
   fetchRevision(docId, revId) {
+    const cached = this._getCachedRevision(docId, revId);
+    if (cached) {
+      this._setRevision(docId, revId, cached);
+      return;
+    }
+
     this._setFetchStatus(true, undefined);
-    this.fetch = fetchRevision(this.db, docId, revId);
+    this.fetch = fetchRevisionApi(this.db, docId, revId);
     this.fetch.promise.then(result => {
-      this._setRevision(result.data);
+      this._setRevision(docId, revId, result.data);
       this._setFetchStatus(false);
     })
     .catch(reason => {
@@ -40,10 +52,25 @@ class RevisionStore extends DatabaseStore {
     });
   }
 
-  _setRevision(rev) {
+  _setRevision(docId, revId, rev) {
     this.setData(data => {
       return Object.assign({ }, data, { rev });
     });
+    this._cacheRevision(docId, revId, rev);
+  }
+
+  _getCacheKey(docId, revId) {
+    return docId + '/' + revId;
+  }
+
+  _getCachedRevision(docId, revId) {
+    const key = this._getCacheKey(docId, revId);
+    return this.cache[key];
+  }
+
+  _cacheRevision(docId, revId, rev) {
+    const key = this._getCacheKey(docId, revId);
+    this.cache[key] = rev;
   }
 }
 

@@ -25,8 +25,9 @@ class Document extends React.Component {
   }
   
   componentWillReceiveProps(nextProps) {
-    const { docId } = nextProps.params;
-    DocumentStore.fetchDocument(docId);
+    const { docId, revId } = nextProps.params;
+    if (!revId)
+      DocumentStore.fetchDocument(docId);
   }
   
   componentWillUpdate(nextProps, nextState) {
