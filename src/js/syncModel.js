@@ -318,7 +318,7 @@ function SyncModel(db) {
     } else {
       seq = ch.seq
     }
-    
+
     ch.doc = doc
     totalChanges++;
     var sync = runSyncFunction(previewChannels, ch.id, ch.doc, seq)
@@ -457,7 +457,7 @@ var syncWrapper = function(newDoc, oldDoc, realUserCtx) {
 
 function compileSyncFunction(syncCode) {
   var codeString = "var syncFun = ("+ syncCode+")",
-    wrappedCode = syncWrapper.replace('"syncCodeStringHere"', codeString),
+    wrappedCode = syncWrapper.replace('"syncCodeStringHere"', function() { return codeString; }),
     evalString = "compiledFunction = ("+ wrappedCode+")",
     compiledFunction;
   eval(evalString);
