@@ -30,10 +30,6 @@ var EditableJSONDoc = React.createClass({
               loadSeq={this.props.loadSeq}
               codeText={this.props.docText} /> : <div/>;
     return <form className="EditableJSONDoc">
-      <div className="EditableJSONDocButtons">
-        <button onClick={this.props.saveDoc}>Save Doc</button>
-        <button onClick={this.props.revertDoc}>Revert Doc</button>
-      </div>
       {editor}
     </form>
   }
