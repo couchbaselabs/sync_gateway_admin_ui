@@ -3,7 +3,7 @@
   "dependencies": {
     "coax": "0.4.x",
     "underscore": "1.4.4",
-    "react": "^0.13.3"
+    "react": "^16.13.1"
   },
   "devDependencies": {
     "babelify": "^6.1.3",
